@@ -12,7 +12,7 @@
     "announce_to_chat": true,
     "bold": true,
     "color": "dark_red",
-    "description": "Attempted to flay own mind.",
+    "description": "Attempt to flay own mind.",
     "frame": "goal",
     "hidden": true,
     "icon": {

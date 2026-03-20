@@ -1,6 +1,9 @@
 package hauveli.hexagony.mixin.mindanchor;
 
+import at.petrak.hexcasting.api.casting.eval.CastResult;
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment;
+import at.petrak.hexcasting.api.casting.eval.env.StaffCastEnv;
+import at.petrak.hexcasting.api.casting.eval.vm.CastingImage;
 import at.petrak.hexcasting.api.casting.iota.*;
 
 import at.petrak.hexcasting.api.casting.mishaps.Mishap;
@@ -23,6 +26,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Objects;
 
 import static hauveli.hexagony.common.lib.AdvancementProvider.grantAdvancement;
 
@@ -56,6 +63,8 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
     ) {
         // We need to ensure that the stack was of form [PlayerEntity(self), Vec3, Brainsweep] at the end
         // The first check (ismob) could be removed, probably? but would need to make some changes
+        // Before anything else, also check if player is enlightened?
+        if (!castingEnvironment.isEnlightened()) return;
         if (!hexagony$expectedIsMob(expected)) return;
         if (!hexagony$perpetratorIsCaster(perpetrator, castingEnvironment)) return;
         if (!hexagony$spellIsBrainsweep(errorCtx, castingEnvironment)) return;
@@ -64,6 +73,7 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
         // Massively helpful reference for obtaining stack with CastingEnvironment
         var block = hexagony$blockFromCastingEnv(castingEnvironment);
         // TODO: can remove serverPlayer probably?
+        castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("Example text2"));
         if (!hexagony$blockIsValidGraftTarget(block)) return;
         castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("Example text2"));
         if (castingEnvironment.getCastingEntity() instanceof ServerPlayer serverPlayer) {
@@ -93,7 +103,9 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
 
     @Unique
     private boolean hexagony$blockIsValidGraftTarget(BlockState block) {
+        //Vec3 vec = block
         if (block.hasBlockEntity()) return true;
+        //if (!castingEnvironment.isVecInAmbit(vec)) return;
     /*
     if (block.hasBlockEntity() &&
             block. instanceof BlockMindAnchor )
@@ -109,9 +121,35 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
         ServerPlayer serverPlayer = (ServerPlayer) castingEnvironment.getCastingEntity();
         var image = IXplatAbstractions.INSTANCE.getStaffcastVM(serverPlayer, castingEnvironment.getCastingHand()).getImage();
         var stack = image.getStack();
+        // Was it called funky-like?
+        if (stack.get(0).subIotas() != null) {
+            // ok so it was called funky-like.
+            // remove the last entry, then execute stack, then get blockPosIota
+
+            CastingImage castingImg = IXplatAbstractions.INSTANCE.getStaffcastVM(serverPlayer, castingEnvironment.getCastingHand()).getImage();
+
+
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.toString() ));
+
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.withUsedOp().getStack().get(0).toString() ));
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.serializeToNbt().toString() ));
+
+            for (Iota iota : stack.get(0).subIotas()) {
+                serverPlayer.sendSystemMessage(Component.nullToEmpty(iota.toString()));
+            }
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.withOverriddenUsedOps(1).getStack().toString() ));
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.withResetEscape().getStack().toString() ));
+
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.toString() ));
+
+        }
+
+        // TODO: stack length can be bad at this step. mainly if called from list
+        // TODO: VERY IMPORTANT TO FIX THIS
         var blockPosIota = stack.get(1);
         Vec3Iota vecIota = (Vec3Iota) blockPosIota;
-        BlockPos blockPos = BlockPos.containing(vecIota.getVec3());
+        Vec3 vec = vecIota.getVec3();
+        BlockPos blockPos = BlockPos.containing(vec);
         BlockState block = serverPlayer.level().getBlockState(blockPos);
         return block; // This will always succeed I think...
     }

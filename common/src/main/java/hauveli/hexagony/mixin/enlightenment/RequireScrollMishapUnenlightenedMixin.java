@@ -65,6 +65,8 @@ public class RequireScrollMishapUnenlightenedMixin {
                 throw new MishapInvalidPattern(errorCtx.getPattern());
             }
         } catch (Mishap mishap) {
+            // TODO: push garbage onto stack
+            // TODO: play bad sound
             Mishap.Context fakeContext = new Mishap.Context(errorCtx.getPattern(), null);
             caster.sendSystemMessage(mishap.errorMessageWithName(env, fakeContext));
         }
