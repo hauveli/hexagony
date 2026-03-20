@@ -6,7 +6,9 @@
   "client": [
   ],
   "mixins": [
-    "MixinDatagenMain"
+    "MixinDatagenMain",
+    "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",
+    "overcast.RemovePenaltyAtHeadStopSleepInBedMixin"
   ],
   "plugin": "hauveli.hexagony.mixin.HexagonyMixinConfigPlugin",
   "injectors": {
