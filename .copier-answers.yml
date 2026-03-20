@@ -1,0 +1,21 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+# https://copier.readthedocs.io/en/stable/updating/#never-change-the-answers-file-manually
+_commit: v2.2.4
+_src_path: gh:FallingColors/hexdummy
+advanced: true
+capitalize_platforms: false
+classname: Hexagony
+default_branch: main
+description: Hexagony addon for Hex Casting
+display_name: Hexagony
+github_repo: hexagony
+github_user: hauveli
+homepage_url: https://hauveli.github.io/hexagony
+java_package: hauveli.hexagony
+kotlin_package: hauveli.hexagony
+mappings_name: Mojmap
+minecraft_version_in_mod_version: true
+mit_license: true
+mod_version: 0.1.0
+modid: hexagony
+sources_url: https://github.com/hauveli/hexagony

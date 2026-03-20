@@ -1,0 +1,46 @@
+modLoader = "kotlinforforge"
+loaderVersion = "[${versions.kotlin_forge},)"
+license = "MIT"
+
+[[mods]]
+modId = "hexagony"
+version = "${version}"
+displayName = "Hexagony"
+logoFile = "assets/hexagony/icon.png"
+authors = "hauveli"
+description = "Hexagony addon for Hex Casting"
+
+[[dependencies.hexagony]]
+modId = "forge"
+mandatory = true
+versionRange = "[${versions.forge_dependency},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.hexagony]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${versions.minecraft},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.hexagony]]
+modId = "architectury"
+mandatory = true
+versionRange = "[${versions.architectury},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.hexagony]]
+modId = "cloth_config"
+mandatory = true
+versionRange = "[${versions.cloth_config},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.hexagony]]
+modId = "hexcasting"
+mandatory = true
+versionRange = "[${versions.hexcasting},)"
+ordering = "NONE"
+side = "BOTH"

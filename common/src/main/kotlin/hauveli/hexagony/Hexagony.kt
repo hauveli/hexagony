@@ -1,0 +1,30 @@
+package hauveli.hexagony
+
+import net.minecraft.resources.ResourceLocation
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import hauveli.hexagony.config.HexagonyServerConfig
+import hauveli.hexagony.networking.HexagonyNetworking
+import hauveli.hexagony.registry.HexagonyActions
+
+object Hexagony {
+    const val MODID = "hexagony"
+
+    @JvmField
+    val LOGGER: Logger = LogManager.getLogger(MODID)
+
+    @JvmStatic
+    fun id(path: String) = ResourceLocation(MODID, path)
+
+    fun init() {
+        HexagonyServerConfig.init()
+        initRegistries(
+            HexagonyActions,
+        )
+        HexagonyNetworking.init()
+    }
+
+    fun initServer() {
+        HexagonyServerConfig.initServer()
+    }
+}

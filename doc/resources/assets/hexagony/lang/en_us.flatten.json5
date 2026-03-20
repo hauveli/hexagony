@@ -1,0 +1,8 @@
+{
+  hexdoc: {
+    hexagony: {
+      title: "Hexagony Book",
+      description: "Hexagony addon for Hex Casting",
+    },
+  }
+}

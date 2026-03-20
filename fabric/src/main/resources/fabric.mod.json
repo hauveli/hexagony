@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "hexagony",
+  "version": "${version}",
+  "name": "Hexagony",
+  "description": "Hexagony addon for Hex Casting",
+  "authors": [
+    "hauveli"
+  ],
+  "contact": {
+    "homepage": "https://hauveli.github.io/hexagony",
+    "sources": "https://github.com/hauveli/hexagony"
+  },
+  "license": "MIT",
+  "icon": "assets/hexagony/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [{
+      "adapter": "kotlin",
+      "value": "hauveli.hexagony.fabric.FabricHexagony"
+    }],
+    "client": [{
+      "adapter": "kotlin",
+      "value": "hauveli.hexagony.fabric.FabricHexagonyClient"
+    }],
+    "server": [{
+      "adapter": "kotlin",
+      "value": "hauveli.hexagony.fabric.FabricHexagonyServer"
+    }],
+    "fabric-datagen": [{
+      "adapter": "kotlin",
+      "value": "hauveli.hexagony.fabric.datagen.FabricHexagonyDatagen"
+    }],
+    "modmenu": [{
+      "adapter": "kotlin",
+      "value": "hauveli.hexagony.fabric.FabricHexagonyModMenu"
+    }]
+  },
+  "mixins": [
+    "hexagony-common.mixins.json",
+    "hexagony-fabric.mixins.json"
+  ],
+  "depends": {
+    "minecraft": "${versions.minecraft}",
+    "fabricloader": ">=${versions.fabric_loader}",
+    "fabric-api": ">=${versions.fabric_api}",
+    "fabric-language-kotlin": ">=${versions.kotlin_fabric}",
+    "architectury": ">=${versions.architectury}",
+    "hexcasting": ">=${versions.hexcasting}",
+    "cloth-config": ">=${versions.clothConfig}"
+  },
+  "suggests": {
+    "modmenu": ">=${versions.modMenu}"
+  }
+}
