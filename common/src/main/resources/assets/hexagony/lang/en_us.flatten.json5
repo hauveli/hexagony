@@ -61,6 +61,26 @@
             "": "Dummy Server Config Option",
             "@Tooltip": "This is an example of a server-side config option that accepts an integer.",
           },
+          recoveryPerRest: {
+            "": "Modifiers removed per rest",
+            "@Tooltip": "Integer value for how many penalties to remove each time a player passes the night in bed.",
+          },
+          maximumHealthPenaltyMultiplier: {
+            "": "Overcast Maximum Healthy Penalty Multiplier",
+            "@Tooltip": "Each modifier subtracts this value from maximum health.",
+          },
+          overcastDamagePenaltyMultiplier: {
+            "": "Overcast Penalty Multiplier",
+            "@Tooltip": "Multiplies damage taken from overcasting.",
+          },
+          overcastDamagePenaltyAdditionalDamage: {
+            "": "Additional Overcast Penalty Damage",
+            "@Tooltip": "Adds flat damage to the total damage taken from overcasting, accepts real numbers.",
+          },
+          overcastAttributeName: {
+            "": "Penalty Modifier Attribute Name",
+            "@Tooltip": "Do not change unless you know what you are doing. Added for compatibility reasons.",
+          }
         },
       },
     },

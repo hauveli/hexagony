@@ -23,6 +23,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static hauveli.hexagony.common.lib.AdvancementProvider.grantAdvancement;
+
 // import static hauveli.hexagony.common.lib.AdvancementProvider.grantAdvancement;
 
 /*
@@ -53,7 +55,9 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
     ) {
         // We need to ensure that the stack was of form [PlayerEntity(self), Vec3, Brainsweep] at the end
         // The first check (ismob) could be removed, probably? but would need to make some changes
+        castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("Entered"));
         if (!hexagony$expectedIsMob(expected)) return;
+        castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("Example text"));
         if (!hexagony$perpetratorIsCaster(perpetrator, castingEnvironment)) return;
         if (!hexagony$spellIsBrainsweep(errorCtx, castingEnvironment)) return;
 
@@ -71,11 +75,11 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
                     if (serverPlayer.getHealth() > 0) {
                         cir.setReturnValue(Component.literal("Your mind resists the spell..."));
                         castingEnvironment.getMishapEnvironment().blind(1000);
-                        //grantAdvancement(serverPlayer, "graft_attempted");
+                        grantAdvancement(serverPlayer, "graft_attempted");
                     } else {
                         cir.setReturnValue(Component.literal("Your mind is torn"));
-                        //grantAdvancement(serverPlayer, "graft_attempted"); // Just in case they haven't succeeded already...?
-                        //grantAdvancement(serverPlayer, "graft_succeeded");
+                        grantAdvancement(serverPlayer, "graft_attempted"); // Just in case they haven't succeeded already...?
+                        grantAdvancement(serverPlayer, "graft_succeeded");
                         // TODO: visuals
                         // castingEnvironment.getMishapEnvironment().dropHeldItems();
                         //SendPacket.toPlayer(serverPlayer, SendPacket.FREEZE_PACKET);
@@ -89,7 +93,7 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
 
     @Unique
     private boolean hexagony$blockIsValidGraftTarget(BlockState block) {
-        if (block.hasBlockEntity()) return false;
+        if (block.hasBlockEntity()) return true;
     /*
     if (block.hasBlockEntity() &&
             block. instanceof BlockMindAnchor )

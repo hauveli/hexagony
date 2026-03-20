@@ -1,0 +1,25 @@
+{
+  "parent": "hexcasting:root",
+  "criteria": {
+    "graft_attempted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  },
+  "display": {
+    "announce_to_chat": true,
+    "bold": true,
+    "color": "dark_red",
+    "description": "Attempted to flay own mind.",
+    "frame": "goal",
+    "hidden": true,
+    "icon": {
+      "item": "minecraft:heart_of_the_sea",
+	  "nbt": "{CustomModelData:123456}"
+    },
+    "show_toast": true,
+    "title": "Where? Where..."
+  }
+}

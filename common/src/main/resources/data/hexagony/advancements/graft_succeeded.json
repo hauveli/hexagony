@@ -1,0 +1,25 @@
+{
+  "parent": "hexagony:graft_attempted",
+  "criteria": {
+    "graft_succeeded": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  },
+  "display": {
+    "announce_to_chat": false,
+    "bold": true,
+    "color": "dark_purple",
+    "description": "Grafted own mind onto an anchor.",
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "item": "minecraft:heart_of_the_sea",
+      "nbt": "{CustomModelData:123456}"
+    },
+    "show_toast": true,
+    "title": "Trepidation, trepanned"
+  }
+}
