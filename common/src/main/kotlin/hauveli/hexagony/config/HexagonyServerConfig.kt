@@ -67,5 +67,24 @@ object HexagonyServerConfig {
             dummyServerConfigOption = buf.readInt()
             return this
         }
+
+        @Tooltip
+        var recoveryPerRest: Double = 1.0
+            private set
+        @Tooltip
+        var maximumHealthPenaltyMultiplier: Double = 1.0
+            private set
+        @Tooltip
+        var overcastDamagePenaltyMultiplier: Double = 1.0
+            private set
+        @Tooltip
+        var overcastDamagePenaltyAdditionalDamage: Double = 1.0
+            private set
+        @Tooltip
+        var overcastAttributeName: String = "hexagony_overcast_penalty"
+            private set
+        @Tooltip
+        var requireScrollForEnlightenment: Boolean = true
+            private set
     }
 }
