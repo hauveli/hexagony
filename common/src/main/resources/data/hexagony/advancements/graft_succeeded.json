@@ -17,7 +17,7 @@
     "hidden": true,
     "icon": {
       "item": "minecraft:heart_of_the_sea",
-      "nbt": "{CustomModelData:123456}"
+      "nbt": "{CustomModelData:270441}"
     },
     "show_toast": true,
     "title": "Trepidation, trepanned"

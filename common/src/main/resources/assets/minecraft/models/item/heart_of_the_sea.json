@@ -3,11 +3,11 @@
   "textures": { "layer0": "minecraft:item/stick" },
   "overrides": [
     {
-      "predicate": { "custom_model_data": 123456 },
+      "predicate": { "custom_model_data": 270439 },
       "model": "hexagony:item/advancement_graft_attempted"
     },
     {
-      "predicate": { "custom_model_data": 1234567 },
+      "predicate": { "custom_model_data": 270441 },
       "model": "hexagony:item/advancement_graft_succeeded"
     }
   ]

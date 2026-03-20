@@ -59,9 +59,7 @@ public class RequireScrollMishapUnenlightenedMixin {
         try {
             if (caster instanceof ServerPlayer player) {
                 // todo: make level() calls be safe? idk...
-                if (hexagony$hasRequiredScrolls(player, errorCtx)) {
-                    return; // continue with enlightenment as usual
-                }
+                if (hexagony$hasRequiredScrolls(player, errorCtx)) return;
                 // if we don't have what we need, cancel the enlightenment
                 ci.cancel();
                 throw new MishapInvalidPattern(errorCtx.getPattern());

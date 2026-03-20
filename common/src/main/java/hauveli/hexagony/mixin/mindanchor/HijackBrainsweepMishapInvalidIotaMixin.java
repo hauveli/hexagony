@@ -13,6 +13,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
 
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
@@ -55,9 +56,7 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
     ) {
         // We need to ensure that the stack was of form [PlayerEntity(self), Vec3, Brainsweep] at the end
         // The first check (ismob) could be removed, probably? but would need to make some changes
-        castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("Entered"));
         if (!hexagony$expectedIsMob(expected)) return;
-        castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("Example text"));
         if (!hexagony$perpetratorIsCaster(perpetrator, castingEnvironment)) return;
         if (!hexagony$spellIsBrainsweep(errorCtx, castingEnvironment)) return;
 
@@ -65,28 +64,29 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
         // Massively helpful reference for obtaining stack with CastingEnvironment
         var block = hexagony$blockFromCastingEnv(castingEnvironment);
         // TODO: can remove serverPlayer probably?
-        if (hexagony$blockIsValidGraftTarget(block)) {
-            if (castingEnvironment.getCastingEntity() instanceof ServerPlayer serverPlayer) {
-                // TODO: get media cost from somewhere? 1000000 is the correct cost, at least...?
-                // TODO: ensure that the target is a valid block that we want to target...
-                long remainingToCast = castingEnvironment.extractMedia(1000000, false);
-                serverPlayer.sendSystemMessage(Component.empty().append(String.valueOf(remainingToCast)));
-                if (remainingToCast == 0) {
-                    if (serverPlayer.getHealth() > 0) {
-                        cir.setReturnValue(Component.literal("Your mind resists the spell..."));
-                        castingEnvironment.getMishapEnvironment().blind(1000);
-                        grantAdvancement(serverPlayer, "graft_attempted");
-                    } else {
-                        cir.setReturnValue(Component.literal("Your mind is torn"));
-                        grantAdvancement(serverPlayer, "graft_attempted"); // Just in case they haven't succeeded already...?
-                        grantAdvancement(serverPlayer, "graft_succeeded");
-                        // TODO: visuals
-                        // castingEnvironment.getMishapEnvironment().dropHeldItems();
-                        //SendPacket.toPlayer(serverPlayer, SendPacket.FREEZE_PACKET);
-                    }
-                    cir.cancel();
+        if (!hexagony$blockIsValidGraftTarget(block)) return;
+        castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("Example text2"));
+        if (castingEnvironment.getCastingEntity() instanceof ServerPlayer serverPlayer) {
+            castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("Example text3"));
+            // TODO: get media cost from somewhere? 1000000 is the correct cost, at least...?
+            // TODO: ensure that the target is a valid block that we want to target...
+            long remainingToCast = castingEnvironment.extractMedia(1000000, false);
+            serverPlayer.sendSystemMessage(Component.empty().append(String.valueOf(remainingToCast)));
+            if (remainingToCast == 0) {
+                if (serverPlayer.getHealth() > 0) {
+                    cir.setReturnValue(Component.literal("Your mind resists the spell..."));
+                    castingEnvironment.getMishapEnvironment().blind(1000);
+                    grantAdvancement(serverPlayer, "graft_attempted");
+                } else {
+                    cir.setReturnValue(Component.literal("Your mind is torn"));
+                    grantAdvancement(serverPlayer, "graft_attempted"); // Just in case they haven't succeeded already...?
+                    grantAdvancement(serverPlayer, "graft_succeeded");
+                    // TODO: visuals
+                    // castingEnvironment.getMishapEnvironment().dropHeldItems();
+                    //SendPacket.toPlayer(serverPlayer, SendPacket.FREEZE_PACKET);
                 }
-            } return;
+                cir.cancel();
+            }
         }
         // I don't think we can ever end up here without going into the if statement with ServerPlayer...
     }
@@ -120,7 +120,7 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
     private boolean hexagony$spellIsBrainsweep(Mishap.Context errorCtx, CastingEnvironment castingEnvironment) {
         if (errorCtx.getName() == null) return false;
         if (errorCtx.getName().getContents() instanceof TranslatableContents translatableErrorContext) {
-            return !translatableErrorContext.getKey().equals("hexcasting.action.hexcasting:brainsweep");
+            return translatableErrorContext.getKey().equals("hexcasting.action.hexcasting:brainsweep");
         }
         return false;
     }
