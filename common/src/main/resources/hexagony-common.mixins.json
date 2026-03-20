@@ -7,6 +7,9 @@
   ],
   "mixins": [
     "MixinDatagenMain",
+    "mindanchor.HijackBrainsweepMishapInvalidIotaMixin",
+    "mindanchor.InterfaceIotaGetPayloadMixin",
+    "mindanchor.MindAnchorIndestructibleAtItemEntityHurtMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",
     "overcast.RemovePenaltyAtHeadStopSleepInBedMixin"
   ],
