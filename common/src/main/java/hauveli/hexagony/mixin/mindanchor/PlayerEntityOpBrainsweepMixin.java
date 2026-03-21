@@ -119,7 +119,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
 
             if (!isTargetingSelf(sacrifice, castingEnvironment)) return;
             // Todo: error message on fail *because* already grafted?
-            if (isGrafted(serverPlayer)) return;
+            if (isGrafted(serverPlayer)) return; // maybe I should allow it? but display a message like for villagers...
             /*
             if (IXplatAbstractions.Companion.getINSTANCE().isBrainswept(serverPlayer)) {
                 serverPlayer.sendSystemMessage(Component.nullToEmpty( "Player already brainswept" ));
@@ -136,11 +136,9 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             // Should I simulate after all?
             long remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, true);
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(remainingToCast)));
-            if (remainingToCast > 0) {
-                sacrifice.hurt(
-                        sacrifice.damageSources().generic(),
-                        MIND_GRAFT_DAMAGE);
-                return;
+
+            if (remainingToCast == 0) {
+                grantAdvancement(serverPlayer, "graft_attempted");
             }
             // remove stack entirely?
             // Hmm... this seems anti-Hexcasting though...
@@ -150,10 +148,12 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             cir.setReturnValue(fakeResult);
 
             // todo: make this cleaner
-            remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST - FAKE_CAST_COST, false);
+            remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, false);
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(remainingToCast)));
-            grantAdvancement(serverPlayer, "graft_attempted");
+            // Do we for real need time inbetween these two events? hmm...
             if (serverPlayer.getHealth() > 0) {
+                serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(serverPlayer.getHealth())));
+                serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(serverPlayer.getMaxHealth())));
                 serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Too much health!")));
                 cir.cancel();
                 return;
@@ -211,7 +211,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
     }
 
     static private void mindAnchorLivingEntity(LivingEntity entity) {
-        IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(entity, true);
+        // IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(entity, true);
         entity.sendSystemMessage(Component.nullToEmpty("Helo!!!!! Mind broken!!!"));
     }
 
