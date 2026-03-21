@@ -78,7 +78,7 @@ object HexagonyServerConfig {
         var overcastDamagePenaltyMultiplier: Double = 1.0
             private set
         @Tooltip
-        var overcastDamagePenaltyAdditionalDamage: Double = 1.0
+        var overcastDamagePenaltyAdditionalDamage: Double = 0.0
             private set
         @Tooltip
         var overcastAttributeName: String = "hexagony_overcast_penalty"

@@ -80,6 +80,10 @@
           overcastAttributeName: {
             "": "Penalty Modifier Attribute Name",
             "@Tooltip": "Do not change unless you know what you are doing. Added for compatibility reasons.",
+          },
+          requireScrollForEnlightenment: {
+            "": "Require Scroll For Enlightenment",
+            "@Tooltip": "On means players are unable to begin enlightenment without holding a corresponding scroll.",
           }
         },
       },

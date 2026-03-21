@@ -2,6 +2,7 @@ package hauveli.hexagony.mixin.mindanchor;
 
 import at.petrak.hexcasting.api.casting.ParticleSpray;
 import at.petrak.hexcasting.api.casting.RenderedSpell;
+import at.petrak.hexcasting.api.casting.castables.Action;
 import at.petrak.hexcasting.api.casting.castables.SpellAction;
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment;
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage;
@@ -12,21 +13,31 @@ import at.petrak.hexcasting.api.casting.iota.Vec3Iota;
 import at.petrak.hexcasting.api.casting.mishaps.*;
 import at.petrak.hexcasting.api.mod.HexTags;
 import at.petrak.hexcasting.api.pigment.FrozenPigment;
+import at.petrak.hexcasting.common.casting.actions.spells.*;
+import at.petrak.hexcasting.common.casting.actions.spells.great.OpLightning;
+import at.petrak.hexcasting.common.casting.actions.stack.OpMask;
+import at.petrak.hexcasting.common.casting.actions.spells.OpErase;
 import at.petrak.hexcasting.common.casting.actions.spells.great.OpBrainsweep;
+import at.petrak.hexcasting.common.casting.actions.stack.OpMask;
+import at.petrak.hexcasting.common.lib.HexDamageTypes;
 import at.petrak.hexcasting.common.recipe.BrainsweepRecipe;
 import at.petrak.hexcasting.common.recipe.HexRecipeStuffRegistry;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
 import com.llamalad7.mixinextras.sugar.Local;
+import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.xplat.IXplatAbstractions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -37,6 +48,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.apache.logging.log4j.core.jmx.Server;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -73,7 +85,9 @@ import static org.spongepowered.asm.mixin.injection.selectors.ElementNode.listOf
 @Mixin(value = OpBrainsweep.class, remap = false)
 public abstract class PlayerEntityOpBrainsweepMixin {
 
+    private static int FAKE_CAST_COST = 150_000; // cost of the spell that gets rid of the extra junk and adds flair
     private static int MIND_GRAFT_COST = 1_000_000;
+    private static int MIND_GRAFT_DAMAGE = 10; // base damage it deals to self if no overcast
 
     @Shadow @Final private static int argc;
 
@@ -85,7 +99,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
     private void onExecute(
             List <Iota> args,
             CastingEnvironment castingEnvironment,
-            CallbackInfoReturnable<Component> cir
+            CallbackInfoReturnable<SpellAction.Result> cir
     ) {
 
         // Can check ServerPlayer another way which won't error?
@@ -97,41 +111,65 @@ public abstract class PlayerEntityOpBrainsweepMixin {
 
             // Ensure Ambit stuff
             castingEnvironment.assertVecInRange(vecPos);
-            castingEnvironment.assertEntityInRange(sacrifice);
+            castingEnvironment.assertEntityInRange(sacrifice); // You never know
 
             if (!castingEnvironment.canEditBlockAt(pos)) {
                 throw new MishapBadLocation(vecPos, "forbidden");
             }
 
+            if (!isTargetingSelf(sacrifice, castingEnvironment)) return;
+            // Todo: error message on fail *because* already grafted?
+            if (isGrafted(serverPlayer)) return;
+            /*
             if (IXplatAbstractions.Companion.getINSTANCE().isBrainswept(serverPlayer)) {
                 serverPlayer.sendSystemMessage(Component.nullToEmpty( "Player already brainswept" ));
+                // Why on earth am I not just checking advancements?
                 IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(sacrifice, false);
                 return;
             }
+            */
 
             BlockState state = castingEnvironment.getWorld().getBlockState(pos);
             // well, No more brainsweep recipe use!
             // TODO: verify that BlockState is correct block << HERE
 
             // Should I simulate after all?
-            long remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, false);
+            long remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, true);
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(remainingToCast)));
-            if (remainingToCast > 0) return;
-            grantAdvancement(serverPlayer, "graft_attempted");
-            if (serverPlayer.getHealth() > 0) {
-                cir.setReturnValue(Component.literal("Your mind resists the spell..."));
+            if (remainingToCast > 0) {
+                sacrifice.hurt(
+                        sacrifice.damageSources().generic(),
+                        MIND_GRAFT_DAMAGE);
                 return;
             }
+            // remove stack entirely?
+            // Hmm... this seems anti-Hexcasting though...
+            clearEntireStack(castingEnvironment);
+
+            SpellAction.Result fakeResult = OpLightning.INSTANCE.execute(List.of(new Vec3Iota(vecPos)), castingEnvironment);
+            cir.setReturnValue(fakeResult);
+
+            // todo: make this cleaner
+            remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST - FAKE_CAST_COST, false);
+            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(remainingToCast)));
+            grantAdvancement(serverPlayer, "graft_attempted");
+            if (serverPlayer.getHealth() > 0) {
+                serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Too much health!")));
+                cir.cancel();
+                return;
+            }
+            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Success! Grafted!!")));
             grantAdvancement(serverPlayer, "graft_succeeded");
+            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Theatrics next!")));
             theatrics(castingEnvironment, sacrifice, pos);
+            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Now mind anchoring!")));
             mindAnchorLivingEntity(sacrifice);
-            cir.setReturnValue(Component.literal("Your mind is torn"));
 
             if (state.hasBlockEntity()) {
                 serverPlayer.sendSystemMessage(Component.nullToEmpty( "Block has block entity!" ));
             }
 
-            serverPlayer.sendSystemMessage(Component.nullToEmpty( "Block has block entity!" ));
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( "Block has NO block entity!" ));
 
             serverPlayer.sendSystemMessage(Component.nullToEmpty( "Spell casted?" ));
             serverPlayer.sendSystemMessage(Component.nullToEmpty( String.valueOf (remainingToCast) ));
@@ -144,6 +182,32 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             cir.cancel();
             // I don't think we can ever end up here without going into the if statement with ServerPlayer...
         }
+    }
+
+
+    static private void clearEntireStack(CastingEnvironment castingEnvironment) {
+        List<Iota> stack = at.petrak.hexcasting.xplat.IXplatAbstractions.INSTANCE
+                .getStaffcastVM(
+                        (ServerPlayer) castingEnvironment.getCastingEntity(),
+                        castingEnvironment.getCastingHand()
+                ).getImage().getStack();
+        // remove stack entirely
+        while(!stack.isEmpty()) {
+            stack.remove(0);
+        }
+    }
+
+    public boolean isTargetingSelf(LivingEntity sacrifice, CastingEnvironment castingEnvironment) {
+        return sacrifice.equals(castingEnvironment.getCastingEntity());
+    }
+
+    public boolean isGrafted(ServerPlayer serverPlayer) {
+        var adv = serverPlayer.getServer().getAdvancements().getAdvancement(
+                new ResourceLocation(Hexagony.MODID, "graft_succeeded"));
+        if (adv == null)
+            return false;
+
+        return serverPlayer.getAdvancements().getOrStartProgress(adv).isDone();
     }
 
     static private void mindAnchorLivingEntity(LivingEntity entity) {
@@ -186,4 +250,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                 0.8f
         );
     }
+
+
+
 }
