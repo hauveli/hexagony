@@ -118,10 +118,14 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(remainingToCast)));
             if (remainingToCast > 0) return;
             grantAdvancement(serverPlayer, "graft_attempted");
-            if (serverPlayer.getHealth() > 0) return;
+            if (serverPlayer.getHealth() > 0) {
+                cir.setReturnValue(Component.literal("Your mind resists the spell..."));
+                return;
+            }
             grantAdvancement(serverPlayer, "graft_succeeded");
             theatrics(castingEnvironment, sacrifice, pos);
             mindAnchorLivingEntity(sacrifice);
+            cir.setReturnValue(Component.literal("Your mind is torn"));
 
             if (state.hasBlockEntity()) {
                 serverPlayer.sendSystemMessage(Component.nullToEmpty( "Block has block entity!" ));
@@ -134,6 +138,9 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             // serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.toString() ));
             // TODO:
             // ESCAPE!!!!!
+            // Result.getCost()
+            // is there a reason not to just return?
+            // If we are already dead anyway...
             cir.cancel();
             // I don't think we can ever end up here without going into the if statement with ServerPlayer...
         }

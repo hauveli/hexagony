@@ -9,7 +9,7 @@ import at.petrak.hexcasting.api.mod.HexConfig
 import at.petrak.hexcasting.common.entities.EntityWallScroll
 import at.petrak.hexcasting.common.lib.HexBlocks
 import at.petrak.hexcasting.common.lib.HexItems
-import at.petrak.hexcasting.fabric.cc.*
+// import at.petrak.hexcasting.fabric.cc.*
 import at.petrak.hexcasting.fabric.cc.adimpl.*
 import dev.onyxstudios.cca.api.v3.component.ComponentFactory
 import dev.onyxstudios.cca.api.v3.component.ComponentKey

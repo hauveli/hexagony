@@ -106,11 +106,9 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
             serverPlayer.sendSystemMessage(Component.empty().append(String.valueOf(remainingToCast)));
             if (remainingToCast == 0) {
                 if (serverPlayer.getHealth() > 0) {
-                    cir.setReturnValue(Component.literal("Your mind resists the spell..."));
                     castingEnvironment.getMishapEnvironment().blind(1000);
                     grantAdvancement(serverPlayer, "graft_attempted");
                 } else {
-                    cir.setReturnValue(Component.literal("Your mind is torn"));
                     grantAdvancement(serverPlayer, "graft_attempted"); // Just in case they haven't succeeded already...?
                     grantAdvancement(serverPlayer, "graft_succeeded");
                     // TODO: visuals

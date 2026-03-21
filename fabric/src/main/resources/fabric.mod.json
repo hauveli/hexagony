@@ -59,6 +59,7 @@
   "custom": {
     "cardinal-components": [
       "hexagony:brainswept",
+      "hexcasting:brainswept",
       "hexagony:iota_holder",
       "hexagony:media_holder"
     ]

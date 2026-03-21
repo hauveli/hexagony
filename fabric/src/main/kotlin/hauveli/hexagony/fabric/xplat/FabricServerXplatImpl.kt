@@ -1,12 +1,12 @@
 package hauveli.hexagony.fabric.xplat
 
 
-import at.petrak.hexcasting.fabric.cc.CCBrainswept
+//import at.petrak.hexcasting.fabric.cc.CCBrainswept
 import at.petrak.hexcasting.fabric.interop.trinkets.TrinketsApiInterop
 import at.petrak.hexcasting.interop.HexInterop
 import at.petrak.hexcasting.xplat.Platform
 
-
+import hauveli.hexagony.fabric.xplat.cc.CCBrainswept
 import hauveli.hexagony.fabric.xplat.cc.HexagonyCardinalComponents.Companion.BRAINSWEPT;
 import hauveli.hexagony.fabric.xplat.cc.HexagonyCardinalComponents
 import hauveli.hexagony.xplat.IXplatAbstractions
@@ -48,13 +48,13 @@ class FabricServerXplatImpl() : IXplatAbstractions {
 
     override fun setBrainsweepAddlData(livingEntity: LivingEntity?, state: Boolean) {
         val cc: CCBrainswept? = BRAINSWEPT.get(livingEntity)
-        cc?.setBrainswept(state)
+        cc?.brainswept = state
         // CC API does the syncing for us
     }
 
     override fun isBrainswept(livingEntity: LivingEntity?): Boolean {
         val cc: CCBrainswept? = BRAINSWEPT.get(livingEntity)
-        return cc?.isBrainswept() ?: false
+        return cc?.brainswept ?: false
     }
 
     override fun isBreakingAllowed(world: ServerLevel?,
