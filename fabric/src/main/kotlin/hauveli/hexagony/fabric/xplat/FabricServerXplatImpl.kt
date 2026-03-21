@@ -46,9 +46,9 @@ class FabricServerXplatImpl() : IXplatAbstractions {
         }
     }
 
-    override fun setBrainsweepAddlData(livingEntity: LivingEntity?) {
+    override fun setBrainsweepAddlData(livingEntity: LivingEntity?, state: Boolean) {
         val cc: CCBrainswept? = BRAINSWEPT.get(livingEntity)
-        cc?.setBrainswept(true)
+        cc?.setBrainswept(state)
         // CC API does the syncing for us
     }
 

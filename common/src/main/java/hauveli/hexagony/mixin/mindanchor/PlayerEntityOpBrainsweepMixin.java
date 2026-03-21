@@ -11,6 +11,7 @@ import at.petrak.hexcasting.api.casting.iota.ListIota;
 import at.petrak.hexcasting.api.casting.iota.Vec3Iota;
 import at.petrak.hexcasting.api.casting.mishaps.*;
 import at.petrak.hexcasting.api.mod.HexTags;
+import at.petrak.hexcasting.api.pigment.FrozenPigment;
 import at.petrak.hexcasting.common.casting.actions.spells.great.OpBrainsweep;
 import at.petrak.hexcasting.common.recipe.BrainsweepRecipe;
 import at.petrak.hexcasting.common.recipe.HexRecipeStuffRegistry;
@@ -18,6 +19,7 @@ import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
 import com.llamalad7.mixinextras.sugar.Local;
 import hauveli.hexagony.xplat.IXplatAbstractions;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,6 +34,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -70,6 +73,8 @@ import static org.spongepowered.asm.mixin.injection.selectors.ElementNode.listOf
 @Mixin(value = OpBrainsweep.class, remap = false)
 public abstract class PlayerEntityOpBrainsweepMixin {
 
+    private static int MIND_GRAFT_COST = 1_000_000;
+
     @Shadow @Final private static int argc;
 
     @Inject(
@@ -85,12 +90,12 @@ public abstract class PlayerEntityOpBrainsweepMixin {
 
         // Can check ServerPlayer another way which won't error?
         LivingEntity sacrifice = OperatorUtils.getLivingEntityButNotArmorStand(args, 0, argc);
-        if (sacrifice instanceof Mob) {
-            return; // Go back to the usual brainsweep
-        } else if (sacrifice instanceof ServerPlayer serverPlayer) {
+        if (sacrifice instanceof Mob) return;
+        if (sacrifice instanceof ServerPlayer serverPlayer) {
             Vec3 vecPos = OperatorUtils.getVec3(args, 1, argc);
             BlockPos pos = BlockPos.containing(vecPos);
 
+            // Ensure Ambit stuff
             castingEnvironment.assertVecInRange(vecPos);
             castingEnvironment.assertEntityInRange(sacrifice);
 
@@ -100,37 +105,32 @@ public abstract class PlayerEntityOpBrainsweepMixin {
 
             if (IXplatAbstractions.Companion.getINSTANCE().isBrainswept(serverPlayer)) {
                 serverPlayer.sendSystemMessage(Component.nullToEmpty( "Player already brainswept" ));
-                //
-                //throw new MishapAlreadyBrainswept(sacrifice);
+                IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(sacrifice, false);
                 return;
             }
-            serverPlayer.sendSystemMessage(Component.nullToEmpty( "Player not brainswept" ));
 
             BlockState state = castingEnvironment.getWorld().getBlockState(pos);
+            // well, No more brainsweep recipe use!
+            // TODO: verify that BlockState is correct block << HERE
 
-            RecipeManager recipeManager = castingEnvironment.getWorld().getRecipeManager();
-            List<BrainsweepRecipe> recipes = recipeManager.getAllRecipesFor(HexRecipeStuffRegistry.BRAINSWEEP_TYPE);
-            BrainsweepRecipe result = recipes.stream()
-                    .filter(r -> r.matches(
-                            state,
-                            sacrifice,
-                            castingEnvironment.getWorld()))
-                    .findFirst()
-                    .orElse(null);
+            // Should I simulate after all?
+            long remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, false);
+            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(remainingToCast)));
+            if (remainingToCast > 0) return;
+            grantAdvancement(serverPlayer, "graft_attempted");
+            if (serverPlayer.getHealth() > 0) return;
+            grantAdvancement(serverPlayer, "graft_succeeded");
+            theatrics(castingEnvironment, sacrifice, pos);
+            mindAnchorLivingEntity(sacrifice);
 
-            serverPlayer.sendSystemMessage(Component.nullToEmpty( "Recipe found" ));
+            if (state.hasBlockEntity()) {
+                serverPlayer.sendSystemMessage(Component.nullToEmpty( "Block has block entity!" ));
+            }
 
-            SpellAction.Result spellResult = new SpellAction.Result(
-                    new Spell(pos, state, sacrifice, result),
-                    result.mediaCost(),
-                    List.of(
-                            ParticleSpray.cloud(sacrifice.position(), 1.0, 100),
-                            ParticleSpray.burst(Vec3.atCenterOf(pos), 0.3, 100)
-                    ),
-                    1
-            );
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( "Block has block entity!" ));
+
             serverPlayer.sendSystemMessage(Component.nullToEmpty( "Spell casted?" ));
-            serverPlayer.sendSystemMessage(Component.nullToEmpty( spellResult.toString() ));
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( String.valueOf (remainingToCast) ));
             // serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.toString() ));
             // TODO:
             // ESCAPE!!!!!
@@ -138,38 +138,25 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             // I don't think we can ever end up here without going into the if statement with ServerPlayer...
         }
     }
-}
 
-class Spell implements RenderedSpell {
-
-    private final BlockPos pos;
-    private final BlockState state;
-    private final LivingEntity sacrifice;
-    private final BrainsweepRecipe recipe;
-
-    public Spell(BlockPos pos, BlockState state, LivingEntity sacrifice, BrainsweepRecipe recipe) {
-        this.pos = pos;
-        this.state = state;
-        this.sacrifice = sacrifice;
-        this.recipe = recipe;
+    static private void mindAnchorLivingEntity(LivingEntity entity) {
+        IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(entity, true);
+        entity.sendSystemMessage(Component.nullToEmpty("Helo!!!!! Mind broken!!!"));
     }
 
-    @Override
-    public @Nullable CastingImage cast(@NotNull CastingEnvironment castingEnvironment, @NotNull CastingImage castingImage) {
-        // Replace block
-        castingEnvironment.getWorld().setBlockAndUpdate(
-                pos,
-                BrainsweepRecipe.copyProperties(state, recipe.result())
-        );
-
-        // Brainsweep
-        // HexAPI.instance().brainsweep(sacrifice);
-        // Set
-        mindAnchorLivingEntity(sacrifice);
+    static private void theatrics(CastingEnvironment castingEnvironment, LivingEntity sacrifice, Vec3i pos) {
 
         // Death sound via accessor
         SoundEvent sound =
                 ((AccessorLivingEntity) sacrifice).hex$getDeathSound();
+
+        ParticleSpray.cloud(sacrifice.position(), 3.0, 100).sprayParticles(
+                ((ServerPlayer) sacrifice).serverLevel(),
+                FrozenPigment.ANCIENT.get()); // TODO: should I respect the player's custom particle choice?
+
+        ParticleSpray.burst(Vec3.atCenterOf(pos), 0.9, 100).sprayParticles(
+                ((ServerPlayer) sacrifice).serverLevel(),
+                FrozenPigment.ANCIENT.get()); // TODO: should I respect the player's custom particle choice?
 
         if (sound != null) {
             castingEnvironment.getWorld().playSound(
@@ -191,16 +178,5 @@ class Spell implements RenderedSpell {
                 0.5f,
                 0.8f
         );
-        return castingImage;
-    }
-
-    static private void mindAnchorLivingEntity(LivingEntity entity) {
-        IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(entity);
-        entity.sendSystemMessage(Component.nullToEmpty("Helo!!!!! Mind broken!!!"));
-    }
-
-    @Override
-    public void cast(@NotNull CastingEnvironment castingEnvironment) {
-        CastingEnvironment _dummy =  (castingEnvironment);
     }
 }

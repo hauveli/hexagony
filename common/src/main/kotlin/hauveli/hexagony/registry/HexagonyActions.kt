@@ -6,7 +6,6 @@ import at.petrak.hexcasting.api.casting.math.HexDir
 import at.petrak.hexcasting.api.casting.math.HexPattern
 import at.petrak.hexcasting.common.lib.HexRegistries
 import at.petrak.hexcasting.common.lib.hex.HexActions
-import hauveli.hexagony.casting.actions.spells.OpBrainsweep
 import hauveli.hexagony.casting.actions.spells.OpCongratulate
 
 object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
@@ -17,7 +16,7 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
 
     val GREAT_CONGRATULATE = make("congratulate/great", HexDir.EAST, "qwwqqqwwqwded", OpCongratulate)
 
-    val GREAT_BRAINSWEEP = make("brainsweep", HexDir.NORTH_EAST, "qeqwqwqwqwqeqaeqeaqeqaeqaqded", OpBrainsweep)
+    // val GREAT_BRAINSWEEP = make("brainsweep", HexDir.NORTH_EAST, "qeqwqwqwqwqeqaeqeaqeqaeqaqded", OpBrainsweep)
 
     private fun make(name: String, startDir: HexDir, signature: String, action: Action) =
         make(name, startDir, signature) { action }

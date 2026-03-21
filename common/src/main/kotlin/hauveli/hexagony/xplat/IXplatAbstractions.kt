@@ -24,7 +24,7 @@ interface IXplatAbstractions {
 
     fun initPlatformSpecific()
 
-    fun setBrainsweepAddlData(livingEntity: LivingEntity?)
+    fun setBrainsweepAddlData(livingEntity: LivingEntity?, state: Boolean)
 
     fun isBrainswept(livingEntity: LivingEntity?): Boolean
 

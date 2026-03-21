@@ -22,7 +22,6 @@ import at.petrak.hexcasting.datagen.recipe.builders.BrainsweepRecipeBuilder
 import at.petrak.hexcasting.datagen.recipe.builders.CompatIngredientValue
 import at.petrak.hexcasting.datagen.recipe.builders.CreateCrushingRecipeBuilder
 import at.petrak.hexcasting.datagen.recipe.builders.FarmersDelightCuttingRecipeBuilder
-import hauveli.hexagony.common.recipe.ingredient.brainsweep.EntityIngredient
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.data.PackOutput
 import net.minecraft.data.recipes.*
@@ -44,6 +43,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer
 import net.minecraft.world.level.block.Blocks
+import org.apache.commons.codec.binary.Hex
 import java.util.List
 import java.util.Map
 import java.util.function.Consumer
@@ -57,7 +57,7 @@ class HexplatRecipes {
 class HexagonyXplatRecipes (
     output: PackOutput, ingredients: IXplatIngredients,
     conditions: Function<RecipeBuilder?, IXplatConditionsBuilder?>
-) : at.petrak.paucal.api.datagen.PaucalRecipeProvider(output, HexAPI.MOD_ID) {
+) {
     private val ingredients: IXplatIngredients
     private val conditions: Function<RecipeBuilder?, IXplatConditionsBuilder?>
 
@@ -66,7 +66,7 @@ class HexagonyXplatRecipes (
         this.conditions = conditions
     }
 
-    public override fun buildRecipes(recipes: Consumer<FinishedRecipe?>) {
+    public fun buildRecipes(recipes: Consumer<FinishedRecipe?>) {
         /*
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, HexItems.ARTIFACT)
             .define('F', ingredients.goldIngot())
@@ -82,8 +82,7 @@ class HexagonyXplatRecipes (
             .save(recipes)
         */
 
-
-        val enlightenment = HexAdvancements.ENLIGHTEN
+        // val enlightenment = HexAdvancements.ENLIGHTEN
         ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, HexBlocks.IMPETUS_EMPTY)
             .define('B', Items.IRON_BARS)
             .define('A', HexItems.CHARGED_AMETHYST)
@@ -92,7 +91,8 @@ class HexagonyXplatRecipes (
             .pattern("PSS")
             .pattern("BAB")
             .pattern("SSP")
-            .unlockedBy("enlightenment", enlightenment).save(recipes)
+            // .unlockedBy("enlightenment", enlightenment).
+            .save(recipes)
 
         // TODO: fix this, but honestly?
         // Unless it's done in HexMod I really can't be bothered,
@@ -110,8 +110,9 @@ class HexagonyXplatRecipes (
         // todo: Make the Mind Anchor be a block that starts a countdown to remove itself upon placing?
         // Would incentivize using spells...?
 
-    private fun specialRecipe(consumer: Consumer<FinishedRecipe?>, serializer: SimpleCraftingRecipeSerializer<*>) {
-        val name = BuiltInRegistries.RECIPE_SERIALIZER.getKey(serializer)
-        SpecialRecipeBuilder.special(serializer).save(consumer, HexAPI.MOD_ID + ":dynamic" + name!!.getPath())
+        fun specialRecipe(consumer: Consumer<FinishedRecipe?>, serializer: SimpleCraftingRecipeSerializer<*>) {
+            val name = BuiltInRegistries.RECIPE_SERIALIZER.getKey(serializer)
+            SpecialRecipeBuilder.special(serializer).save(consumer, HexAPI.MOD_ID + ":dynamic" + name!!.getPath())
+        }
     }
 }
