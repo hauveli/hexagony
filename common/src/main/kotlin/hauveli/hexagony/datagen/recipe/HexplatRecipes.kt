@@ -83,7 +83,7 @@ class HexagonyXplatRecipes (
         */
 
         // val enlightenment = HexAdvancements.ENLIGHTEN
-        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, HexBlocks.IMPETUS_EMPTY)
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, hauveli.hexagony.common.lib.HexagonyBlocks.MIND_ANCHOR )
             .define('B', Items.IRON_BARS)
             .define('A', HexItems.CHARGED_AMETHYST)
             .define('S', HexBlocks.SLATE_BLOCK)

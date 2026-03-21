@@ -19,5 +19,7 @@ import net.minecraft.world.item.ItemStack
  * I feel like botnia probably does it this way becase it's older than xplat curios
  */
 interface MindContainerItem {
+
+    // this is for bauble stuff originally, do we even want to use this?
     fun getMindContainerAttrs(stack: ItemStack?): Multimap<Attribute?, AttributeModifier?>?
 }
