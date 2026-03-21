@@ -45,6 +45,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 
@@ -98,9 +99,12 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             }
 
             if (IXplatAbstractions.Companion.getINSTANCE().isBrainswept(serverPlayer)) {
+                serverPlayer.sendSystemMessage(Component.nullToEmpty( "Player already brainswept" ));
+                //
                 //throw new MishapAlreadyBrainswept(sacrifice);
                 return;
             }
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( "Player not brainswept" ));
 
             BlockState state = castingEnvironment.getWorld().getBlockState(pos);
 
@@ -112,6 +116,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                     .orElse(null);
             if (result == null) return;
 
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( "Recipe found" ));
 
             SpellAction.Result spellResult = new SpellAction.Result(
                     new Spell(pos, state, sacrifice, result),
@@ -122,10 +127,13 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                     ),
                     1
             );
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( "Spell casted?" ));
+            serverPlayer.sendSystemMessage(Component.nullToEmpty( spellResult.toString() ));
+            IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(serverPlayer);
             // serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.toString() ));
             // TODO:
             // ESCAPE!!!!!
-
+            cir.cancel();
             // I don't think we can ever end up here without going into the if statement with ServerPlayer...
         }
     }

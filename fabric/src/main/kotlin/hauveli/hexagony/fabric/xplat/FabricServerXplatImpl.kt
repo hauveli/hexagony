@@ -2,12 +2,15 @@ package hauveli.hexagony.fabric.xplat
 
 
 import at.petrak.hexcasting.fabric.cc.CCBrainswept
-import at.petrak.hexcasting.fabric.cc.HexCardinalComponents
-import at.petrak.hexcasting.fabric.cc.HexCardinalComponents.BRAINSWEPT
 import at.petrak.hexcasting.fabric.interop.trinkets.TrinketsApiInterop
 import at.petrak.hexcasting.interop.HexInterop
 import at.petrak.hexcasting.xplat.Platform
+
+
+import hauveli.hexagony.fabric.xplat.cc.HexagonyCardinalComponents.Companion.BRAINSWEPT;
+import hauveli.hexagony.fabric.xplat.cc.HexagonyCardinalComponents
 import hauveli.hexagony.xplat.IXplatAbstractions
+
 import net.fabricmc.api.EnvType
 import net.fabricmc.fabric.api.entity.FakePlayer
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
@@ -44,14 +47,14 @@ class FabricServerXplatImpl() : IXplatAbstractions {
     }
 
     override fun setBrainsweepAddlData(livingEntity: LivingEntity?) {
-        val cc: CCBrainswept = BRAINSWEPT.get(livingEntity)
-        cc.setBrainswept(true)
+        val cc: CCBrainswept? = BRAINSWEPT.get(livingEntity)
+        cc?.setBrainswept(true)
         // CC API does the syncing for us
     }
 
     override fun isBrainswept(livingEntity: LivingEntity?): Boolean {
-        val cc: CCBrainswept = BRAINSWEPT.get(livingEntity)
-        return cc.isBrainswept()
+        val cc: CCBrainswept? = BRAINSWEPT.get(livingEntity)
+        return cc?.isBrainswept() ?: false
     }
 
     override fun isBreakingAllowed(world: ServerLevel?,

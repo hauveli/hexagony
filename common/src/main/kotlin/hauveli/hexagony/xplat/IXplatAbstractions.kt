@@ -38,10 +38,10 @@ interface IXplatAbstractions {
 
     companion object {
         private fun find(): IXplatAbstractions? {
-            val providers = ServiceLoader.load<IXplatAbstractions?>(IXplatAbstractions::class.java).stream().toList()
+            val providers = ServiceLoader.load(IXplatAbstractions::class.java).stream().toList()
             if (providers.size != 1) {
                 val names = providers.stream()
-                    .map<String?> { p: ServiceLoader.Provider<IXplatAbstractions?> -> p.type().getName() }.collect(
+                    .map { p: ServiceLoader.Provider<IXplatAbstractions?> -> p.type().getName() }.collect(
                         Collectors.joining(",", "[", "]")
                     )
                 throw IllegalStateException(

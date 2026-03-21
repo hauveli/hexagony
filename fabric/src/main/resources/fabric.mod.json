@@ -34,6 +34,10 @@
     "modmenu": [{
       "adapter": "kotlin",
       "value": "hauveli.hexagony.fabric.FabricHexagonyModMenu"
+    }],
+    "cardinal-components-entity": [{
+      "adapter": "kotlin",
+      "value": "hauveli.hexagony.fabric.xplat.cc.HexagonyCardinalComponents"
     }]
   },
   "mixins": [
@@ -51,5 +55,12 @@
   },
   "suggests": {
     "modmenu": ">=${versions.modMenu}"
+  },
+  "custom": {
+    "cardinal-components": [
+      "hexagony:brainswept",
+      "hexagony:iota_holder",
+      "hexagony:media_holder"
+    ]
   }
 }
