@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
+import java.util.stream.StreamSupport;
 
 import static hauveli.hexagony.common.lib.AdvancementProvider.grantAdvancement;
 
@@ -69,11 +70,32 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
         if (!hexagony$perpetratorIsCaster(perpetrator, castingEnvironment)) return;
         if (!hexagony$spellIsBrainsweep(errorCtx, castingEnvironment)) return;
 
+        ServerPlayer sp = (ServerPlayer) castingEnvironment.getCastingEntity();
+        var image = IXplatAbstractions.INSTANCE.getStaffcastVM(sp, castingEnvironment.getCastingHand()).getImage();
+        var stack = image.getStack();
+
+        castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("text"));
+        if (stack.get(0) instanceof ListIota listIota) {
+            for (Iota iota : listIota.getList()) {
+                Object payload = ((InterfaceIotaGetPayloadMixin) iota).hex$getPayload();
+                if (payload instanceof Vec3Iota vecIota) {
+                    castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty(vecIota.toString()));
+                }
+            }
+            Object payload = ((InterfaceIotaGetPayloadMixin) perpetrator).hex$getPayload();
+            if (payload instanceof Entity entityFromIota) {
+                if (entityFromIota instanceof ServerPlayer playerFromIota) {
+                    var entity = castingEnvironment.getCastingEntity();
+                    if (entity instanceof ServerPlayer) {
+                        castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("yipi"));
+                    }
+                }
+            }
+        }
         // https://github.com/YukkuriC/HexOverpowered/blob/9e3789713236056f73f5398ba0f3f7c60dc9cce7/common/src/main/java/io/yukkuric/hexop/actions/mind_env/OpMindStackEdit.kt#L13
         // Massively helpful reference for obtaining stack with CastingEnvironment
         var block = hexagony$blockFromCastingEnv(castingEnvironment);
         // TODO: can remove serverPlayer probably?
-        castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("Example text2"));
         if (!hexagony$blockIsValidGraftTarget(block)) return;
         castingEnvironment.getCastingEntity().sendSystemMessage(Component.nullToEmpty("Example text2"));
         if (castingEnvironment.getCastingEntity() instanceof ServerPlayer serverPlayer) {
@@ -122,6 +144,10 @@ public abstract class HijackBrainsweepMishapInvalidIotaMixin {
         var image = IXplatAbstractions.INSTANCE.getStaffcastVM(serverPlayer, castingEnvironment.getCastingHand()).getImage();
         var stack = image.getStack();
         // Was it called funky-like?
+        List<Iota> args = StreamSupport
+                .stream(stack.get(0).subIotas().spliterator(), false)
+                .toList();
+        serverPlayer.sendSystemMessage(Component.nullToEmpty( args.toString() ));
         if (stack.get(0).subIotas() != null) {
             // ok so it was called funky-like.
             // remove the last entry, then execute stack, then get blockPosIota

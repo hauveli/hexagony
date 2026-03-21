@@ -11,6 +11,7 @@
     "mindanchor.HijackBrainsweepMishapInvalidIotaMixin",
     "mindanchor.InterfaceIotaGetPayloadMixin",
     "mindanchor.MindAnchorIndestructibleAtItemEntityHurtMixin",
+    "mindanchor.PlayerEntityOpBrainsweepMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",
     "overcast.RemovePenaltyAtHeadStopSleepInBedMixin"
   ],
