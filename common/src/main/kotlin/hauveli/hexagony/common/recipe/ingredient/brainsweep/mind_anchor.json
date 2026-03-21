@@ -2,15 +2,14 @@
   "type": "hexcasting:brainsweep",
   "blockIn": {
     "type": "block",
-    "block": "hexharderhealthcasting:mind_anchor/empty"
+    "block": "hexcasting:impetus/empty"
   },
   "cost": 1000000,
   "entityIn": {
-    "type": "player",
-    "minLevel": 100
+    "type": "player"
   },
   "result": {
-    "name": "hexharderhealthcasting:mind_anchor/full",
+    "name": "hexcasting:impetus/full",
     "properties": {
       "energized": "false",
       "facing": "north"

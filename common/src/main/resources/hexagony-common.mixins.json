@@ -8,7 +8,6 @@
   "mixins": [
     "MixinDatagenMain",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
-    "mindanchor.HijackBrainsweepMishapInvalidIotaMixin",
     "mindanchor.InterfaceIotaGetPayloadMixin",
     "mindanchor.MindAnchorIndestructibleAtItemEntityHurtMixin",
     "mindanchor.PlayerEntityOpBrainsweepMixin",

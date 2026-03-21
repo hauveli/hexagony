@@ -108,13 +108,15 @@ public abstract class PlayerEntityOpBrainsweepMixin {
 
             BlockState state = castingEnvironment.getWorld().getBlockState(pos);
 
-            RecipeManager recman = castingEnvironment.getWorld().getRecipeManager();
-            List<BrainsweepRecipe> recipes = recman.getAllRecipesFor(HexRecipeStuffRegistry.BRAINSWEEP_TYPE);
+            RecipeManager recipeManager = castingEnvironment.getWorld().getRecipeManager();
+            List<BrainsweepRecipe> recipes = recipeManager.getAllRecipesFor(HexRecipeStuffRegistry.BRAINSWEEP_TYPE);
             BrainsweepRecipe result = recipes.stream()
-                    .filter(r -> r.matches(state, sacrifice, castingEnvironment.getWorld()))
+                    .filter(r -> r.matches(
+                            state,
+                            sacrifice,
+                            castingEnvironment.getWorld()))
                     .findFirst()
                     .orElse(null);
-            if (result == null) return;
 
             serverPlayer.sendSystemMessage(Component.nullToEmpty( "Recipe found" ));
 
@@ -129,7 +131,6 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             );
             serverPlayer.sendSystemMessage(Component.nullToEmpty( "Spell casted?" ));
             serverPlayer.sendSystemMessage(Component.nullToEmpty( spellResult.toString() ));
-            IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(serverPlayer);
             // serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.toString() ));
             // TODO:
             // ESCAPE!!!!!
@@ -194,10 +195,7 @@ class Spell implements RenderedSpell {
     }
 
     static private void mindAnchorLivingEntity(LivingEntity entity) {
-        IXplatAbstractions xplatAbstractions = IXplatAbstractions.Companion.getINSTANCE();
-        if (xplatAbstractions != null) {
-            xplatAbstractions.setBrainsweepAddlData(entity);
-        }
+        IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(entity);
         entity.sendSystemMessage(Component.nullToEmpty("Helo!!!!! Mind broken!!!"));
     }
 
