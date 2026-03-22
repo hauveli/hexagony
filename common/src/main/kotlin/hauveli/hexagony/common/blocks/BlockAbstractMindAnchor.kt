@@ -1,16 +1,18 @@
-package at.petrak.hexcasting.common.blocks.circles
+package hauveli.hexagony.common.blocks
 
 import at.petrak.hexcasting.api.block.circle.BlockCircleComponent
+import at.petrak.hexcasting.api.casting.circles.BlockEntityAbstractImpetus
 import at.petrak.hexcasting.api.casting.circles.ICircleComponent
 import at.petrak.hexcasting.api.casting.eval.env.CircleCastEnv
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
-import com.mojang.datafixers.util.Pair
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.RandomSource
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.EntityBlock
 import net.minecraft.world.level.block.Mirror
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.block.state.BlockState
@@ -18,31 +20,23 @@ import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.DirectionProperty
 import java.util.*
-import java.util.List
 
-// As it turns out, not actually an impetus
-class BlockEmptyMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_) {
+
+// Facing dir is the direction it starts searching for slates in to start
+abstract class BlockAbstractMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_), EntityBlock {
     init {
         this.registerDefaultState(
-            this.stateDefinition.any()
-                .setValue<Boolean?, Boolean?>(ENERGIZED, false)
-                .setValue<Direction?, Direction?>(FACING, Direction.NORTH)
+            this.stateDefinition.any().setValue<Boolean?, Boolean?>(ENERGIZED, false).setValue<Direction?, Direction?>(
+                FACING, Direction.NORTH
+            )
         )
     }
 
     override fun acceptControlFlow(
         imageIn: CastingImage?, env: CircleCastEnv?, enterDir: Direction?, pos: BlockPos?,
-        bs: BlockState, world: ServerLevel?
+        bs: BlockState?, world: ServerLevel?
     ): ICircleComponent.ControlFlow {
-        return ICircleComponent.ControlFlow.Continue(
-            imageIn, List.of<Pair<BlockPos?, Direction?>?>(
-                this.exitPositionFromDirection(
-                    pos, bs.getValue<Direction?>(
-                        FACING
-                    )
-                )
-            )
-        )
+        return ICircleComponent.ControlFlow.Stop()
     }
 
     override fun canEnterFromDirection(
@@ -51,6 +45,8 @@ class BlockEmptyMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_
         bs: BlockState,
         world: ServerLevel?
     ): Boolean {
+        // FACING is the direction media EXITS from, so we can't have media entering in that direction
+        // so, flip it
         return enterDir != bs.getValue<Direction?>(FACING).getOpposite()
     }
 
@@ -59,11 +55,33 @@ class BlockEmptyMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_
     }
 
     override fun normalDir(pos: BlockPos, bs: BlockState, world: Level?, recursionLeft: Int): Direction? {
-        return normalDirOfOther(pos.relative(bs.getValue<Direction?>(FACING)), world, recursionLeft)
+        return normalDirOfOther(pos.relative(bs.getValue(FACING)), world, recursionLeft)
     }
 
     override fun particleHeight(pos: BlockPos?, bs: BlockState?, world: Level?): Float {
         return 0.5f
+    }
+
+    override fun tick(pState: BlockState, pLevel: ServerLevel, pPos: BlockPos, pRandom: RandomSource) {
+        if (pLevel.getBlockEntity(pPos) is BlockEntityAbstractImpetus && pState.getValue(ENERGIZED)) {
+            // hmm... where is tile even coming from? I've checked the code and can not find it...
+        }
+    }
+
+    override fun onRemove(
+        pState: BlockState,
+        pLevel: Level,
+        pPos: BlockPos,
+        pNewState: BlockState,
+        pIsMoving: Boolean
+    ) {
+        if (!pNewState.`is`(pState.getBlock())
+            && pLevel.getBlockEntity(pPos) is BlockEntityAbstractImpetus
+        ) {
+            // do something else?
+            // impetus.endExecution()
+        }
+        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving)
     }
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {

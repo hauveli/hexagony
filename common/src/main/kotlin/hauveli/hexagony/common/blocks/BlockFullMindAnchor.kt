@@ -37,16 +37,17 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.phys.BlockHitResult
 
 // BlockAbstractImpetus happens to have a lot of useful features I want so that's convenient
+// Also I get to avoid having to construct quite a few classes which is awesome
 class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
-    BlockEmptyMindAnchor(properties) {
+    BlockRedstoneImpetus(properties) {
 
-    fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity {
+    override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity {
         return BlockEntityFullMindAnchor(pPos, pState)
     }
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
         super.createBlockStateDefinition(builder)
-        builder.add(POWERED)
+        // builder.add(POWERED)
     }
 
     override fun use(
@@ -72,6 +73,7 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         ) {
             val tile = pLevel.getBlockEntity(pPos) as BlockEntityFullMindAnchor
             summonItem(pLevel, pPos)
+            println("DDDDDDD")
         }
     }
 
@@ -80,6 +82,7 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor
         ) {
             summonItem(pLevel, pPos)
+            println("WXXXXXXXXXXXXXXXXXX")
         }
     }
 
@@ -130,7 +133,7 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         // Create custom NBT
         val nbt = itemStack.getOrCreateCompound("UUID")
         nbt.putUUID("UUID", getThisTile(level, pos).getStoredUUID())
-
+        println("What the sigma??")
         val itemEntity = ItemEntity(
             level,
             pos.x + 0.5,   // Center in the block
