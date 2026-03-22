@@ -50,6 +50,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
@@ -176,7 +177,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Theatrics next!")));
             theatrics(castingEnvironment, sacrifice, pos);
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Now mind anchoring!")));
-            mindAnchorLivingEntity(sacrifice, serverPlayer.serverLevel(), pos);
+            mindAnchorServerPlayer(serverPlayer, serverPlayer.serverLevel(), pos);
 
             // serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.toString() ));
             // TODO:
@@ -215,15 +216,22 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         return serverPlayer.getAdvancements().getOrStartProgress(adv).isDone();
     }
 
-    static private void mindAnchorLivingEntity(LivingEntity entity, ServerLevel level, BlockPos pos) {
+    static private void mindAnchorServerPlayer(ServerPlayer serverPlayer, ServerLevel level, BlockPos pos) {
         // IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(entity, true);
-        entity.sendSystemMessage(Component.nullToEmpty("Helo!!!!! Mind broken!!!"));
+        serverPlayer.sendSystemMessage(Component.nullToEmpty("Helo!!!!! Mind broken!!!"));
 
         // world.setBlock(pos, block.defaultBlockState().setValue(FILLED, true), 3);
         Block myBlock = HexagonyBlocks.INSTANCE.getMIND_ANCHOR_FULL().getValue();
 
         BlockState state = myBlock.defaultBlockState();
         level.setBlock(pos, state, 3);
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof BlockEntityFullMindAnchor) {
+            ((BlockEntityFullMindAnchor) be).setPlayer(
+                    serverPlayer.getGameProfile(),
+                    serverPlayer.getUUID());
+            be.setChanged(); // mark dirty so it saves
+        }
     }
 
     static private void theatrics(CastingEnvironment castingEnvironment, LivingEntity sacrifice, Vec3i pos) {
