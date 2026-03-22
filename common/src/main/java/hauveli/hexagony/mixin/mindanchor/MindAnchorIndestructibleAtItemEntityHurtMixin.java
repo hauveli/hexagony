@@ -1,6 +1,7 @@
 package hauveli.hexagony.mixin.mindanchor;
 
 // import hauveli.hexagony.registry.HexagonyItems;
+import hauveli.hexagony.registry.HexagonyItems;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -18,13 +19,11 @@ public class MindAnchorIndestructibleAtItemEntityHurtMixin {
         ItemStack stack = entity.getItem();
 
         // TODO: uncomment after making the item
-        /*
         // Example: Only make Netherite items indestructible
-        if (stack.is(HexagonyItems.MIND_ANCHOR)) {
+        if (stack.is(HexagonyItems.MIND_ANCHOR.getValue())) {
             // Cancel the damage so it never takes damage
             cir.setReturnValue(false);
         }
-        */
 
         // OR: Make ALL items indestructible
         // cir.setReturnValue(false);

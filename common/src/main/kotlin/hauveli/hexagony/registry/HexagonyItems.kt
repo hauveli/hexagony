@@ -19,6 +19,7 @@ object HexagonyItems : HexagonyRegistrar<Item>(
     { BuiltInRegistries.ITEM }
 ) {
     // BlockItems
+    @JvmField
     val MIND_ANCHOR = make("mind_anchor") {
         BlockItem(
             HexagonyBlocks.MIND_ANCHOR.value,   // safe: lazy evaluated during init

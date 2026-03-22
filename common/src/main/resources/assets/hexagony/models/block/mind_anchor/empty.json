@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "hexagony:block/mind_anchor" }
+  }
+}

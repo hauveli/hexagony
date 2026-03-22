@@ -25,6 +25,8 @@ import at.petrak.hexcasting.common.recipe.HexRecipeStuffRegistry;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
 import com.llamalad7.mixinextras.sugar.Local;
 import hauveli.hexagony.Hexagony;
+import hauveli.hexagony.registry.HexagonyBlockProperties;
+import hauveli.hexagony.registry.HexagonyBlocks;
 import hauveli.hexagony.xplat.IXplatAbstractions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -132,6 +134,12 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             BlockState state = castingEnvironment.getWorld().getBlockState(pos);
             // well, No more brainsweep recipe use!
             // TODO: verify that BlockState is correct block << HERE
+            // TODO: add custom error messages using fake error contexts and such?
+            // Might be as easy as setting the cir.returnvalue with a simple fake error?
+            // alternatively, Print error myself, and return a successful cast (which wont print an error)
+            if (!state.is(HexagonyBlocks.INSTANCE.getMIND_ANCHOR().getValue())) return;
+            if (state.getValue(HexagonyBlockProperties.INSTANCE.getFILLED())) return; // if filled, return.
+            // world.setBlock(pos, block.defaultBlockState().setValue(FILLED, true), 3)
 
             // Should I simulate after all?
             long remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, true);
