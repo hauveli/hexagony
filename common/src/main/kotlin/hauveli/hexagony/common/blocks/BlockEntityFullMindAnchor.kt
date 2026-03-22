@@ -35,18 +35,6 @@ open class BlockEntityFullMindAnchor(pWorldPosition: BlockPos, pBlockState: Bloc
     private var cachedDisplayProfile: GameProfile? = null
     private var cachedDisplayStack: ItemStack? = null
 
-    protected val playerName: GameProfile?
-        get() {
-            if (this.level is ServerLevel) {
-                val player: Player? = getStoredPlayer()
-                if (player != null) {
-                    return player.getGameProfile()
-                }
-            }
-
-            return this.storedPlayerProfile
-        }
-
     override fun setPlayer(profile: GameProfile?, player: UUID?) {
         this.storedPlayerProfile = profile
         this.storedPlayer = player

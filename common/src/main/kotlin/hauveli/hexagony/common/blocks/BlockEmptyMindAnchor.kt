@@ -8,6 +8,7 @@ import com.mojang.datafixers.util.Pair
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
@@ -21,13 +22,17 @@ import java.util.*
 import java.util.List
 
 // As it turns out, not actually an impetus
-class BlockEmptyMindAnchor (p_49795_: Properties) : BlockCircleComponent(p_49795_) {
+open class BlockEmptyMindAnchor (p_49795_: Properties) : BlockCircleComponent(p_49795_) {
     init {
         this.registerDefaultState(
             this.stateDefinition.any()
                 .setValue<Boolean?, Boolean?>(ENERGIZED, false)
                 .setValue<Direction?, Direction?>(FACING, Direction.NORTH)
         )
+    }
+
+    override fun asItem(): Item? {
+        return super.asItem()
     }
 
     override fun acceptControlFlow(

@@ -36,10 +36,8 @@ object HexagonyBlocks : HexagonyRegistrar<Block>(
         BlockEmptyMindAnchor(
             BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(1.0f, 100.0f)
+                .strength(0.2f, 100.0f)
                 .sound(SoundType.AMETHYST)
-                .requiresCorrectToolForDrops()
-                .instabreak()
         )
     }
 
@@ -47,7 +45,7 @@ object HexagonyBlocks : HexagonyRegistrar<Block>(
         BlockFullMindAnchor(
             BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(-1.0f, 360000000.0f)
+                .strength(0.2f, 360000000.0f)
                 .sound(SoundType.AMETHYST)
         )
     }
