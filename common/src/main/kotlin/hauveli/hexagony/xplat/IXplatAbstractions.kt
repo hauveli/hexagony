@@ -7,8 +7,12 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import java.util.*
+import java.util.function.BiFunction
 import java.util.stream.Collectors
 
 
@@ -31,6 +35,11 @@ interface IXplatAbstractions {
     fun isBreakingAllowed(world: ServerLevel?, pos: BlockPos?, state: BlockState?, player: Player?): Boolean
 
     fun isPlacingAllowed(world: ServerLevel?, pos: BlockPos?, blockStack: ItemStack?, player: Player?): Boolean
+
+    fun <T : BlockEntity> createBlockEntityType(
+        factory: BiFunction<BlockPos, BlockState, T>,
+        vararg blocks: Block
+    ): BlockEntityType<T>
 
     var INSTANCE: IXplatAbstractions?
         get() = find()

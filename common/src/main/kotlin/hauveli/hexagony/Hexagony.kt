@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger
 import hauveli.hexagony.config.HexagonyServerConfig
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.registry.HexagonyActions
+import hauveli.hexagony.registry.HexagonyBlockEntities
 import hauveli.hexagony.registry.HexagonyBlocks
 import hauveli.hexagony.registry.HexagonyItems
 
@@ -23,7 +24,8 @@ object Hexagony {
         initRegistries(
             HexagonyActions,
             HexagonyBlocks,
-            HexagonyItems // Blocks must be registered first in order to access block.value!!!
+            HexagonyItems, // Blocks must be registered first in order to access block.value!!!
+            // HexagonyBlockEntities
         )
         HexagonyNetworking.init()
     }

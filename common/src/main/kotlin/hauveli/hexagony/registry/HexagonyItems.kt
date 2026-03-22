@@ -22,7 +22,7 @@ object HexagonyItems : HexagonyRegistrar<Item>(
     @JvmField
     val MIND_ANCHOR = make("mind_anchor") {
         BlockItem(
-            HexagonyBlocks.MIND_ANCHOR.value,   // safe: lazy evaluated during init
+            HexagonyBlocks.MIND_ANCHOR_EMPTY.value,   // safe: lazy evaluated during init
             Item.Properties()
                 .stacksTo(1)
                 .rarity(Rarity.EPIC)

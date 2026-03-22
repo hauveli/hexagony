@@ -4,14 +4,24 @@ import at.petrak.hexcasting.api.casting.ActionRegistryEntry
 import at.petrak.hexcasting.api.casting.castables.Action
 import at.petrak.hexcasting.api.casting.math.HexDir
 import at.petrak.hexcasting.api.casting.math.HexPattern
+import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockRedstoneImpetus
+import com.mojang.authlib.properties.Property
 import hauveli.hexagony.Hexagony
+import hauveli.hexagony.common.blocks.BlockEmptyMindAnchor
+import hauveli.hexagony.common.blocks.BlockFullMindAnchor
 import hauveli.hexagony.common.lib.PropertyBlock
+import io.netty.util.collection.ByteCollections.emptyMap
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceKey
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.Rarity
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockBehaviour
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.material.MapColor
 
@@ -22,13 +32,21 @@ object HexagonyBlocks : HexagonyRegistrar<Block>(
     // Declare your property somewhere early
     val FILLED: BooleanProperty = BooleanProperty.create("filled")
 
-    val MIND_ANCHOR = make("mind_anchor/empty") {
-        Block(
+    val MIND_ANCHOR_EMPTY = make("mind_anchor/empty") {
+        BlockEmptyMindAnchor(
             BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
                 .strength(3.0f, 6.0f)
                 .sound(SoundType.AMETHYST)
                 .requiresCorrectToolForDrops()
+        )
+    }
+    val MIND_ANCHOR_FULL = make("mind_anchor/full") {
+        BlockFullMindAnchor(
+            BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_PURPLE)
+                .strength(3.0f, 6.0f)
+                .sound(SoundType.AMETHYST)
         )
     }
 

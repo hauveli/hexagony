@@ -23,7 +23,11 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
+import java.util.function.BiFunction
 
 // https://github.com/FallingColors/HexMod/blob/532fe9a60138544112e096812c7aefb78b3d7364/Fabric/src/main/java/at/petrak/hexcasting/fabric/xplat/FabricXplatImpl.java
 class FabricServerXplatImpl() : IXplatAbstractions {
@@ -78,5 +82,12 @@ class FabricServerXplatImpl() : IXplatAbstractions {
         val success = UseItemCallback.EVENT.invoker().interact(player, world, InteractionHand.MAIN_HAND)
         player?.setItemInHand(InteractionHand.MAIN_HAND, cached)
         return success.getResult() == InteractionResult.PASS // No other mod tried to consume this
+    }
+
+    override fun <T : BlockEntity> createBlockEntityType(
+        factory: BiFunction<BlockPos, BlockState, T>,
+        vararg blocks: Block
+    ): BlockEntityType<T> {
+        return BlockEntityType.Builder.of(factory::apply, *blocks).build(null)
     }
 }
