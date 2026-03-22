@@ -20,7 +20,7 @@ object HexagonyItems : HexagonyRegistrar<Item>(
 ) {
     // BlockItems
     @JvmField
-    val MIND_ANCHOR = make("mind_anchor/empty") {
+    val MIND_ANCHOR_EMPTY = make("mind_anchor/empty") {
         BlockItem(
             HexagonyBlocks.MIND_ANCHOR_EMPTY.value,   // safe: lazy evaluated during init
             Item.Properties()

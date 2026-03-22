@@ -72,12 +72,9 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
     }
 
     override fun playerWillDestroy(pLevel: Level, pPos: BlockPos, state: BlockState, player: Player) {
-        //super.playerWillDestroy(pLevel, pPos, state, player)
-        if (pLevel is ServerLevel
-            && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor
-        ) {
-            summonItem(pLevel, pPos)
-        }
+        if (pLevel !is ServerLevel
+            && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor) return
+        summonItem(pLevel as ServerLevel, pPos)
     }
 
      override fun attack(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player) {
@@ -143,6 +140,9 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         if (playerProfileOrNull != null) {
             nbt.putCompound(TAG_STORED_PLAYER_PROFILE, NbtUtils.writeGameProfile(CompoundTag(), playerProfileOrNull))
         }
+        // TODO:
+        // We probably want to escape if either of the two above were null, and say sommething like
+        // "ooOooooOOOoo the dormant spirit could not be woken..."
         println("What the sigma??")
         println(getThisTile(level, pos))
         val itemEntity = ItemEntity(
@@ -154,5 +154,10 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         )
         itemEntity.setNoPickUpDelay() // ticks before it can be picked up
         val test = level.addFreshEntity(itemEntity)
+        // OK. Now that it is an itemEntity, what now?
+        // Update the player associated with this Anchor, and let them know that their soul is now
+        // Splattered on the ground at that position?
+        // Do I make ItemFullMindAnchor have a tick function
+        // and continually update the reference?
     }
 }

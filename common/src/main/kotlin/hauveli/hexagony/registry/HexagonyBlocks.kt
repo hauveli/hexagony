@@ -1,30 +1,20 @@
 package hauveli.hexagony.registry
 
-import at.petrak.hexcasting.api.casting.ActionRegistryEntry
-import at.petrak.hexcasting.api.casting.castables.Action
-import at.petrak.hexcasting.api.casting.math.HexDir
-import at.petrak.hexcasting.api.casting.math.HexPattern
-
-import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockRedstoneImpetus
-import com.mojang.authlib.properties.Property
 import hauveli.hexagony.Hexagony
 import hauveli.hexagony.common.blocks.BlockEmptyMindAnchor
 import hauveli.hexagony.common.blocks.BlockFullMindAnchor
-import hauveli.hexagony.common.lib.PropertyBlock
-import io.netty.util.collection.ByteCollections.emptyMap
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceKey
-import net.minecraft.world.item.BlockItem
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.Rarity
+import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.material.MapColor
+import java.util.function.ToIntFunction
 
 object HexagonyBlocks : HexagonyRegistrar<Block>(
     BuiltInRegistries.BLOCK.key() as ResourceKey<Registry<Block>>,
@@ -39,6 +29,8 @@ object HexagonyBlocks : HexagonyRegistrar<Block>(
                 .mapColor(MapColor.COLOR_PURPLE)
                 .strength(0.2f, 100.0f)
                 .sound(SoundType.AMETHYST)
+                .lightLevel(ToIntFunction { i: BlockState? -> 5 })
+                .emissiveRendering(BlockBehaviour.StatePredicate { state: BlockState?, level: BlockGetter?, pos: BlockPos? -> true })
         )
     }
 
