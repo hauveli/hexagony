@@ -1,62 +1,33 @@
 package hauveli.hexagony.mixin.mindanchor;
 
 import at.petrak.hexcasting.api.casting.ParticleSpray;
-import at.petrak.hexcasting.api.casting.RenderedSpell;
-import at.petrak.hexcasting.api.casting.castables.Action;
 import at.petrak.hexcasting.api.casting.castables.SpellAction;
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment;
-import at.petrak.hexcasting.api.casting.eval.vm.CastingImage;
-import at.petrak.hexcasting.api.casting.iota.EntityIota;
 import at.petrak.hexcasting.api.casting.iota.Iota;
-import at.petrak.hexcasting.api.casting.iota.ListIota;
 import at.petrak.hexcasting.api.casting.iota.Vec3Iota;
 import at.petrak.hexcasting.api.casting.mishaps.*;
-import at.petrak.hexcasting.api.mod.HexTags;
 import at.petrak.hexcasting.api.pigment.FrozenPigment;
-import at.petrak.hexcasting.common.casting.actions.spells.*;
 import at.petrak.hexcasting.common.casting.actions.spells.great.OpLightning;
-import at.petrak.hexcasting.common.casting.actions.stack.OpMask;
-import at.petrak.hexcasting.common.casting.actions.spells.OpErase;
 import at.petrak.hexcasting.common.casting.actions.spells.great.OpBrainsweep;
-import at.petrak.hexcasting.common.casting.actions.stack.OpMask;
-import at.petrak.hexcasting.common.lib.HexDamageTypes;
-import at.petrak.hexcasting.common.recipe.BrainsweepRecipe;
-import at.petrak.hexcasting.common.recipe.HexRecipeStuffRegistry;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
-import com.llamalad7.mixinextras.sugar.Local;
 import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor;
-import hauveli.hexagony.common.blocks.BlockFullMindAnchor;
 import hauveli.hexagony.registry.HexagonyBlocks;
-import hauveli.hexagony.xplat.IXplatAbstractions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.EntityTypeTags;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
-import org.apache.logging.log4j.core.jmx.Server;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -66,14 +37,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.StreamSupport;
 
 
 import at.petrak.hexcasting.api.casting.OperatorUtils;
 
 import static hauveli.hexagony.common.lib.AdvancementProvider.grantAdvancement;
-import static org.spongepowered.asm.mixin.injection.selectors.ElementNode.listOf;
 
 // import static hauveli.hexagony.common.lib.AdvancementProvider.grantAdvancement;
 
@@ -123,9 +91,9 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                 throw new MishapBadLocation(vecPos, "forbidden");
             }
 
-            if (!isTargetingSelf(sacrifice, castingEnvironment)) return;
+            if (!hexagony$isTargetingSelf(sacrifice, castingEnvironment)) return;
             // Todo: error message on fail *because* already grafted?
-            if (isGrafted(serverPlayer)) return; // maybe I should allow it? but display a message like for villagers...
+            if (hexagony$isGrafted(serverPlayer)) return; // maybe I should allow it? but display a message like for villagers...
             /*
             if (IXplatAbstractions.Companion.getINSTANCE().isBrainswept(serverPlayer)) {
                 serverPlayer.sendSystemMessage(Component.nullToEmpty( "Player already brainswept" ));
@@ -175,9 +143,9 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Success! Grafted!!")));
             grantAdvancement(serverPlayer, "graft_succeeded");
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Theatrics next!")));
-            theatrics(castingEnvironment, sacrifice, pos);
+            hexagony$theatrics(castingEnvironment, sacrifice, pos);
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Now mind anchoring!")));
-            mindAnchorServerPlayer(serverPlayer, serverPlayer.serverLevel(), pos);
+            hexagony$mindAnchorServerPlayer(serverPlayer, serverPlayer.serverLevel(), pos);
 
             // serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.toString() ));
             // TODO:
@@ -191,6 +159,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
     }
 
 
+    @Unique
     static private void clearEntireStack(CastingEnvironment castingEnvironment) {
         List<Iota> stack = at.petrak.hexcasting.xplat.IXplatAbstractions.INSTANCE
                 .getStaffcastVM(
@@ -203,11 +172,13 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         }
     }
 
-    public boolean isTargetingSelf(LivingEntity sacrifice, CastingEnvironment castingEnvironment) {
+    @Unique
+    public boolean hexagony$isTargetingSelf(LivingEntity sacrifice, CastingEnvironment castingEnvironment) {
         return sacrifice.equals(castingEnvironment.getCastingEntity());
     }
 
-    public boolean isGrafted(ServerPlayer serverPlayer) {
+    @Unique
+    public boolean hexagony$isGrafted(ServerPlayer serverPlayer) {
         var adv = serverPlayer.getServer().getAdvancements().getAdvancement(
                 new ResourceLocation(Hexagony.MODID, "graft_succeeded"));
         if (adv == null)
@@ -216,7 +187,8 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         return serverPlayer.getAdvancements().getOrStartProgress(adv).isDone();
     }
 
-    static private void mindAnchorServerPlayer(ServerPlayer serverPlayer, ServerLevel level, BlockPos pos) {
+    @Unique
+    static private void hexagony$mindAnchorServerPlayer(ServerPlayer serverPlayer, ServerLevel level, BlockPos pos) {
         // IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(entity, true);
         serverPlayer.sendSystemMessage(Component.nullToEmpty("Helo!!!!! Mind broken!!!"));
 
@@ -234,7 +206,8 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         }
     }
 
-    static private void theatrics(CastingEnvironment castingEnvironment, LivingEntity sacrifice, Vec3i pos) {
+    @Unique
+    static private void hexagony$theatrics(CastingEnvironment castingEnvironment, LivingEntity sacrifice, Vec3i pos) {
 
         // Death sound via accessor
         SoundEvent sound =
@@ -265,8 +238,8 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                 sacrifice,
                 SoundEvents.GLASS_BREAK, // spooky
                 SoundSource.AMBIENT,
-                0.5f,
-                0.8f
+                1.5f,
+                0.5f
         );
     }
 

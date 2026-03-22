@@ -3,9 +3,11 @@ package hauveli.hexagony.common.blocks
 import at.petrak.hexcasting.api.HexAPI
 import at.petrak.hexcasting.api.casting.circles.BlockEntityAbstractImpetus
 import at.petrak.hexcasting.api.utils.putTag
+import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockEntityRedstoneImpetus
 import at.petrak.hexcasting.common.lib.HexBlockEntities
 import com.mojang.authlib.GameProfile
 import com.mojang.datafixers.util.Pair
+import hauveli.hexagony.common.blocks.BlockFullMindAnchor.Companion.POWERED
 import hauveli.hexagony.registry.HexagonyBlockEntities
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -19,11 +21,13 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
 import java.util.*
 
-class BlockEntityFullMindAnchor(pWorldPosition: BlockPos, pBlockState: BlockState?) : BlockEntityAbstractImpetus(
-    HexagonyBlockEntities.MIND_ANCHOR.value, pWorldPosition, pBlockState
+open class BlockEntityFullMindAnchor(pWorldPosition: BlockPos, pBlockState: BlockState?) :
+    BlockEntityRedstoneImpetus( pWorldPosition, pBlockState
 ) {
     private var storedPlayerProfile: GameProfile? = null
     private var storedPlayer: UUID? = null
@@ -43,18 +47,18 @@ class BlockEntityFullMindAnchor(pWorldPosition: BlockPos, pBlockState: BlockStat
             return this.storedPlayerProfile
         }
 
-    fun setPlayer(profile: GameProfile?, player: UUID?) {
+    override fun setPlayer(profile: GameProfile?, player: UUID?) {
         this.storedPlayerProfile = profile
         this.storedPlayer = player
         this.setChanged()
     }
 
-    fun clearPlayer() {
+    override fun clearPlayer() {
         this.storedPlayerProfile = null
         this.storedPlayer = null
     }
 
-    fun updatePlayerProfile() {
+    override fun updatePlayerProfile() {
         val player = getStoredPlayer()
         if (player != null) {
             val newProfile = player.getGameProfile()
@@ -65,8 +69,12 @@ class BlockEntityFullMindAnchor(pWorldPosition: BlockPos, pBlockState: BlockStat
         }
     }
 
+    fun getStoredUUID(): UUID? {
+        return this.storedPlayer
+    }
+
     // just feels wrong to use the protected method
-    fun getStoredPlayer(): ServerPlayer? {
+    override fun getStoredPlayer(): ServerPlayer? {
         if (this.storedPlayer == null) {
             return null
         }

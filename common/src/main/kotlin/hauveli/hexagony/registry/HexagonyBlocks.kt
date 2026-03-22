@@ -36,16 +36,18 @@ object HexagonyBlocks : HexagonyRegistrar<Block>(
         BlockEmptyMindAnchor(
             BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(3.0f, 6.0f)
+                .strength(1.0f, 100.0f)
                 .sound(SoundType.AMETHYST)
                 .requiresCorrectToolForDrops()
+                .instabreak()
         )
     }
+
     val MIND_ANCHOR_FULL = make("mind_anchor/full") {
         BlockFullMindAnchor(
             BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_PURPLE)
-                .strength(3.0f, 6.0f)
+                .strength(-1.0f, 360000000.0f)
                 .sound(SoundType.AMETHYST)
         )
     }
