@@ -18,14 +18,11 @@ public class MindAnchorIndestructibleAtItemEntityHurtMixin {
         ItemEntity entity = (ItemEntity)(Object)this;
         ItemStack stack = entity.getItem();
 
-        // TODO: uncomment after making the item
-        // Example: Only make Netherite items indestructible
-        if (stack.is(HexagonyItems.MIND_ANCHOR.getValue())) {
+        // TODO: prevent despawn timer from acting on this?
+        if (stack.is(HexagonyItems.MIND_ANCHOR_FULL.getValue())) {
             // Cancel the damage so it never takes damage
             cir.setReturnValue(false);
         }
-
-        // OR: Make ALL items indestructible
         // cir.setReturnValue(false);
     }
 }

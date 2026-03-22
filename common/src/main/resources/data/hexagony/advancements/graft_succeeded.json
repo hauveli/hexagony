@@ -11,7 +11,7 @@
   "display": {
     "announce_to_chat": false,
     "bold": true,
-    "color": "dark_purple",
+    "color": "light_purple",
     "description": "... and succeed.",
     "frame": "challenge",
     "hidden": true,

@@ -24,8 +24,11 @@ object Hexagony {
         initRegistries(
             HexagonyActions,
             HexagonyBlocks,
-            HexagonyItems, // Blocks must be registered first in order to access block.value!!!
-            // HexagonyBlockEntities
+            HexagonyItems // Blocks must be registered first in order to access block.value!!!
+        )
+        // It works and I'm lazy?
+        initRegistries(
+            HexagonyBlockEntities
         )
         HexagonyNetworking.init()
     }

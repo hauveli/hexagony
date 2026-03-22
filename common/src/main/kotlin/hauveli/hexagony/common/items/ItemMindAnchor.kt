@@ -21,6 +21,7 @@ import java.util.UUID
 
 
 class ItemMindAnchor(properties: Properties?) : Item(properties), MindContainerItem {
+
     init {
         DispenserBlock.registerBehavior(this, object : OptionalDispenseItemBehavior() {
             override fun execute(world: BlockSource, stack: ItemStack): ItemStack {

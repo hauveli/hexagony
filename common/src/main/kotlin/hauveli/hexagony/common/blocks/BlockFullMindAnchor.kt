@@ -5,6 +5,9 @@ import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockEntityRedstoneImpetus
 import at.petrak.hexcasting.common.lib.HexSounds
 import at.petrak.hexcasting.xplat.IXplatAbstractions
+//import hauveli.hexagony.common.lib.BlockProperties
+//import hauveli.hexagony.common.lib.BlockProperties.Companion.FILLED
+import hauveli.hexagony.registry.HexagonyBlockEntities
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -102,6 +105,6 @@ class BlockFullMindAnchor(p_49795_: Properties) : BlockAbstractImpetus(p_49795_)
     }
 
     companion object {
-        val POWERED: BooleanProperty = BlockStateProperties.POWERED
+        val POWERED: BooleanProperty  = BooleanProperty.create("powered")
     }
 }

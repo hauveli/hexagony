@@ -20,9 +20,21 @@ object HexagonyItems : HexagonyRegistrar<Item>(
 ) {
     // BlockItems
     @JvmField
-    val MIND_ANCHOR = make("mind_anchor") {
+    val MIND_ANCHOR = make("mind_anchor/empty") {
         BlockItem(
             HexagonyBlocks.MIND_ANCHOR_EMPTY.value,   // safe: lazy evaluated during init
+            Item.Properties()
+                .stacksTo(64)
+                .rarity(Rarity.RARE)
+                .fireResistant()
+        )
+    }
+
+    // BlockItems
+    @JvmField
+    val MIND_ANCHOR_FULL = make("mind_anchor/full") {
+        BlockItem(
+            HexagonyBlocks.MIND_ANCHOR_FULL.value,   // safe: lazy evaluated during init
             Item.Properties()
                 .stacksTo(1)
                 .rarity(Rarity.EPIC)

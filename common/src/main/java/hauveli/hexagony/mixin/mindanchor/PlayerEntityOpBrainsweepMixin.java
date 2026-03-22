@@ -25,6 +25,8 @@ import at.petrak.hexcasting.common.recipe.HexRecipeStuffRegistry;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
 import com.llamalad7.mixinextras.sugar.Local;
 import hauveli.hexagony.Hexagony;
+import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor;
+import hauveli.hexagony.common.blocks.BlockFullMindAnchor;
 import hauveli.hexagony.registry.HexagonyBlocks;
 import hauveli.hexagony.xplat.IXplatAbstractions;
 import net.minecraft.core.BlockPos;
@@ -32,6 +34,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
@@ -138,7 +141,8 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             // Might be as easy as setting the cir.returnvalue with a simple fake error?
             // alternatively, Print error myself, and return a successful cast (which wont print an error)
             if (!state.is(HexagonyBlocks.INSTANCE.getMIND_ANCHOR_EMPTY().getValue())) return;
-            if (state.getValue(BlockStateProperties.POWERED)) return; // if filled, return.
+            // Actually, once it's filled, it becomes type BlockFullMindAnchor... No need to check or even have this property...
+            // if (state.getValue(BlockFullMindAnchor.Companion.getFILLED())) return; // if filled, return.
             // currently set to redstone powered
             // world.setBlock(pos, block.defaultBlockState().setValue(FILLED, true), 3)
 
@@ -172,16 +176,8 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Theatrics next!")));
             theatrics(castingEnvironment, sacrifice, pos);
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Now mind anchoring!")));
-            mindAnchorLivingEntity(sacrifice);
+            mindAnchorLivingEntity(sacrifice, serverPlayer.serverLevel(), pos);
 
-            if (state.hasBlockEntity()) {
-                serverPlayer.sendSystemMessage(Component.nullToEmpty( "Block has block entity!" ));
-            }
-
-            serverPlayer.sendSystemMessage(Component.nullToEmpty( "Block has NO block entity!" ));
-
-            serverPlayer.sendSystemMessage(Component.nullToEmpty( "Spell casted?" ));
-            serverPlayer.sendSystemMessage(Component.nullToEmpty( String.valueOf (remainingToCast) ));
             // serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.toString() ));
             // TODO:
             // ESCAPE!!!!!
@@ -219,9 +215,15 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         return serverPlayer.getAdvancements().getOrStartProgress(adv).isDone();
     }
 
-    static private void mindAnchorLivingEntity(LivingEntity entity) {
+    static private void mindAnchorLivingEntity(LivingEntity entity, ServerLevel level, BlockPos pos) {
         // IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(entity, true);
         entity.sendSystemMessage(Component.nullToEmpty("Helo!!!!! Mind broken!!!"));
+
+        // world.setBlock(pos, block.defaultBlockState().setValue(FILLED, true), 3);
+        Block myBlock = HexagonyBlocks.INSTANCE.getMIND_ANCHOR_FULL().getValue();
+
+        BlockState state = myBlock.defaultBlockState();
+        level.setBlock(pos, state, 3);
     }
 
     static private void theatrics(CastingEnvironment castingEnvironment, LivingEntity sacrifice, Vec3i pos) {

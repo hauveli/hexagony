@@ -1,5 +1,6 @@
 {
-  "variants": {
-    "": { "model": "hexagony:block/mind_anchor" }
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "hexagony:block/mind_anchor2"
   }
 }

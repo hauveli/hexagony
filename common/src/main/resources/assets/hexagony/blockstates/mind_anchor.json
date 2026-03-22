@@ -1,6 +1,0 @@
-{
-  "variants": {
-    "filled=false": { "model": "hexagony:block/mind_anchor_empty" },
-    "filled=true":  { "model": "hexagony:block/mind_anchor_full" }
-  }
-}

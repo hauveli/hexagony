@@ -1,4 +1,11 @@
 {
+  "block.hexagony": {
+    mind_anchor: {
+      empty: "Empty Mind Anchor",
+      full: "Occupied Mind Anchor"
+    },
+  },
+
   hexagony: {
     book: {
       patterns: {

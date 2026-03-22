@@ -1,5 +1,5 @@
 {
-  "parent": "hexcasting:root",
+  "parent": "hexcasting:enlightenment",
   "criteria": {
     "graft_attempted": {
       "trigger": "minecraft:impossible"
@@ -11,7 +11,7 @@
   "display": {
     "announce_to_chat": true,
     "bold": true,
-    "color": "dark_red",
+    "color": "dark_purple",
     "description": "Attempt to flay own mind...",
     "frame": "goal",
     "hidden": true,
