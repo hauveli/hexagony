@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger
 import hauveli.hexagony.config.HexagonyServerConfig
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.registry.HexagonyActions
+import hauveli.hexagony.registry.HexagonyBlocks
+import hauveli.hexagony.registry.HexagonyItems
 
 object Hexagony {
     const val MODID = "hexagony"
@@ -20,6 +22,8 @@ object Hexagony {
         HexagonyServerConfig.init()
         initRegistries(
             HexagonyActions,
+            HexagonyBlocks,
+            HexagonyItems // Blocks must be registered first in order to access block.value!!!
         )
         HexagonyNetworking.init()
     }

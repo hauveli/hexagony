@@ -4,8 +4,6 @@ import at.petrak.hexcasting.fabric.cc.CCBrainswept
 import at.petrak.hexcasting.fabric.cc.HexCardinalComponents.BRAINSWEPT;
 
 import hauveli.hexagony.Hexagony
-import hauveli.hexagony.common.lib.HexagonyBlocks
-import hauveli.hexagony.common.lib.HexagonyItems
 
 import net.fabricmc.api.DedicatedServerModInitializer
 import net.minecraft.core.Registry
@@ -23,9 +21,6 @@ object FabricHexagonyServer : DedicatedServerModInitializer {
     }
 
     private fun initRegistries() {
-
-        HexagonyBlocks.registerBlocks(bind(BuiltInRegistries.BLOCK) as BiConsumer<Block?, ResourceLocation?>)
-        HexagonyBlocks.registerBlockItems(bind(BuiltInRegistries.ITEM) as BiConsumer<Item?, ResourceLocation?>)
     }
 
     private fun <T> bind(registry: Registry<in T>): BiConsumer<T, ResourceLocation> =

@@ -62,7 +62,7 @@ class FabricServerXplatImpl() : IXplatAbstractions {
                                    state: BlockState?,
                                    player: Player?): Boolean {
         var player = player
-        if (player == null) player = FakePlayer.get(world, IXplatAbstractions.HEXCASTING)
+        if (player == null) player = FakePlayer.get(world, IXplatAbstractions.HEXAGONY)
         return PlayerBlockBreakEvents.BEFORE.invoker()
             .beforeBlockBreak(world, player, pos, state, world?.getBlockEntity(pos))
     }
@@ -72,7 +72,7 @@ class FabricServerXplatImpl() : IXplatAbstractions {
                                   blockStack: ItemStack?,
                                   player: Player?): Boolean {
         var player = player
-        if (player == null) player = FakePlayer.get(world, IXplatAbstractions.HEXCASTING)
+        if (player == null) player = FakePlayer.get(world, IXplatAbstractions.HEXAGONY)
         val cached = player?.getMainHandItem()
         player?.setItemInHand(InteractionHand.MAIN_HAND, blockStack?.copy())
         val success = UseItemCallback.EVENT.invoker().interact(player, world, InteractionHand.MAIN_HAND)

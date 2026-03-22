@@ -22,6 +22,7 @@ import at.petrak.hexcasting.datagen.recipe.builders.BrainsweepRecipeBuilder
 import at.petrak.hexcasting.datagen.recipe.builders.CompatIngredientValue
 import at.petrak.hexcasting.datagen.recipe.builders.CreateCrushingRecipeBuilder
 import at.petrak.hexcasting.datagen.recipe.builders.FarmersDelightCuttingRecipeBuilder
+import hauveli.hexagony.registry.HexagonyBlocks
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.data.PackOutput
 import net.minecraft.data.recipes.*
@@ -42,6 +43,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer
+import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Blocks
 import org.apache.commons.codec.binary.Hex
 import java.util.List
@@ -82,8 +84,9 @@ class HexagonyXplatRecipes (
             .save(recipes)
         */
 
+        /*
         // val enlightenment = HexAdvancements.ENLIGHTEN
-        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, hauveli.hexagony.common.lib.HexagonyBlocks.MIND_ANCHOR )
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, HexagonyBlocks.MIND_ANCHOR as ItemLike)
             .define('B', Items.IRON_BARS)
             .define('A', HexItems.CHARGED_AMETHYST)
             .define('S', HexBlocks.SLATE_BLOCK)
@@ -97,7 +100,6 @@ class HexagonyXplatRecipes (
         // TODO: fix this, but honestly?
         // Unless it's done in HexMod I really can't be bothered,
         // I personally am only going to use this for one method I think...
-        /*
         BrainsweepRecipeBuilder(
             StateIngredientHelper.of(HexBlocks.IMPETUS_EMPTY),
             EntityIngredient(ServerPlayer, 1),

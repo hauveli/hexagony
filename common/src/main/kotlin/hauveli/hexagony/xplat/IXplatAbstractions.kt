@@ -54,8 +54,8 @@ interface IXplatAbstractions {
             }
         }
 
-        val HEXCASTING: GameProfile =
-            GameProfile(UUID.fromString("8BE7E9DA-1667-11EE-BE56-0242AC120002"), "[HexCasting]")
+        val HEXAGONY: GameProfile =
+            GameProfile(UUID.fromString("570B4172-4900-4351-89DE-B0749BBD1E1A"), "[Hexagony]")
 
         /** */
         val INSTANCE: IXplatAbstractions? = find()
