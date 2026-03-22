@@ -71,7 +71,6 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         if (pLevel is ServerLevel
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor
         ) {
-            val tile = pLevel.getBlockEntity(pPos) as BlockEntityFullMindAnchor
             summonItem(pLevel, pPos)
             println("DDDDDDD")
         }
@@ -81,8 +80,7 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         if (pLevel is ServerLevel
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor
         ) {
-            summonItem(pLevel, pPos)
-            println("WXXXXXXXXXXXXXXXXXX")
+            // todo: Do something like hurting or notifying the player here
         }
     }
 
@@ -132,8 +130,13 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         val itemStack = ItemStack(HexagonyBlocks.MIND_ANCHOR_FULL.value)
         // Create custom NBT
         val nbt = itemStack.getOrCreateCompound("UUID")
-        nbt.putUUID("UUID", getThisTile(level, pos).getStoredUUID())
+        println(getThisTile(level, pos).getStoredUUID())
+        val uuidOrNull = getThisTile(level, pos).getStoredUUID()
+        if (uuidOrNull != null) {
+            nbt.putUUID("UUID", uuidOrNull)
+        }
         println("What the sigma??")
+        println(getThisTile(level, pos).storedPlayer)
         val itemEntity = ItemEntity(
             level,
             pos.x + 0.5,   // Center in the block
