@@ -77,7 +77,6 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor
         ) {
             summonItem(pLevel, pPos)
-            println("DDDDDDD")
         }
     }
 
@@ -134,7 +133,7 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
     fun summonItem(level: ServerLevel, pos: BlockPos) {
         val itemStack = ItemStack(HexagonyBlocks.MIND_ANCHOR_FULL.value)
         // Create custom NBT
-        val nbt = itemStack.getOrCreateCompound("UUID")
+        val nbt = itemStack.getOrCreateCompound("BlockEntityTag")
         val tile = getThisTile(level, pos)
         val playerOrNull: ServerPlayer? = tile.storedPlayer
         val playerProfileOrNull = tile.playerNameHelper
