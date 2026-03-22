@@ -3,24 +3,29 @@ package hauveli.hexagony.common.blocks
 import at.petrak.hexcasting.api.block.circle.BlockAbstractImpetus
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.utils.getOrCreateCompound
+import at.petrak.hexcasting.api.utils.putCompound
 import at.petrak.hexcasting.api.utils.putUUID
 import at.petrak.hexcasting.common.blocks.circles.BlockEmptyImpetus
 import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockEntityRedstoneImpetus
 import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockRedstoneImpetus
 import at.petrak.hexcasting.common.lib.HexSounds
 import at.petrak.hexcasting.xplat.IXplatAbstractions
+import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER
+import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER_PROFILE
 //import hauveli.hexagony.common.lib.BlockProperties
 //import hauveli.hexagony.common.lib.BlockProperties.Companion.FILLED
 import hauveli.hexagony.registry.HexagonyBlockEntities
 import hauveli.hexagony.registry.HexagonyBlocks
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtUtils
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.BlockItem
@@ -42,7 +47,7 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
     BlockRedstoneImpetus(properties) {
 
     override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity {
-        return BlockEntityFullMindAnchor(pPos, pState)
+        return BlockEntityFullMindAnchor (pPos, pState)
     }
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
@@ -130,13 +135,17 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         val itemStack = ItemStack(HexagonyBlocks.MIND_ANCHOR_FULL.value)
         // Create custom NBT
         val nbt = itemStack.getOrCreateCompound("UUID")
-        println(getThisTile(level, pos).getStoredUUID())
-        val uuidOrNull = getThisTile(level, pos).getStoredUUID()
-        if (uuidOrNull != null) {
-            nbt.putUUID("UUID", uuidOrNull)
+        val tile = getThisTile(level, pos)
+        val playerOrNull: ServerPlayer? = tile.storedPlayer
+        val playerProfileOrNull = tile.playerNameHelper
+        if (playerOrNull != null) {
+            nbt.putUUID(TAG_STORED_PLAYER, playerOrNull.uuid)
+        }
+        if (playerProfileOrNull != null) {
+            nbt.putCompound(TAG_STORED_PLAYER_PROFILE, NbtUtils.writeGameProfile(CompoundTag(), playerProfileOrNull))
         }
         println("What the sigma??")
-        println(getThisTile(level, pos).storedPlayer)
+        println(getThisTile(level, pos))
         val itemEntity = ItemEntity(
             level,
             pos.x + 0.5,   // Center in the block
@@ -145,5 +154,6 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
             itemStack
         )
         itemEntity.setNoPickUpDelay() // ticks before it can be picked up
+        val test = level.addFreshEntity(itemEntity)
     }
 }

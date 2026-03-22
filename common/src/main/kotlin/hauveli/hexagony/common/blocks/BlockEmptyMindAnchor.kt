@@ -1,4 +1,4 @@
-package at.petrak.hexcasting.common.blocks.circles
+package hauveli.hexagony.common.blocks
 
 import at.petrak.hexcasting.api.block.circle.BlockCircleComponent
 import at.petrak.hexcasting.api.casting.circles.ICircleComponent

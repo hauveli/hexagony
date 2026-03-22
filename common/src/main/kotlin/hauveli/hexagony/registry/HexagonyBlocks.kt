@@ -4,10 +4,11 @@ import at.petrak.hexcasting.api.casting.ActionRegistryEntry
 import at.petrak.hexcasting.api.casting.castables.Action
 import at.petrak.hexcasting.api.casting.math.HexDir
 import at.petrak.hexcasting.api.casting.math.HexPattern
-import at.petrak.hexcasting.common.blocks.circles.BlockEmptyMindAnchor
+
 import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockRedstoneImpetus
 import com.mojang.authlib.properties.Property
 import hauveli.hexagony.Hexagony
+import hauveli.hexagony.common.blocks.BlockEmptyMindAnchor
 import hauveli.hexagony.common.blocks.BlockFullMindAnchor
 import hauveli.hexagony.common.lib.PropertyBlock
 import io.netty.util.collection.ByteCollections.emptyMap
