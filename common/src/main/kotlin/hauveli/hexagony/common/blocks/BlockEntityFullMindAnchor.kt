@@ -2,6 +2,7 @@ package hauveli.hexagony.common.blocks
 
 import at.petrak.hexcasting.api.HexAPI
 import at.petrak.hexcasting.api.casting.circles.BlockEntityAbstractImpetus
+import at.petrak.hexcasting.api.utils.putCompound
 import at.petrak.hexcasting.api.utils.putTag
 import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockEntityRedstoneImpetus
 import at.petrak.hexcasting.common.lib.HexBlockEntities
@@ -9,6 +10,7 @@ import com.mojang.authlib.GameProfile
 import com.mojang.datafixers.util.Pair
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.core.UUIDUtil
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtUtils
 import net.minecraft.nbt.Tag
@@ -22,7 +24,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import java.util.*
 
-open class BlockEntityFullMindAnchor (pWorldPosition: BlockPos, pBlockState: BlockState?) :
+class BlockEntityFullMindAnchor (pWorldPosition: BlockPos, pBlockState: BlockState?) :
     BlockEntityRedstoneImpetus( pWorldPosition, pBlockState
     ) {
 
@@ -90,12 +92,19 @@ open class BlockEntityFullMindAnchor (pWorldPosition: BlockPos, pBlockState: Blo
 
     override fun saveModData(tag: CompoundTag) {
         super.saveModData(tag)
-        if (this.storedPlayer != null) {
-            tag.putUUID(TAG_STORED_PLAYER, this.storedPlayer)
+        val playerNameNBT = CompoundTag()
+        val profile = this.storedPlayerProfile
+        if (profile != null && profile.name is String)
+            playerNameNBT.putString("Name", profile.name)
+        val uuid = this.storedPlayer
+        if (uuid != null) {
+            playerNameNBT.putIntArray("Id", UUIDUtil.uuidToIntArray(uuid) )
+            tag.putUUID(TAG_STORED_PLAYER, uuid)
         }
-        if (this.storedPlayerProfile != null) {
-            tag.put(TAG_STORED_PLAYER_PROFILE, NbtUtils.writeGameProfile(CompoundTag(), storedPlayerProfile))
-        }
+        tag.putCompound(
+            TAG_STORED_PLAYER_PROFILE,
+            value = playerNameNBT
+        )
     }
 
     override fun loadModData(tag: CompoundTag) {

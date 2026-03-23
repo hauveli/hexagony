@@ -1,25 +1,22 @@
 package hauveli.hexagony.common.blocks
 
+//import hauveli.hexagony.common.lib.BlockProperties
+//import hauveli.hexagony.common.lib.BlockProperties.Companion.FILLED
 import at.petrak.hexcasting.api.block.circle.BlockAbstractImpetus
 import at.petrak.hexcasting.api.casting.circles.BlockEntityAbstractImpetus.TAG_MEDIA
 import at.petrak.hexcasting.api.casting.circles.BlockEntityAbstractImpetus.TAG_PIGMENT
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.utils.getOrCreateCompound
 import at.petrak.hexcasting.api.utils.putCompound
-import at.petrak.hexcasting.api.utils.putUUID
-import at.petrak.hexcasting.common.blocks.circles.BlockEmptyImpetus
 import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockEntityRedstoneImpetus
 import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockRedstoneImpetus
 import at.petrak.hexcasting.common.lib.HexSounds
 import at.petrak.hexcasting.xplat.IXplatAbstractions
-import com.mojang.authlib.GameProfile
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER_PROFILE
-//import hauveli.hexagony.common.lib.BlockProperties
-//import hauveli.hexagony.common.lib.BlockProperties.Companion.FILLED
-import hauveli.hexagony.registry.HexagonyBlockEntities
 import hauveli.hexagony.registry.HexagonyBlocks
 import net.minecraft.core.BlockPos
+import net.minecraft.core.UUIDUtil
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtUtils
 import net.minecraft.server.level.ServerLevel
@@ -28,11 +25,8 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
-import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.BlockItem
-import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
@@ -43,16 +37,16 @@ import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.phys.BlockHitResult
-import java.text.DecimalFormat
-import java.util.UUID
+import org.jetbrains.annotations.Nullable
 
 // BlockAbstractImpetus happens to have a lot of useful features I want so that's convenient
 // Also I get to avoid having to construct quite a few classes which is awesome
-class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
+class BlockFullMindAnchor(properties: Properties) :
     BlockRedstoneImpetus(properties) {
 
     // Hmm...
     // BlockRedstoneImpetus already has a BlockEntity, how do we a void conflicts?
+    @Nullable
     override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity {
         return BlockEntityFullMindAnchor (pPos, pState)
     }
@@ -88,7 +82,6 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         if (pLevel is ServerLevel
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor
         ) {
-            // todo: Do something like hurting or notifying the player here
         }
     }
 
@@ -145,16 +138,14 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         // Create custom NBT
         val thisItemsNBT = itemStack.getOrCreateCompound("BlockEntityTag")
         val tile = getThisTile(level, pos)
-
-        // Todo: better checks?
         // For when it has been tied to a player
         if (tile.storedPlayer != null) {
             thisItemsNBT.putUUID(TAG_STORED_PLAYER, tile.storedPlayer?.uuid)
-        }
+        } else return thisItemsNBT
         if (tile.playerNameHelper != null) {
             thisItemsNBT.putCompound(TAG_STORED_PLAYER_PROFILE,
                 NbtUtils.writeGameProfile(CompoundTag(), tile.playerNameHelper))
-        }
+        } else return thisItemsNBT
 
         // Pigment can be null
         if (tile.pigment != null) {
