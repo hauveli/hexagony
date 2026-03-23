@@ -282,12 +282,12 @@ class BlockEntityFullMindAnchor(
     }
 
     fun helperApplyNbt(nbt: CompoundTag) : CompoundTag {
-        // Create custom NBT
-
         val playerNameNBT = CompoundTag()
+
         val profile = this.storedPlayerProfile
         if (profile != null && profile.name is String)
             playerNameNBT.putString("Name", profile.name)
+
         val uuid = this.storedPlayer
         if (uuid != null) {
             playerNameNBT.putIntArray("Id", UUIDUtil.uuidToIntArray(uuid) )
@@ -297,10 +297,11 @@ class BlockEntityFullMindAnchor(
             TAG_STORED_PLAYER_PROFILE,
             value = playerNameNBT
         )
-        // Pigment can be null
+
         if (this.pigment != null) {
             nbt.put(BlockEntityAbstractImpetus.TAG_PIGMENT, this.pigment!!.serializeToNBT());
         }
+
         nbt.putLong(BlockEntityAbstractImpetus.TAG_MEDIA, this.media)
 
         println(nbt)
