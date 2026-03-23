@@ -23,8 +23,7 @@ object HexagonyBlockEntities : HexagonyRegistrar<BlockEntityType<*>>(
     val MIND_ANCHOR = make(
         "mind_anchor/full",
         ::BlockEntityConjured ,
-        HexagonyBlocks.MIND_ANCHOR_FULL.value,
-        HexagonyBlocks.MIND_ANCHOR_EMPTY.value
+        HexagonyBlocks.MIND_ANCHOR_FULL.value //, HexagonyBlocks.MIND_ANCHOR_EMPTY.value
     )
 
     fun <T : BlockEntity> make(

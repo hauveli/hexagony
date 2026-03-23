@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.material.MapColor
-import java.util.function.ToIntFunction
 
 object HexagonyBlocks : HexagonyRegistrar<Block>(
     BuiltInRegistries.BLOCK.key() as ResourceKey<Registry<Block>>,
@@ -29,8 +28,6 @@ object HexagonyBlocks : HexagonyRegistrar<Block>(
                 .mapColor(MapColor.COLOR_PURPLE)
                 .strength(0.2f, 100.0f)
                 .sound(SoundType.AMETHYST)
-                .lightLevel(ToIntFunction { i: BlockState? -> 5 })
-                .emissiveRendering(BlockBehaviour.StatePredicate { state: BlockState?, level: BlockGetter?, pos: BlockPos? -> true })
         )
     }
 
@@ -40,6 +37,8 @@ object HexagonyBlocks : HexagonyRegistrar<Block>(
                 .mapColor(MapColor.COLOR_PURPLE)
                 .strength(0.2f, 360000000.0f)
                 .sound(SoundType.AMETHYST)
+                .lightLevel { _: BlockState? -> 25 }
+                .emissiveRendering { _: BlockState?, _: BlockGetter?, _: BlockPos? -> true }
         )
     }
 

@@ -14,11 +14,13 @@ import at.petrak.hexcasting.common.lib.HexSounds
 import at.petrak.hexcasting.xplat.IXplatAbstractions
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER_PROFILE
+import hauveli.hexagony.registry.HexagonyBlockEntities
 import hauveli.hexagony.registry.HexagonyBlocks
 import net.minecraft.core.BlockPos
 import net.minecraft.core.UUIDUtil
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtUtils
+import net.minecraft.network.chat.MutableComponent
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
@@ -42,14 +44,17 @@ import org.jetbrains.annotations.Nullable
 // BlockAbstractImpetus happens to have a lot of useful features I want so that's convenient
 // Also I get to avoid having to construct quite a few classes which is awesome
 class BlockFullMindAnchor(properties: Properties) :
-    BlockRedstoneImpetus(properties) {
+    BlockAbstractMindAnchor(properties) {
 
     // Hmm...
     // BlockRedstoneImpetus already has a BlockEntity, how do we a void conflicts?
     @Nullable
     override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity {
-        return BlockEntityFullMindAnchor (pPos, pState)
+        return BlockEntityFullMindAnchor (
+            HexagonyBlockEntities.MIND_ANCHOR.value, pPos, pState)
     }
+
+
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
         super.createBlockStateDefinition(builder)
@@ -63,11 +68,6 @@ class BlockFullMindAnchor(properties: Properties) :
         if (pLevel is ServerLevel
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor
         ) {
-            val tile = pLevel.getBlockEntity(pPos) as BlockEntityFullMindAnchor
-            when (tile.getStoredPlayer()) {
-                is ServerPlayer -> {}
-                else -> {}
-            }
         }
         return InteractionResult.PASS
     }
@@ -75,6 +75,7 @@ class BlockFullMindAnchor(properties: Properties) :
     override fun playerWillDestroy(pLevel: Level, pPos: BlockPos, state: BlockState, player: Player) {
         if (pLevel !is ServerLevel
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor) return
+        // TODO: if player is in creative, OR if item has empty tag, break as usual?
         summonItem(pLevel as ServerLevel, pPos)
     }
 
@@ -82,14 +83,15 @@ class BlockFullMindAnchor(properties: Properties) :
         if (pLevel is ServerLevel
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor
         ) {
+
         }
     }
 
      override fun tick(pState: BlockState, pLevel: ServerLevel, pPos: BlockPos, pRandom: RandomSource) {
         // I don't undertsand the purpose of the code below
         if (pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor) {
-            val tile = pLevel.getBlockEntity(pPos) as BlockEntityFullMindAnchor
-            tile.updatePlayerProfile()
+            // val tile = pLevel.getBlockEntity(pPos) as BlockEntityFullMindAnchor
+            // tile.updatePlayerProfile()
         }
     }
 
@@ -107,11 +109,6 @@ class BlockFullMindAnchor(properties: Properties) :
                 pLevel.setBlockAndUpdate(pPos, pState.setValue(POWERED, isPowered))
 
                 if (isPowered && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor) {
-                    val tile = pLevel.getBlockEntity(pPos) as BlockEntityFullMindAnchor
-                    val player: ServerPlayer? = tile.getStoredPlayer()
-                    // todo: in here!
-                    // Also todo: it might be fun to leave this behaviour here...
-                    tile.startExecution(player)
                 }
             }
         }
@@ -122,11 +119,6 @@ class BlockFullMindAnchor(properties: Properties) :
         val POWERED: BooleanProperty  = BooleanProperty.create("powered")
     }
 
-    fun getThisTile(level: ServerLevel, pos: BlockPos) : BlockEntityFullMindAnchor {
-        val tile = level.getBlockEntity(pos) as BlockEntityFullMindAnchor
-        return tile
-    }
-
     /*
         Need:
         Player UUID
@@ -134,33 +126,13 @@ class BlockFullMindAnchor(properties: Properties) :
         DUST_AMOUNT
         TAG_PIGMENT
      */
-    fun applyNbt(itemStack: ItemStack, level: ServerLevel, pos: BlockPos) : CompoundTag {
-        // Create custom NBT
-        val thisItemsNBT = itemStack.getOrCreateCompound("BlockEntityTag")
-        val tile = getThisTile(level, pos)
-        // For when it has been tied to a player
-        if (tile.storedPlayer != null) {
-            thisItemsNBT.putUUID(TAG_STORED_PLAYER, tile.storedPlayer?.uuid)
-        } else return thisItemsNBT
-        if (tile.playerNameHelper != null) {
-            thisItemsNBT.putCompound(TAG_STORED_PLAYER_PROFILE,
-                NbtUtils.writeGameProfile(CompoundTag(), tile.playerNameHelper))
-        } else return thisItemsNBT
-
-        // Pigment can be null
-        if (tile.pigment != null) {
-            thisItemsNBT.put(TAG_PIGMENT, tile.pigment.serializeToNBT());
-        }
-        thisItemsNBT.putLong(TAG_MEDIA, tile.media)
-
-        //val nbt_hover = itemStack.getOrCreateCompound("Hover")
-        return thisItemsNBT
-    }
 
     fun summonItem(level: ServerLevel, pos: BlockPos) {
         val itemStack = ItemStack(HexagonyBlocks.MIND_ANCHOR_FULL.value)
+        val thisItemsNBT = itemStack.getOrCreateCompound("BlockEntityTag")
         // Create custom NBT
-        applyNbt(itemStack, level, pos)
+        val tile = level.getBlockEntity(pos) as BlockEntityFullMindAnchor
+        tile.helperApplyNbt(thisItemsNBT)
         // TODO:
         // We probably want to escape if either of the two above were null, and say sommething like
         // "ooOooooOOOoo the dormant spirit could not be woken..."
@@ -178,5 +150,11 @@ class BlockFullMindAnchor(properties: Properties) :
         // Splattered on the ground at that position?
         // Do I make ItemFullMindAnchor have a tick function
         // and continually update the reference?
+    }
+
+    // No reason to bother killing all other instances if I code properly
+    // Only update player's reference if needed, in case server did not save nicely?
+    fun onLoad() {
+
     }
 }

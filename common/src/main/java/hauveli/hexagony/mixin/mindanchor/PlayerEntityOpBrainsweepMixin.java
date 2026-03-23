@@ -119,9 +119,9 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             long remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, true);
             serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(remainingToCast)));
 
-            if (remainingToCast == 0) {
-                grantAdvancement(serverPlayer, "graft_attempted");
-            }
+            if (remainingToCast > 0) return;
+
+            grantAdvancement(serverPlayer, "graft_attempted");
             // remove stack entirely?
             // Hmm... this seems anti-Hexcasting though...
             clearEntireStack(castingEnvironment);
@@ -199,9 +199,11 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         level.setBlock(pos, state, 3);
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof BlockEntityFullMindAnchor) {
-            ((BlockEntityFullMindAnchor) be).setPlayer(
-                    serverPlayer.getGameProfile(),
-                    serverPlayer.getUUID());
+            ((BlockEntityFullMindAnchor) be)
+                    .setPlayer(
+                        serverPlayer.getGameProfile(),
+                        serverPlayer.getUUID()
+                    );
             be.setChanged(); // mark dirty so it saves
         }
     }
