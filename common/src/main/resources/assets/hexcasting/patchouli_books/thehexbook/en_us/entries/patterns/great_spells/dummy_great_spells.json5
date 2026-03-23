@@ -1,7 +1,7 @@
 {
   name: "hexagony.book.patterns.great_spells.dummy_great_spells",
   category: "hexcasting:patterns/great_spells",
-  icon: "minecraft:birch_sign",
+  icon: "minecraft:acacia_sign",
   advancement: "hexcasting:root",
   pages: [
     {
