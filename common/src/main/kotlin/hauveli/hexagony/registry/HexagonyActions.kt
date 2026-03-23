@@ -16,8 +16,6 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
 
     val GREAT_CONGRATULATE = make("congratulate/great", HexDir.EAST, "qwwqqqwwqwded", OpCongratulate)
 
-    // val GREAT_BRAINSWEEP = make("brainsweep", HexDir.NORTH_EAST, "qeqwqwqwqwqeqaeqeaqeqaeqaqded", OpBrainsweep)
-
     private fun make(name: String, startDir: HexDir, signature: String, action: Action) =
         make(name, startDir, signature) { action }
 
