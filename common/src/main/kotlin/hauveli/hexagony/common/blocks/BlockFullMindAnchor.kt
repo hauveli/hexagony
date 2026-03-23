@@ -51,6 +51,8 @@ import java.util.UUID
 class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
     BlockRedstoneImpetus(properties) {
 
+    // Hmm...
+    // BlockRedstoneImpetus already has a BlockEntity, how do we a void conflicts?
     override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity {
         return BlockEntityFullMindAnchor (pPos, pState)
     }
