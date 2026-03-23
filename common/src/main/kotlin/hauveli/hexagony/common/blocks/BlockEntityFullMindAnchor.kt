@@ -17,6 +17,7 @@ import at.petrak.hexcasting.common.items.magic.ItemCreativeUnlocker
 import at.petrak.hexcasting.common.lib.HexItems
 import com.mojang.authlib.GameProfile
 import com.mojang.datafixers.util.Pair
+import hauveli.hexagony.registry.HexagonyBlockEntities
 import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -54,10 +55,9 @@ import kotlin.math.min
  * wanna do something wild and new
  */
 class BlockEntityFullMindAnchor(
-    pType: BlockEntityType<*>?,
     pWorldPosition: BlockPos,
     pBlockState: BlockState?
-) : HexBlockEntity(pType, pWorldPosition, pBlockState), WorldlyContainer {
+) : HexBlockEntity (HexagonyBlockEntities.MIND_ANCHOR.value, pWorldPosition, pBlockState), WorldlyContainer {
     // We might try to load the executor in loadModData when the level doesn't exist yet,
     // so save the tag and load it lazy
     var lazyExecutionState: CompoundTag? = null
@@ -121,8 +121,6 @@ class BlockEntityFullMindAnchor(
             tag.put(TAG_EXECUTION_STATE, this.executionState!!.save())
         }
 
-        tag.putLong(TAG_MEDIA, this.media)
-
         if (this.displayMsg != null && this.displayItem != null) {
             tag.putString(
                 TAG_ERROR_MSG,
@@ -132,10 +130,8 @@ class BlockEntityFullMindAnchor(
             this.displayItem!!.save(itemTag)
             tag.put(TAG_ERROR_DISPLAY, itemTag)
         }
-        if (this.pigment != null) tag.put(
-            TAG_PIGMENT,
-            this.pigment!!.serializeToNBT()
-        )
+
+        helperApplyNbt(tag)
     }
 
     override fun loadModData(tag: CompoundTag) {
@@ -307,6 +303,7 @@ class BlockEntityFullMindAnchor(
         }
         nbt.putLong(BlockEntityAbstractImpetus.TAG_MEDIA, this.media)
 
+        println(nbt)
         //val nbt_hover = itemStack.getOrCreateCompound("Hover")
         return nbt
     }

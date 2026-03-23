@@ -1,7 +1,7 @@
 package hauveli.hexagony.registry
 
-import at.petrak.hexcasting.common.blocks.entity.BlockEntityConjured
 import hauveli.hexagony.Hexagony
+import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
@@ -22,7 +22,7 @@ object HexagonyBlockEntities : HexagonyRegistrar<BlockEntityType<*>>(
     // testing
     val MIND_ANCHOR = make(
         "mind_anchor/full",
-        ::BlockEntityConjured ,
+        ::BlockEntityFullMindAnchor,
         HexagonyBlocks.MIND_ANCHOR_FULL.value //, HexagonyBlocks.MIND_ANCHOR_EMPTY.value
     )
 

@@ -50,11 +50,8 @@ class BlockFullMindAnchor(properties: Properties) :
     // BlockRedstoneImpetus already has a BlockEntity, how do we a void conflicts?
     @Nullable
     override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity {
-        return BlockEntityFullMindAnchor (
-            HexagonyBlockEntities.MIND_ANCHOR.value, pPos, pState)
+        return BlockEntityFullMindAnchor (pPos, pState)
     }
-
-
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
         super.createBlockStateDefinition(builder)

@@ -199,6 +199,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         level.setBlock(pos, state, 3);
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof BlockEntityFullMindAnchor) {
+            serverPlayer.sendSystemMessage(Component.nullToEmpty("Block WAS instance of, should be OK!!"));
             ((BlockEntityFullMindAnchor) be)
                     .setPlayer(
                         serverPlayer.getGameProfile(),
@@ -206,6 +207,9 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                     );
             be.setChanged(); // mark dirty so it saves
         }
+        serverPlayer.sendSystemMessage(Component.nullToEmpty(be.toString()));
+
+        serverPlayer.sendSystemMessage(Component.nullToEmpty("POST setting block entity"));
     }
 
     @Unique

@@ -23,10 +23,10 @@ import java.util.*
 
 
 // Facing dir is the direction it starts searching for slates in to start
-abstract class BlockAbstractMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_), EntityBlock {
+abstract class BlockAbstractMindAnchor(properties: Properties) : BlockCircleComponent(properties), EntityBlock {
     init {
         this.registerDefaultState(
-            this.stateDefinition.any().setValue<Boolean?, Boolean?>(ENERGIZED, false).setValue<Direction?, Direction?>(
+            this.stateDefinition.any().setValue(ENERGIZED, false).setValue(
                 FACING, Direction.NORTH
             )
         )
@@ -51,7 +51,7 @@ abstract class BlockAbstractMindAnchor(p_49795_: Properties) : BlockCircleCompon
     }
 
     override fun possibleExitDirections(pos: BlockPos?, bs: BlockState, world: Level?): EnumSet<Direction?> {
-        return EnumSet.of<Direction?>(bs.getValue<Direction?>(FACING))
+        return EnumSet.of(bs.getValue(FACING))
     }
 
     override fun normalDir(pos: BlockPos, bs: BlockState, world: Level?, recursionLeft: Int): Direction? {
@@ -94,7 +94,7 @@ abstract class BlockAbstractMindAnchor(p_49795_: Properties) : BlockCircleCompon
     }
 
     override fun rotate(pState: BlockState, pRot: Rotation): BlockState {
-        return pState.setValue<Direction?, Direction?>(FACING, pRot.rotate(pState.getValue<Direction?>(FACING)))
+        return pState.setValue(FACING, pRot.rotate(pState.getValue<Direction?>(FACING)))
     }
 
     override fun mirror(pState: BlockState, pMirror: Mirror): BlockState {

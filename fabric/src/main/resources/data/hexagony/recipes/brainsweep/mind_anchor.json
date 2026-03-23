@@ -2,7 +2,7 @@
   "type": "hexcasting:brainsweep",
   "blockIn": {
     "type": "block",
-    "block": "hexcasting:impetus/empty"
+    "block": "hexagony:mind_anchor/full"
   },
   "cost": 1000000,
   "entityIn": {
@@ -10,7 +10,7 @@
     "entityType": "minecraft:player"
   },
   "result": {
-    "name": "hexcasting:impetus/full",
+    "name": "hexagony:mind_anchor/full",
     "properties": {
       "energized": "false",
       "facing": "north"
