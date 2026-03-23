@@ -58,7 +58,7 @@ class BlockFullMindAnchor(properties: Properties) :
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
         super.createBlockStateDefinition(builder)
-        // builder.add(POWERED)
+        builder.add(POWERED)
     }
 
     override fun use(
@@ -113,7 +113,6 @@ class BlockFullMindAnchor(properties: Properties) :
             }
         }
     }
-
 
     companion object {
         val POWERED: BooleanProperty  = BooleanProperty.create("powered")
