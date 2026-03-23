@@ -1,6 +1,8 @@
 package hauveli.hexagony.common.blocks
 
 import at.petrak.hexcasting.api.block.circle.BlockAbstractImpetus
+import at.petrak.hexcasting.api.casting.circles.BlockEntityAbstractImpetus.TAG_MEDIA
+import at.petrak.hexcasting.api.casting.circles.BlockEntityAbstractImpetus.TAG_PIGMENT
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.utils.getOrCreateCompound
 import at.petrak.hexcasting.api.utils.putCompound
@@ -10,6 +12,7 @@ import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockEntityRedstoneI
 import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockRedstoneImpetus
 import at.petrak.hexcasting.common.lib.HexSounds
 import at.petrak.hexcasting.xplat.IXplatAbstractions
+import com.mojang.authlib.GameProfile
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER_PROFILE
 //import hauveli.hexagony.common.lib.BlockProperties
@@ -40,6 +43,8 @@ import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.phys.BlockHitResult
+import java.text.DecimalFormat
+import java.util.UUID
 
 // BlockAbstractImpetus happens to have a lot of useful features I want so that's convenient
 // Also I get to avoid having to construct quite a few classes which is awesome
@@ -127,24 +132,45 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
         return tile
     }
 
+    /*
+        Need:
+        Player UUID
+        Player GameProfile
+        DUST_AMOUNT
+        TAG_PIGMENT
+     */
+    fun applyNbt(itemStack: ItemStack, level: ServerLevel, pos: BlockPos) : CompoundTag {
+        // Create custom NBT
+        val thisItemsNBT = itemStack.getOrCreateCompound("BlockEntityTag")
+        val tile = getThisTile(level, pos)
+
+        // Todo: better checks?
+        // For when it has been tied to a player
+        if (tile.storedPlayer != null) {
+            thisItemsNBT.putUUID(TAG_STORED_PLAYER, tile.storedPlayer?.uuid)
+        }
+        if (tile.playerNameHelper != null) {
+            thisItemsNBT.putCompound(TAG_STORED_PLAYER_PROFILE,
+                NbtUtils.writeGameProfile(CompoundTag(), tile.playerNameHelper))
+        }
+
+        // Pigment can be null
+        if (tile.pigment != null) {
+            thisItemsNBT.put(TAG_PIGMENT, tile.pigment.serializeToNBT());
+        }
+        thisItemsNBT.putLong(TAG_MEDIA, tile.media)
+
+        //val nbt_hover = itemStack.getOrCreateCompound("Hover")
+        return thisItemsNBT
+    }
+
     fun summonItem(level: ServerLevel, pos: BlockPos) {
         val itemStack = ItemStack(HexagonyBlocks.MIND_ANCHOR_FULL.value)
         // Create custom NBT
-        val nbt = itemStack.getOrCreateCompound("BlockEntityTag")
-        val tile = getThisTile(level, pos)
-        val playerOrNull: ServerPlayer? = tile.storedPlayer
-        val playerProfileOrNull = tile.playerNameHelper
-        if (playerOrNull != null) {
-            nbt.putUUID(TAG_STORED_PLAYER, playerOrNull.uuid)
-        }
-        if (playerProfileOrNull != null) {
-            nbt.putCompound(TAG_STORED_PLAYER_PROFILE, NbtUtils.writeGameProfile(CompoundTag(), playerProfileOrNull))
-        }
+        applyNbt(itemStack, level, pos)
         // TODO:
         // We probably want to escape if either of the two above were null, and say sommething like
         // "ooOooooOOOoo the dormant spirit could not be woken..."
-        println("What the sigma??")
-        println(getThisTile(level, pos))
         val itemEntity = ItemEntity(
             level,
             pos.x + 0.5,   // Center in the block
@@ -153,7 +179,7 @@ class BlockFullMindAnchor(properties: BlockBehaviour.Properties) :
             itemStack
         )
         itemEntity.setNoPickUpDelay() // ticks before it can be picked up
-        val test = level.addFreshEntity(itemEntity)
+        level.addFreshEntity(itemEntity)
         // OK. Now that it is an itemEntity, what now?
         // Update the player associated with this Anchor, and let them know that their soul is now
         // Splattered on the ground at that position?

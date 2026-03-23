@@ -1,17 +1,21 @@
 package hauveli.hexagony.common.items
 
 import at.petrak.hexcasting.annotations.SoftImplement
+import at.petrak.hexcasting.api.casting.circles.BlockEntityAbstractImpetus.TAG_MEDIA
 import at.petrak.hexcasting.common.lib.HexAttributes
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
+import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor.Companion.TAG_STORED_PLAYER
+import net.minecraft.ChatFormatting
 import net.minecraft.client.renderer.item.ItemProperties
 import net.minecraft.core.BlockPos
 
 import net.minecraft.core.BlockSource
 import net.minecraft.core.dispenser.OptionalDispenseItemBehavior
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ai.attributes.Attribute
@@ -20,6 +24,8 @@ import net.minecraft.world.item.ArmorItem
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.DispenserBlock
 
@@ -28,8 +34,37 @@ import java.util.UUID
 import javax.swing.text.html.BlockView
 
 
-class ItemMindAnchor(properties: ItemProperties?) : Item (properties as Properties), MindContainerItem {
+class ItemMindAnchor(block: Block?, properties: Properties) : BlockItem (block as Block, properties), MindContainerItem {
 
+    override fun appendHoverText(
+        stack: ItemStack,
+        level: Level?,
+        tooltip: MutableList<Component>,
+        flag: TooltipFlag
+    ) {
+        val tag = stack.tag ?: return
+
+        tooltip.add(
+            Component.literal("Hello! Testing this to see how it works! ${tag}")
+                .withStyle(ChatFormatting.GRAY)
+        )
+
+        if (tag.contains(TAG_STORED_PLAYER)) {
+            tooltip.add(
+                Component.literal("Owner: ${tag.getString(TAG_STORED_PLAYER)}")
+                    .withStyle(ChatFormatting.GRAY)
+            )
+        }
+
+        if (tag.contains(TAG_MEDIA)) {
+            tooltip.add(
+                Component.literal("Media: ${tag.getInt(TAG_MEDIA)}")
+                    .withStyle(ChatFormatting.AQUA)
+            )
+        }
+    }
+
+    // dont need this
     init {
         DispenserBlock.registerBehavior(this, object : OptionalDispenseItemBehavior() {
             override fun execute(world: BlockSource, stack: ItemStack): ItemStack {

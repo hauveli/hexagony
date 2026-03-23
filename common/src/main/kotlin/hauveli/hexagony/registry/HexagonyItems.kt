@@ -1,6 +1,7 @@
 package hauveli.hexagony.registry
 
 import hauveli.hexagony.Hexagony
+import hauveli.hexagony.common.items.ItemMindAnchor
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Item
@@ -33,7 +34,7 @@ object HexagonyItems : HexagonyRegistrar<Item>(
     // BlockItems
     @JvmField
     val MIND_ANCHOR_FULL = make("mind_anchor/full") {
-        BlockItem(
+        ItemMindAnchor(
             HexagonyBlocks.MIND_ANCHOR_FULL.value,   // safe: lazy evaluated during init
             Item.Properties()
                 .stacksTo(1)
