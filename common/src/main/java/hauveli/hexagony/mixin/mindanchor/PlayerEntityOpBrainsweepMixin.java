@@ -9,12 +9,15 @@ import at.petrak.hexcasting.api.casting.mishaps.*;
 import at.petrak.hexcasting.api.pigment.FrozenPigment;
 import at.petrak.hexcasting.common.casting.actions.spells.great.OpLightning;
 import at.petrak.hexcasting.common.casting.actions.spells.great.OpBrainsweep;
+import at.petrak.hexcasting.common.lib.HexDamageTypes;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
 import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor;
 import hauveli.hexagony.registry.HexagonyBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -22,8 +25,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -87,29 +96,49 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             castingEnvironment.assertVecInRange(vecPos);
             castingEnvironment.assertEntityInRange(sacrifice); // You never know
 
+
+            // Regardless of if it is valid or not, apply one damage, same as villagers take from it?
+            Holder<DamageType> holder = serverPlayer.level().registryAccess()
+                    .registryOrThrow(Registries.DAMAGE_TYPE)
+                    .getHolderOrThrow(HexDamageTypes.OVERCAST);;
+            serverPlayer.hurt(
+                    new DamageSource(holder, castingEnvironment.getCastingEntity()),
+                    1);
+
+            // Out of range
             if (!castingEnvironment.canEditBlockAt(pos)) {
                 throw new MishapBadLocation(vecPos, "forbidden");
             }
 
-            if (!hexagony$isTargetingSelf(sacrifice, castingEnvironment)) return;
-            // Todo: error message on fail *because* already grafted?
-            if (hexagony$isGrafted(serverPlayer)) return; // maybe I should allow it? but display a message like for villagers...
-            /*
-            if (IXplatAbstractions.Companion.getINSTANCE().isBrainswept(serverPlayer)) {
-                serverPlayer.sendSystemMessage(Component.nullToEmpty( "Player already brainswept" ));
-                // Why on earth am I not just checking advancements?
-                IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(sacrifice, false);
-                return;
+            // I forget what this one prints but I'm sure it's intelligible
+            if (!hexagony$isTargetingSelf(sacrifice, castingEnvironment))  {
+                throw new MishapImmuneEntity(sacrifice);
             }
-            */
+
+            // Mind has already been used
+            if (hexagony$isGrafted(serverPlayer)) {
+                ServerLevel serverLevel = (ServerLevel) serverPlayer.level();
+                Villager villager = new Villager(
+                        EntityType.VILLAGER,
+                        serverLevel,
+                        VillagerType.PLAINS
+                );
+                villager.setCustomName(Component.literal("Bob"));
+                throw new MishapAlreadyBrainswept(villager);
+            }
 
             BlockState state = castingEnvironment.getWorld().getBlockState(pos);
-            // well, No more brainsweep recipe use!
-            // TODO: verify that BlockState is correct block << HERE
-            // TODO: add custom error messages using fake error contexts and such?
-            // Might be as easy as setting the cir.returnvalue with a simple fake error?
-            // alternatively, Print error myself, and return a successful cast (which wont print an error)
-            if (!state.is(HexagonyBlocks.INSTANCE.getMIND_ANCHOR_EMPTY().getValue())) return;
+            // The X rejected the being's mind error?
+            if (!state.is(HexagonyBlocks.INSTANCE.getMIND_ANCHOR_EMPTY().getValue())) {
+                ServerLevel serverLevel = (ServerLevel) serverPlayer.level();
+                Villager villager = new Villager(
+                        EntityType.VILLAGER,
+                        serverLevel,
+                        VillagerType.PLAINS
+                );
+                villager.setCustomName(Component.literal("Bob"));
+                throw new MishapBadBrainsweep(villager, pos);
+            }
             // Actually, once it's filled, it becomes type BlockFullMindAnchor... No need to check or even have this property...
             // if (state.getValue(BlockFullMindAnchor.Companion.getFILLED())) return; // if filled, return.
             // currently set to redstone powered
@@ -117,42 +146,33 @@ public abstract class PlayerEntityOpBrainsweepMixin {
 
             // Should I simulate after all?
             long remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, true);
-            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(remainingToCast)));
 
+            // TODO: what error here?
+            // No error?
             if (remainingToCast > 0) return;
 
             grantAdvancement(serverPlayer, "graft_attempted");
             // remove stack entirely?
             // Hmm... this seems anti-Hexcasting though...
+            // TODO: remove only relevant parts of stack based on how cast went
             clearEntireStack(castingEnvironment);
 
+            // use a less flashy spell?
             SpellAction.Result fakeResult = OpLightning.INSTANCE.execute(List.of(new Vec3Iota(vecPos)), castingEnvironment);
             cir.setReturnValue(fakeResult);
 
             // todo: make this cleaner
             remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, false);
-            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(remainingToCast)));
-            // Do we for real need time inbetween these two events? hmm...
             if (serverPlayer.getHealth() > 0) {
-                serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(serverPlayer.getHealth())));
-                serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(serverPlayer.getMaxHealth())));
-                serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Too much health!")));
                 cir.cancel();
                 return;
             }
-            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Success! Grafted!!")));
-            grantAdvancement(serverPlayer, "graft_succeeded");
-            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Theatrics next!")));
+
             hexagony$theatrics(castingEnvironment, sacrifice, pos);
-            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf("Now mind anchoring!")));
+
             hexagony$mindAnchorServerPlayer(serverPlayer, serverPlayer.serverLevel(), pos);
 
-            // serverPlayer.sendSystemMessage(Component.nullToEmpty( castingImg.toString() ));
-            // TODO:
-            // ESCAPE!!!!!
-            // Result.getCost()
-            // is there a reason not to just return?
-            // If we are already dead anyway...
+            grantAdvancement(serverPlayer, "graft_succeeded");
             cir.cancel();
             // I don't think we can ever end up here without going into the if statement with ServerPlayer...
         }

@@ -148,8 +148,22 @@ class BlockFullMindAnchor(properties: Properties) :
         // and continually update the reference?
     }
 
-    // No reason to bother killing all other instances if I code properly
-    // Only update player's reference if needed, in case server did not save nicely?
+    /*
+     No reason to bother killing all other instances if I code properly
+     Only update player's reference if needed, in case server did not save nicely?
+     Would need to know what to do when an ItemStack, when an ItemEntity AND when a BlockEntity...
+     Possible solutions:
+     Server (NOT player!) should store a list of mind anchored players
+     each entry in the list should have these fields if possible
+        dimension: ResourceLocation?
+        position: Vec3
+        type: ItemStack, ItemEntity, BlockEntity
+        holder: ServerPlayer? // needs to account for offline players too... Just drop it when logging out instead? no need to manage offline players then...
+
+        getMindAnchor() // Gets dimension, Position in Dimension of Mind Anchor (Without stating form or holder)
+
+        setMindAnchor(dimension, position) // Places the block at that location as a BlockEntity, if possible, does nothing if not
+     */
     fun onLoad() {
 
     }
