@@ -8,6 +8,7 @@ import at.petrak.hexcasting.api.casting.circles.CircleExecutionState
 import at.petrak.hexcasting.api.casting.circles.ICircleComponent
 import at.petrak.hexcasting.api.misc.MediaConstants
 import at.petrak.hexcasting.api.pigment.FrozenPigment
+import at.petrak.hexcasting.api.utils.contains
 import at.petrak.hexcasting.api.utils.extractMedia
 import at.petrak.hexcasting.api.utils.putCompound
 import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockEntityRedstoneImpetus
@@ -46,7 +47,7 @@ import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
-
+// https://github.com/FallingColors/HexMod/blob/532fe9a60138544112e096812c7aefb78b3d7364/Common/src/main/java/at/petrak/hexcasting/common/blocks/circles/impetuses/BlockEntityRedstoneImpetus.java
 /**
  * Default impl for an impetus, not tecnically necessary but I'm exposing it for ease of use
  *
@@ -131,6 +132,9 @@ class BlockEntityFullMindAnchor(
             tag.put(TAG_ERROR_DISPLAY, itemTag)
         }
 
+        // This is needed for the dropped item, todo: just straight up re-use saveModData instead?
+        // Moving the contents of helperApplyNbt into saveModData and then calling the method would make a lot of sense
+        // if I have access to it...
         helperApplyNbt(tag)
     }
 
@@ -161,6 +165,17 @@ class BlockEntityFullMindAnchor(
         }
         if (tag.contains(TAG_PIGMENT, Tag.TAG_COMPOUND.toInt())) this.pigment =
             FrozenPigment.fromNBT(tag.getCompound(TAG_PIGMENT))
+
+        if (tag.contains(TAG_STORED_PLAYER, Tag.TAG_INT_ARRAY)) {
+            this.storedPlayer = tag.getUUID(TAG_STORED_PLAYER);
+        } else {
+            this.storedPlayer = null;
+        }
+        if (tag.contains(TAG_STORED_PLAYER_PROFILE, Tag.TAG_COMPOUND)) {
+            this.storedPlayerProfile = NbtUtils.readGameProfile(tag.getCompound(TAG_STORED_PLAYER_PROFILE));
+        } else {
+            this.storedPlayerProfile = null;
+        }
     }
 
     fun applyScryingLensOverlay(
@@ -304,7 +319,6 @@ class BlockEntityFullMindAnchor(
 
         nbt.putLong(BlockEntityAbstractImpetus.TAG_MEDIA, this.media)
 
-        println(nbt)
         //val nbt_hover = itemStack.getOrCreateCompound("Hover")
         return nbt
     }
