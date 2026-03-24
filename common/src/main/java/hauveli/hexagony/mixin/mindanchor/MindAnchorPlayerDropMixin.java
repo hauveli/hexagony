@@ -46,8 +46,6 @@ public abstract class MindAnchorPlayerDropMixin {
         if (deeperTag == null || !deeperTag.contains(TAG_STORED_PLAYER)) return;
         UUID mindUUID = deeperTag.getUUID(TAG_STORED_PLAYER);
 
-
-        serverPlayer.sendSystemMessage(Component.nullToEmpty(tag.toString()));
         MinecraftServer server = serverPlayer.server;
 
         MindAnchorManager.INSTANCE.trackItemEntity(
