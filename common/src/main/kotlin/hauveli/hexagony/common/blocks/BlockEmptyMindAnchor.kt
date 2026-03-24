@@ -28,8 +28,8 @@ class BlockEmptyMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_
     init {
         this.registerDefaultState(
             this.stateDefinition.any()
-                .setValue<Boolean?, Boolean?>(ENERGIZED, false)
-                .setValue<Direction?, Direction?>(FACING, Direction.NORTH)
+                .setValue(ENERGIZED, false)
+                .setValue(FACING, Direction.NORTH)
         )
     }
 
@@ -38,7 +38,7 @@ class BlockEmptyMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_
         bs: BlockState, world: ServerLevel?
     ): ICircleComponent.ControlFlow {
         return ICircleComponent.ControlFlow.Continue(
-            imageIn, List.of<Pair<BlockPos?, Direction?>?>(
+            imageIn, listOf<Pair<BlockPos?, Direction?>?>(
                 this.exitPositionFromDirection(
                     pos, bs.getValue<Direction?>(
                         FACING
@@ -54,11 +54,11 @@ class BlockEmptyMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_
         bs: BlockState,
         world: ServerLevel?
     ): Boolean {
-        return enterDir != bs.getValue<Direction?>(FACING).getOpposite()
+        return enterDir != bs.getValue<Direction?>(FACING).opposite
     }
 
     override fun possibleExitDirections(pos: BlockPos?, bs: BlockState, world: Level?): EnumSet<Direction?> {
-        return EnumSet.of<Direction?>(bs.getValue<Direction?>(FACING))
+        return EnumSet.of(bs.getValue(FACING))
     }
 
     override fun normalDir(pos: BlockPos, bs: BlockState, world: Level?, recursionLeft: Int): Direction? {

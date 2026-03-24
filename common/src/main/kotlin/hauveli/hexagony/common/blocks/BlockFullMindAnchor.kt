@@ -85,9 +85,9 @@ class BlockFullMindAnchor(properties: Properties) :
         super.setPlacedBy(level, pos, state, placer, stack)
         // Only run on the server
         if (!level.isClientSide) {
-            // Check if the stack has a mind UUID tag
-            val tag = stack.tag
-            val mindUUID = tag?.getUUID("MindUUID") ?: return
+            val mindAnchor = level.getBlockEntity(pos) as BlockEntityFullMindAnchor
+            val mindUUID = mindAnchor.getPlayerUuid()
+            if (mindUUID == null) return
             val minecraftServer = level.server
             // Update the MindAnchorSavedData to track as block
             if (minecraftServer != null) {

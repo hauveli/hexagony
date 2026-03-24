@@ -8,6 +8,7 @@ import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor.Companion.TAG_STORED_PLAYER
+import hauveli.hexagony.mind_anchor.MindAnchorManager
 import net.minecraft.ChatFormatting
 import net.minecraft.client.renderer.item.ItemProperties
 import net.minecraft.core.BlockPos
@@ -17,6 +18,8 @@ import net.minecraft.core.dispenser.OptionalDispenseItemBehavior
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
@@ -25,6 +28,7 @@ import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.DispenserBlock
@@ -35,6 +39,46 @@ import javax.swing.text.html.BlockView
 
 
 class ItemMindAnchor(block: Block?, properties: Properties) : BlockItem (block as Block, properties), MindContainerItem {
+
+    override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slotId: Int, isSelected: Boolean) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected)
+        val server = level.server
+        val tag = stack.tag
+        if (server != null &&
+            tag != null &&
+            tag.hasUUID(TAG_STORED_PLAYER)) {
+            MindAnchorManager.moveAnchor(
+                server,
+                tag.getUUID(TAG_STORED_PLAYER),
+                entity
+            )
+        }
+    }
+
+    override fun place(context: BlockPlaceContext): InteractionResult? {
+        // Erm, I'm not sure this is actually doing anything as opposed to the method in the BlockFullMindAnchor class...
+        // TODO: determine if this is actually needed
+        val level = context.level
+        val server = level.server
+        val player = context.player
+        val tag = context.itemInHand.tag
+        if (context.canPlace() &&
+            level != null &&
+            server != null &&
+            player != null &&
+            tag != null &&
+            tag.hasUUID(TAG_STORED_PLAYER)) {
+            val serverPlayer = server.playerList.getPlayer(player.uuid)
+            if (serverPlayer != null) {
+                MindAnchorManager.moveAnchor(
+                    server,
+                    tag.getUUID(TAG_STORED_PLAYER),
+                    serverPlayer.serverLevel(),
+                    context.clickedPos
+                )}
+        }
+        return super.place(context)
+    }
 
     override fun appendHoverText(
         stack: ItemStack,

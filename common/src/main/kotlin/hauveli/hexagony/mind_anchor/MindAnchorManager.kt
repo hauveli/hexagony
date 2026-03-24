@@ -1,7 +1,10 @@
 package hauveli.hexagony.mind_anchor
 
 import net.minecraft.core.BlockPos
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
@@ -41,6 +44,8 @@ object MindAnchorManager {
 
         if (entry != null) {
             entry.location = newLocation
+            entry.lastKnownDimension = holder.level().dimension()
+            entry.lastKnownPos = holder.position()
         } else {
             data.anchors[mindUUID] = MindAnchorEntry(
                 mindUUID,
@@ -54,15 +59,17 @@ object MindAnchorManager {
         data.setDirty()
     }
 
-    fun trackEntityByUUID(server: MinecraftServer, mindUUID: UUID, holderUUID: UUID) {
+    fun trackEntity(server: MinecraftServer, mindUUID: UUID, holderUUID: UUID) {
         val data = MindAnchorData.get(server)
         val entry = data.getMindAnchor(mindUUID)
 
         val newLocation = AnchorLocation.InEntity(holderUUID)
         val holderEntity = getEntityByUuid(server, holderUUID)
 
-        if (entry != null) {
+        if (entry != null && holderEntity != null) {
             entry.location = newLocation
+            entry.lastKnownDimension = holderEntity.level().dimension()
+            entry.lastKnownPos = holderEntity.position()
         } else {
             // doesn't make ANY sense if this is null, does it?
             if (holderEntity != null) {
@@ -75,6 +82,7 @@ object MindAnchorManager {
             }
         }
 
+        data.getMindAnchor(mindUUID)?.let { updateLastKnown(it, server) }
         data.setDirty()
     }
 
@@ -101,6 +109,8 @@ object MindAnchorManager {
 
         if (entry != null) {
             entry.location = newLocation
+            entry.lastKnownDimension = level.dimension()
+            entry.lastKnownPos = pos.center
         } else {
             data.anchors[mindUUID] = MindAnchorEntry(
                 mindUUID,
@@ -122,7 +132,7 @@ object MindAnchorManager {
         }
     }
 
-    fun getDimension(server: MinecraftServer, mindUUID: UUID): ResourceKey<Level>? {
+    fun getDim(server: MinecraftServer, mindUUID: UUID): ResourceKey<Level>? {
         val entry = getAnchor(server, mindUUID) ?: return null
         return when (val loc = entry.location) {
             is AnchorLocation.AsBlock -> loc.dimension
@@ -133,7 +143,7 @@ object MindAnchorManager {
     fun getLastKnownPos(server: MinecraftServer, mindUUID: UUID): Vec3? =
         getAnchor(server, mindUUID)?.lastKnownPos
 
-    fun getLastKnownDimension(server: MinecraftServer, mindUUID: UUID): ResourceKey<Level>? =
+    fun getLastKnownDim(server: MinecraftServer, mindUUID: UUID): ResourceKey<Level>? =
         getAnchor(server, mindUUID)?.lastKnownDimension
 
     fun getBestGuessPos(server: MinecraftServer, mindUUID: UUID): Vec3 {
@@ -149,6 +159,21 @@ object MindAnchorManager {
             return posOld
         }
         return Vec3(0.0,0.0,0.0) // I would hope Vec3 memoizes this one...
+    }
+
+    fun getBestGuessDim(server: MinecraftServer, mindUUID: UUID): ResourceKey<Level> {
+        val dimBlock = getDim(server, mindUUID)
+        val dimEntity = getEntity(server, mindUUID)?.level()?.dimension()
+        val dimOld = getLastKnownDim(server, mindUUID)
+        // ORDER OF PRIORITY: pos_block > pos_entity > pos_old
+        if (dimBlock != null) {
+            return dimBlock
+        } else if (dimEntity != null) {
+            return dimEntity
+        } else if (dimOld != null) {
+            return dimOld
+        }
+        return Level.OVERWORLD // Some worlds may not include Level.OVERWORLD, what then...
     }
 
 

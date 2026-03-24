@@ -12,7 +12,9 @@ import at.petrak.hexcasting.common.items.magic.ItemCreativeUnlocker
 import at.petrak.hexcasting.common.lib.HexItems
 import com.mojang.authlib.GameProfile
 import com.mojang.datafixers.util.Pair
+import hauveli.hexagony.common.blocks.anchors.MindAnchor
 import hauveli.hexagony.mind_anchor.MindAnchorData
+import hauveli.hexagony.mind_anchor.MindAnchorManager
 import hauveli.hexagony.registry.HexagonyBlockEntities
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -21,6 +23,8 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtUtils
 import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.tags.BlockTags
 import net.minecraft.util.Mth
 import net.minecraft.world.WorldlyContainer
@@ -66,6 +70,10 @@ class BlockEntityFullMindAnchor(
         protected set
     protected var displayItem: ItemStack? = null
     protected var pigment: FrozenPigment? = null
+
+    fun getPlayerUuid() : UUID? {
+        return this.storedPlayer
+    }
 
     fun extractMediaFromInsertedItem(stack: ItemStack, simulate: Boolean): Long {
         if (this.media < 0) {
@@ -157,10 +165,6 @@ class BlockEntityFullMindAnchor(
 
         if (tag.contains(TAG_STORED_PLAYER, Tag.TAG_INT_ARRAY)) {
             this.storedPlayer = tag.getUUID(TAG_STORED_PLAYER);
-            val uuid = this.storedPlayer
-            if (uuid != null) {
-                MindAnchorData().getMindAnchor(uuid)
-            }
         } else {
             this.storedPlayer = null;
         }

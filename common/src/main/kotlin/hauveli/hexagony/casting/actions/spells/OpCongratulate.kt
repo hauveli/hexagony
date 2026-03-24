@@ -29,8 +29,15 @@ object OpCongratulate : SpellAction {
     private data class Spell(val target: Entity) : RenderedSpell {
         // IMPORTANT: do not throw mishaps in this method! mishaps should ONLY be thrown in SpellAction.execute
         override fun cast(env: CastingEnvironment) {
-            env.printMessage(Component.nullToEmpty( (MindAnchorManager.getBestGuessPos(env.world.server, env.castingEntity!!.uuid)
-                .toString())));
+            val castingEntity = env.castingEntity as Entity
+            env.printMessage(Component.nullToEmpty(
+                MindAnchorManager
+                    .getBestGuessPos(env.world.server,
+                        castingEntity.uuid)
+                    .toString()));
+            env.printMessage(Component.nullToEmpty(
+                MindAnchorManager
+                    .toString()));
             env.printMessage("text.hexagony.congrats".asTranslatedComponent(target.displayName));
         }
     }
