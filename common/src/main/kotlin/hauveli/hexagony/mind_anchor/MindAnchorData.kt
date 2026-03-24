@@ -1,124 +1,191 @@
 package hauveli.hexagony.mind_anchor
 
+import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
+import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
-import net.minecraft.world.level.saveddata.SavedData
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import java.util.UUID
-import net.minecraft.core.BlockPos
-import net.minecraft.resources.ResourceKey
-import net.minecraft.core.registries.Registries
+
+
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.saveddata.SavedData
+
+// should I just somehow get them all to be part of the same variable instead? hmm...
+class MindAnchorRuntime {
+    var blockEntity: BlockEntity? = null
+        private set
+
+    var itemEntity: ItemEntity? = null
+        private set
+
+    var itemStack: Entity? = null
+        private set
+
+    var entity: Entity? = null
+        private set
+
+    fun trackBlock(be: BlockEntity) {
+        clear()
+        blockEntity = be
+    }
+
+    fun trackItemEntity(entity: ItemEntity) {
+        clear()
+        itemEntity = entity
+    }
+
+    fun trackItemStack(entity: Entity) {
+        clear()
+        itemStack = entity
+    }
+
+    fun trackEntity(entity: Entity) {
+        clear()
+        itemStack = entity
+    }
+
+    fun clear() {
+        blockEntity = null
+        itemEntity = null
+        itemStack = null
+    }
+}
+
+data class MindAnchorEntry(
+    val mindUUID: UUID,
+    var type: AnchorType,
+    var activeUUID: UUID?,
+    var dimension: ResourceKey<Level>,
+    var pos: BlockPos
+)
+
+enum class AnchorType {
+    BLOCK_ENTITY,
+    ITEM_ENTITY,
+    ITEM_STACK
+}
 
 class MindAnchorData : SavedData() {
-
     val anchors: MutableMap<UUID, MindAnchorEntry> = mutableMapOf()
 
-    // Fetch or create the saved data for the overworld
-    companion object {
-        private const val DATA_NAME = "hexagony_mind_anchors"
+    /*
+    fun resolve(server: MinecraftServer): Pair<ServerLevel, Vec3>? {
+        val level = server.getLevel(dimension) ?: return null
+        val bPos = BlockPos(
+            pos.x.toInt(),
+            pos.y.toInt(),
+            pos.z.toInt()
+        )
 
-        fun get(server: MinecraftServer): MindAnchorData {
-            return server.overworld().dataStorage.computeIfAbsent(::load, ::MindAnchorData, DATA_NAME)
-        }
-
-        fun load(tag: CompoundTag): MindAnchorData {
-            val data = MindAnchorData()
-            val list = tag.getList(DATA_NAME, Tag.TAG_COMPOUND.toInt())
-
-            for (i in 0 until list.size) {
-                val entryTag = list.getCompound(i)
-
-                val mindUUID = entryTag.getUUID("mindUUID")
-                val holderUUID = entryTag.getUUID("holderUUID")
-                val type = entryTag.getString("Type")
-                val dimension = ResourceKey.create(
-                    Registries.DIMENSION,
-                    ResourceLocation(entryTag.getString("Dimension"))
-                )
-                val pos = BlockPos(
-                    entryTag.getDouble("X").toInt(),
-                    entryTag.getDouble("Y").toInt(),
-                    entryTag.getDouble("Z").toInt()
-                )
-
-                val location = when (type) {
-                    "BLOCK_ENTITY" -> AnchorLocation.AsBlock(dimension, pos)
-                    else -> AnchorLocation.InEntity(holderUUID)
-                }
-
-                data.anchors[mindUUID] = MindAnchorEntry(
-                    mindUUID, location,
-                    lastKnownPos = pos.center,
-                    lastKnownDimension = dimension,
-                )
+        // returning the pair level, vec3
+        return when (type) {
+            AnchorType.BLOCK_ENTITY -> {
+                // Unlikely scenario, but it's possible that the uuid does not match...
+                if (level.getBlockEntity(bPos) != null &&
+                    (level.getBlockEntity(bPos) as BlockEntityFullMindAnchor).getPlayerUuid() == mindUUID) {
+                    level to pos
+                } else
+                    null
             }
 
-            return data
+            AnchorType.ITEM_ENTITY,
+            AnchorType.ITEM_STACK -> {
+                val entity = activeUUID?.let { level.getEntity(it) }
+                if (entity != null) {
+                    level to entity.position()
+                } else {
+                    // fallback to last known
+                    level to pos
+                }
+            }
         }
     }
+    */
 
-    // Get a specific mind anchor
-    fun getMindAnchor(mindUUID: UUID): MindAnchorEntry? = anchors[mindUUID]
-
-    // Add or update a mind anchor
-    fun setMindAnchor(
-        mindUUID: UUID,
-        holderUUID: UUID,
-        type: String,
-        dimension: ResourceLocation,
-        pos: Vec3
-    ) {
-        val location = when (type) {
-            "BLOCK_ENTITY" -> AnchorLocation.AsBlock(
-                ResourceKey.create(Registries.DIMENSION, dimension),
-                BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
+    fun getOrCreate(uuid: UUID): MindAnchorEntry {
+        return anchors.getOrPut(uuid) {
+            MindAnchorEntry(
+                uuid,
+                AnchorType.ITEM_STACK,
+                null,
+                Level.OVERWORLD,
+                BlockPos.ZERO
             )
-            else -> AnchorLocation.InEntity(holderUUID)
         }
-
-        anchors[mindUUID] = MindAnchorEntry(
-            mindUUID, location,
-            lastKnownPos = pos,
-            lastKnownDimension = ResourceKey.create(Registries.DIMENSION, dimension),
-        )
-        setDirty() // mark for saving
     }
 
-    // Save all anchors to NBT
     override fun save(tag: CompoundTag): CompoundTag {
         val list = ListTag()
 
         anchors.values.forEach { entry ->
-            val entryTag = CompoundTag()
-            entryTag.putUUID("mindUUID", entry.mindUUID)
+            val e = CompoundTag()
 
-            when (val loc = entry.location) {
-                is AnchorLocation.AsBlock -> {
-                    entryTag.putString("holderType", "BLOCK_ENTITY")
-                    entryTag.putString("Dimension", loc.dimension.location().toString())
-                    entryTag.putDouble("X", loc.pos.x.toDouble())
-                    entryTag.putDouble("Y", loc.pos.y.toDouble())
-                    entryTag.putDouble("Z", loc.pos.z.toDouble())
-                    entryTag.putUUID("holderUUID", UUID(0, 0)) // placeholder
-                }
+            e.putUUID("Mind", entry.mindUUID)
+            e.putString("Type", entry.type.name)
+            e.putString("Dimension", entry.dimension.location().toString())
+            entry.activeUUID?.let { e.putUUID("ActiveUUID", it) }
 
-                is AnchorLocation.InEntity -> {
-                    entryTag.putString("holderType", "ENTITY")
-                    entryTag.putUUID("holderUUID", loc.entityUUID)
-                    entryTag.putString("Dimension", "minecraft:overworld") // optional placeholder
-                    entryTag.putDouble("X", 0.0) // optional placeholder
-                    entryTag.putDouble("Y", 0.0)
-                    entryTag.putDouble("Z", 0.0)
-                }
-            }
+            e.putInt("X", entry.pos.x)
+            e.putInt("Y", entry.pos.y)
+            e.putInt("Z", entry.pos.z)
 
-            list.add(entryTag)
+            list.add(e)
         }
 
-        tag.put(DATA_NAME, list)
+        tag.put("Anchors", list)
         return tag
+    }
+
+    companion object {
+
+        private const val NAME = "hexagony_mind_anchors"
+
+        fun get(server: MinecraftServer): MindAnchorData {
+            return server.overworld().dataStorage.computeIfAbsent(
+                ::load,
+                ::MindAnchorData,
+                NAME
+            )
+        }
+
+        private fun load(tag: CompoundTag): MindAnchorData {
+            val data = MindAnchorData()
+            val list = tag.getList("Anchors", Tag.TAG_COMPOUND.toInt())
+
+            for (i in 0 until list.size) {
+                val e = list.getCompound(i)
+
+                val uuid = e.getUUID("Mind")
+                val type = AnchorType.valueOf(e.getString("Type"))
+                val dim = ResourceKey.create(
+                    net.minecraft.core.registries.Registries.DIMENSION,
+                    ResourceLocation(e.getString("Dimension"))
+                )
+
+                val activeUUID =
+                    if (e.hasUUID("ActiveUUID")) e.getUUID("ActiveUUID") else null
+
+                val pos = BlockPos(
+                    e.getInt("X"),
+                    e.getInt("Y"),
+                    e.getInt("Z")
+                )
+
+                data.anchors[uuid] =
+                    MindAnchorEntry(uuid, type, activeUUID, dim, pos)
+            }
+
+            return data
+        }
     }
 }

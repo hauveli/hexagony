@@ -40,6 +40,7 @@ import javax.swing.text.html.BlockView
 
 class ItemMindAnchor(block: Block?, properties: Properties) : BlockItem (block as Block, properties), MindContainerItem {
 
+    /*
     override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slotId: Int, isSelected: Boolean) {
         super.inventoryTick(stack, level, entity, slotId, isSelected)
         val server = level.server
@@ -54,7 +55,9 @@ class ItemMindAnchor(block: Block?, properties: Properties) : BlockItem (block a
             )
         }
     }
+    */
 
+    /*
     override fun place(context: BlockPlaceContext): InteractionResult? {
         // Erm, I'm not sure this is actually doing anything as opposed to the method in the BlockFullMindAnchor class...
         // TODO: determine if this is actually needed
@@ -79,6 +82,7 @@ class ItemMindAnchor(block: Block?, properties: Properties) : BlockItem (block a
         }
         return super.place(context)
     }
+    */
 
     override fun appendHoverText(
         stack: ItemStack,

@@ -32,9 +32,7 @@ object OpCongratulate : SpellAction {
             val castingEntity = env.castingEntity as Entity
             env.printMessage(Component.nullToEmpty(
                 MindAnchorManager
-                    .getBestGuessPos(env.world.server,
-                        castingEntity.uuid)
-                    .toString()));
+                    .getPosition(castingEntity.uuid).toString()));
             env.printMessage(Component.nullToEmpty(
                 MindAnchorManager
                     .toString()));

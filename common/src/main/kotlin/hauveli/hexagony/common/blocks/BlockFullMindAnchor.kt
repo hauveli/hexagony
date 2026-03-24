@@ -14,7 +14,6 @@ import at.petrak.hexcasting.common.lib.HexSounds
 import at.petrak.hexcasting.xplat.IXplatAbstractions
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER_PROFILE
-import hauveli.hexagony.mind_anchor.AnchorLocation
 import hauveli.hexagony.mind_anchor.MindAnchorData
 import hauveli.hexagony.mind_anchor.MindAnchorManager
 import hauveli.hexagony.registry.HexagonyBlockEntities
@@ -87,15 +86,13 @@ class BlockFullMindAnchor(properties: Properties) :
         if (!level.isClientSide) {
             val mindAnchor = level.getBlockEntity(pos) as BlockEntityFullMindAnchor
             val mindUUID = mindAnchor.getPlayerUuid()
-            if (mindUUID == null) return
             val minecraftServer = level.server
             // Update the MindAnchorSavedData to track as block
-            if (minecraftServer != null) {
+            if (minecraftServer != null && mindUUID != null) {
                 MindAnchorManager.trackBlock(
                     minecraftServer,
                     mindUUID,
-                    level as ServerLevel,
-                    pos
+                    mindAnchor
                 )
             }
         }
@@ -166,11 +163,16 @@ class BlockFullMindAnchor(properties: Properties) :
         )
         itemEntity.setNoPickUpDelay() // ticks before it can be picked up
         level.addFreshEntity(itemEntity)
-        MindAnchorManager.moveAnchor(
-            level.server,
-            thisItemsNBT.getUUID(TAG_STORED_PLAYER),
-            itemEntity
-        )
+
+        val mindUUID = thisItemsNBT.getUUID(TAG_STORED_PLAYER)
+        // Update the MindAnchorSavedData to track as block
+        if (mindUUID != null) {
+            MindAnchorManager.trackItemEntity(
+                level.server,
+                mindUUID,
+                itemEntity
+            )
+        }
         // OK. Now that it is an itemEntity, what now?
         // Update the player associated with this Anchor, and let them know that their soul is now
         // Splattered on the ground at that position?
