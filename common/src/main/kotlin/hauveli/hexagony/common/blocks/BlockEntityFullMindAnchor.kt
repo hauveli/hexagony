@@ -1,25 +1,19 @@
 package hauveli.hexagony.common.blocks
 
-import at.petrak.hexcasting.api.HexAPI
 import at.petrak.hexcasting.api.block.HexBlockEntity
-import at.petrak.hexcasting.api.block.circle.BlockCircleComponent
 import at.petrak.hexcasting.api.casting.circles.BlockEntityAbstractImpetus
 import at.petrak.hexcasting.api.casting.circles.CircleExecutionState
-import at.petrak.hexcasting.api.casting.circles.ICircleComponent
 import at.petrak.hexcasting.api.misc.MediaConstants
 import at.petrak.hexcasting.api.pigment.FrozenPigment
 import at.petrak.hexcasting.api.utils.contains
 import at.petrak.hexcasting.api.utils.extractMedia
 import at.petrak.hexcasting.api.utils.putCompound
-import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockEntityRedstoneImpetus
-import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockEntityRedstoneImpetus.TAG_STORED_PLAYER
-import at.petrak.hexcasting.common.blocks.circles.impetuses.BlockEntityRedstoneImpetus.TAG_STORED_PLAYER_PROFILE
 import at.petrak.hexcasting.common.items.magic.ItemCreativeUnlocker
 import at.petrak.hexcasting.common.lib.HexItems
 import com.mojang.authlib.GameProfile
 import com.mojang.datafixers.util.Pair
+import hauveli.hexagony.mind_anchor.MindAnchorData
 import hauveli.hexagony.registry.HexagonyBlockEntities
-import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.UUIDUtil
@@ -27,19 +21,14 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtUtils
 import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
-import net.minecraft.server.level.ServerLevel
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.tags.BlockTags
 import net.minecraft.util.Mth
 import net.minecraft.world.WorldlyContainer
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.phys.AABB
 import org.jetbrains.annotations.Contract
 import java.text.DecimalFormat
@@ -168,6 +157,10 @@ class BlockEntityFullMindAnchor(
 
         if (tag.contains(TAG_STORED_PLAYER, Tag.TAG_INT_ARRAY)) {
             this.storedPlayer = tag.getUUID(TAG_STORED_PLAYER);
+            val uuid = this.storedPlayer
+            if (uuid != null) {
+                MindAnchorData().getMindAnchor(uuid)
+            }
         } else {
             this.storedPlayer = null;
         }

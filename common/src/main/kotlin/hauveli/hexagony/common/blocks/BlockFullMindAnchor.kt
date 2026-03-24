@@ -14,6 +14,9 @@ import at.petrak.hexcasting.common.lib.HexSounds
 import at.petrak.hexcasting.xplat.IXplatAbstractions
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER_PROFILE
+import hauveli.hexagony.mind_anchor.AnchorLocation
+import hauveli.hexagony.mind_anchor.MindAnchorData
+import hauveli.hexagony.mind_anchor.MindAnchorManager
 import hauveli.hexagony.registry.HexagonyBlockEntities
 import hauveli.hexagony.registry.HexagonyBlocks
 import net.minecraft.core.BlockPos
@@ -21,12 +24,14 @@ import net.minecraft.core.UUIDUtil
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtUtils
 import net.minecraft.network.chat.MutableComponent
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -74,6 +79,26 @@ class BlockFullMindAnchor(properties: Properties) :
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor) return
         // TODO: if player is in creative, OR if item has empty tag, break as usual?
         summonItem(pLevel as ServerLevel, pPos)
+    }
+
+    override fun setPlacedBy(level: Level, pos: BlockPos, state: BlockState, placer: LivingEntity?, stack: ItemStack) {
+        super.setPlacedBy(level, pos, state, placer, stack)
+        // Only run on the server
+        if (!level.isClientSide) {
+            // Check if the stack has a mind UUID tag
+            val tag = stack.tag
+            val mindUUID = tag?.getUUID("MindUUID") ?: return
+            val minecraftServer = level.server
+            // Update the MindAnchorSavedData to track as block
+            if (minecraftServer != null) {
+                MindAnchorManager.trackBlock(
+                    minecraftServer,
+                    mindUUID,
+                    level as ServerLevel,
+                    pos
+                )
+            }
+        }
     }
 
      override fun attack(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player) {
@@ -141,6 +166,11 @@ class BlockFullMindAnchor(properties: Properties) :
         )
         itemEntity.setNoPickUpDelay() // ticks before it can be picked up
         level.addFreshEntity(itemEntity)
+        MindAnchorManager.moveAnchor(
+            level.server,
+            thisItemsNBT.getUUID(TAG_STORED_PLAYER),
+            itemEntity
+        )
         // OK. Now that it is an itemEntity, what now?
         // Update the player associated with this Anchor, and let them know that their soul is now
         // Splattered on the ground at that position?

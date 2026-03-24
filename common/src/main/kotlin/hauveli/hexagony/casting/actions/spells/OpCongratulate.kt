@@ -8,6 +8,8 @@ import at.petrak.hexcasting.api.misc.MediaConstants
 import at.petrak.hexcasting.api.casting.getEntity
 import at.petrak.hexcasting.api.casting.ParticleSpray
 import at.petrak.hexcasting.api.utils.asTranslatedComponent
+import hauveli.hexagony.mind_anchor.MindAnchorManager
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 
 object OpCongratulate : SpellAction {
@@ -27,6 +29,8 @@ object OpCongratulate : SpellAction {
     private data class Spell(val target: Entity) : RenderedSpell {
         // IMPORTANT: do not throw mishaps in this method! mishaps should ONLY be thrown in SpellAction.execute
         override fun cast(env: CastingEnvironment) {
+            env.printMessage(Component.nullToEmpty( (MindAnchorManager.getBestGuessPos(env.world.server, env.castingEntity!!.uuid)
+                .toString())));
             env.printMessage("text.hexagony.congrats".asTranslatedComponent(target.displayName));
         }
     }

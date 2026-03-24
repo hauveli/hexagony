@@ -4,8 +4,8 @@
       "apply": { "model": "hexagony:block/mind_anchor/full" }
     },
     {
-      "when": { "energized": "true" },
-      "apply": { "model": "hexagony:block/mind_anchor/full_energized" }
+      "when": { "powered": "true" },
+      "apply": { "model": "hexagony:block/mind_anchor/full_powered" }
     }
   ]
 }
