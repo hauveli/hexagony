@@ -15,5 +15,12 @@ class HexagonyDamageTypes {
             Registries.DAMAGE_TYPE,
             ResourceLocation(Hexagony.MODID, "hidden")
         )
+
+        @JvmField
+        var BRAINSWEEP: ResourceKey<DamageType?> = ResourceKey.create(
+            Registries.DAMAGE_TYPE,
+            ResourceLocation(Hexagony.MODID, "brainsweep")
+        )
     }
+
 }

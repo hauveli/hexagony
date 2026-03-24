@@ -6,6 +6,15 @@
     },
   },
 
+  death: {
+    "attack.hexagony": {
+      brainsweep: "%1$s finished themselves off with a snap",
+      "brainsweep.player": "%1$s was consumed by forbidden energy from %2$s",
+      hidden: "",
+      "hidden.player": "",
+    }
+  },
+
   hexagony: {
     book: {
       patterns: {

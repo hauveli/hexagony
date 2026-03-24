@@ -66,9 +66,21 @@ import static hauveli.hexagony.common.lib.AdvancementProvider.grantAdvancement;
 
 @Mixin(value = OpBrainsweep.class, remap = false)
 public abstract class PlayerEntityOpBrainsweepMixin {
-
+    // If I make MIND_GRAFT_COST a non-multiple of CRYSTAL_UNIT, implicitly the caster must have a flask...
+    // Is that ideal? It would be as simple as adding or subtracting 1
+    // The player could then infer how much media they need from using it on themselves, and observing how much
+    // media the spell has used...
+    // This is quite anti hexcasting however, in my opinion.
+    // But needing to be so exacting sounds sort of cool even if it is a bit annoying...
+    // And it is an easy way to check if the player has
+    // progressed to a certain point without adding any logic... (Having the greater spells Flay Mind, Craft Phial)
+    // at full health:
+    // /give @p hexcasting:battery{"hexcasting:start_media":810200L,"hexcasting:media":810200L} 1
+    // A phial with 80.02 dust will have enough if your only remaining cast is Flay Mind
     @Unique
-    private static final long MIND_GRAFT_COST =  10 * MediaConstants.CRYSTAL_UNIT; // 1 MILLION
+    private static final long MIND_GRAFT_COST_OFFSET = MediaConstants.DUST_UNIT / 100; // 0.01 dust in a media containing flask.
+    @Unique
+    private static final long MIND_GRAFT_COST =  10 * MediaConstants.CRYSTAL_UNIT + MIND_GRAFT_COST_OFFSET; // 1 MILLION and 1
     @Unique
     private static final long MIND_GRAFT_DAMAGE = 1; // base damage it deals to self if no overcast
 
@@ -106,18 +118,13 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                     .registryOrThrow(Registries.DAMAGE_TYPE)
                     .getHolderOrThrow(HexDamageTypes.OVERCAST);
             */
-            Holder<DamageType> holder = serverPlayer.level().registryAccess()
-                    .registryOrThrow(Registries.DAMAGE_TYPE)
-                    .getHolderOrThrow(HexagonyDamageTypes.HIDDEN);
-            serverPlayer.hurt(
-                    new DamageSource(holder),
-                    MIND_GRAFT_DAMAGE);
 
             // Out of range
             if (!castingEnvironment.canEditBlockAt(pos)) {
                 throw new MishapBadLocation(vecPos, "forbidden");
             }
 
+            hexagony$brainsweepAttack(sacrifice);
             // I forget what this one prints but I'm sure it's intelligible
             if (!hexagony$isTargetingSelf(sacrifice, castingEnvironment))  {
                 throw new MishapImmuneEntity(sacrifice);
@@ -164,21 +171,32 @@ public abstract class PlayerEntityOpBrainsweepMixin {
 
             // slurp up all mana, do this here because I want to consume Flay Mind?
             // Simulate it instead of casting.
-            long simulatedRemainingMedia = castingEnvironment.extractMedia(MIND_GRAFT_COST, true);
+            // Negative means we had media to SPARE: simulatedMediaNeeded = COST - BALANCE
+            // If it IS negative, it means we were holding a very large chunk of media and OVERSHOT
+            // TODO: use that to determine if we want to go for it?
+            // Checking how much is left if we add one media. If we have 0, we have too much media, if we have 1, we have exactly  the right
+            // amount of media, if we have 2 or more, we don't have enough media
+            // Because I'm not using MediaConstants.CRYSTAL_UNIT, this means the player MUST have the flask as well, or an artifact?
+            // Quenched Allay = 400k each.
+            long simulatedMediaNeeded = castingEnvironment.extractMedia(MIND_GRAFT_COST+1, true);
+
+            serverPlayer.sendSystemMessage(Component.nullToEmpty(String.valueOf(simulatedMediaNeeded)));
 
             // Only grant attempt if the caster survived in the first place
-            if (simulatedRemainingMedia > 0) {
+            if (simulatedMediaNeeded <= 0) {
                 grantAdvancement(serverPlayer, "graft_attempted");
             }
 
             // Kill or don't kill player, it doesn't matter.
-            if (simulatedRemainingMedia != 0) {
+            if (simulatedMediaNeeded != 1) {
                 castingEnvironment.extractMedia(MIND_GRAFT_COST, false);
                 return;
             }
 
             // Do not know what to do but to start, lets move the players position into the target position
             serverPlayer.moveTo(vecPos.add(0.5,0.5,0.5));
+            // Extract all media+health except a healf-heart? or less...
+            castingEnvironment.extractMedia(MIND_GRAFT_COST-1, false);
 
             hexagony$theatrics(castingEnvironment, sacrifice, pos);
 
@@ -188,11 +206,22 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         }
     }
 
+    @Unique
     static private void graftPlayer(ServerPlayer serverPlayer, BlockState state, BlockPos pos) {
         ServerLevel serverLevel = serverPlayer.serverLevel();
         // Create the anchor, todo: get reference to the blockentity?
         hexagony$mindAnchorServerPlayer(serverPlayer, pos);
 
+    }
+
+    @Unique
+    static private void hexagony$brainsweepAttack(LivingEntity targetEntity) {
+        Holder<DamageType> holder = targetEntity.level().registryAccess()
+                .registryOrThrow(Registries.DAMAGE_TYPE)
+                .getHolderOrThrow(HexagonyDamageTypes.BRAINSWEEP);
+        targetEntity.hurt(
+                new DamageSource(holder),
+                MIND_GRAFT_DAMAGE);
     }
 
     @Unique
