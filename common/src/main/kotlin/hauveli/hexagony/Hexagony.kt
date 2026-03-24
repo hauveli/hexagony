@@ -8,6 +8,7 @@ import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.registry.HexagonyActions
 import hauveli.hexagony.registry.HexagonyBlockEntities
 import hauveli.hexagony.registry.HexagonyBlocks
+import hauveli.hexagony.registry.HexagonyDamageTypes
 import hauveli.hexagony.registry.HexagonyItems
 
 object Hexagony {

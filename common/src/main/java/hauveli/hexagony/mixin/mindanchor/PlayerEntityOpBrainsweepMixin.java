@@ -4,16 +4,16 @@ import at.petrak.hexcasting.api.casting.ParticleSpray;
 import at.petrak.hexcasting.api.casting.castables.SpellAction;
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment;
 import at.petrak.hexcasting.api.casting.iota.Iota;
-import at.petrak.hexcasting.api.casting.iota.Vec3Iota;
 import at.petrak.hexcasting.api.casting.mishaps.*;
+import at.petrak.hexcasting.api.misc.MediaConstants;
 import at.petrak.hexcasting.api.pigment.FrozenPigment;
-import at.petrak.hexcasting.common.casting.actions.spells.great.OpLightning;
+import at.petrak.hexcasting.common.casting.actions.spells.OpFlight;
 import at.petrak.hexcasting.common.casting.actions.spells.great.OpBrainsweep;
-import at.petrak.hexcasting.common.lib.HexDamageTypes;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
 import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor;
 import hauveli.hexagony.registry.HexagonyBlocks;
+import hauveli.hexagony.registry.HexagonyDamageTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
@@ -26,7 +26,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -68,9 +67,10 @@ import static hauveli.hexagony.common.lib.AdvancementProvider.grantAdvancement;
 @Mixin(value = OpBrainsweep.class, remap = false)
 public abstract class PlayerEntityOpBrainsweepMixin {
 
-    private static int FAKE_CAST_COST = 150_000; // cost of the spell that gets rid of the extra junk and adds flair
-    private static int MIND_GRAFT_COST = 1_000_000;
-    private static int MIND_GRAFT_DAMAGE = 10; // base damage it deals to self if no overcast
+    @Unique
+    private static final long MIND_GRAFT_COST =  10 * MediaConstants.CRYSTAL_UNIT; // 1 MILLION
+    @Unique
+    private static final long MIND_GRAFT_DAMAGE = 1; // base damage it deals to self if no overcast
 
     @Shadow @Final private static int argc;
 
@@ -97,13 +97,21 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             castingEnvironment.assertEntityInRange(sacrifice); // You never know
 
 
+            // TODO:
+            // if DamgeSource(holder) replaced with custom named temporary mob, could make
+            // the mob name be so ex. "... mind was subsumed into energy while fighting <it>
             // Regardless of if it is valid or not, apply one damage, same as villagers take from it?
+            /*
             Holder<DamageType> holder = serverPlayer.level().registryAccess()
                     .registryOrThrow(Registries.DAMAGE_TYPE)
-                    .getHolderOrThrow(HexDamageTypes.OVERCAST);;
+                    .getHolderOrThrow(HexDamageTypes.OVERCAST);
+            */
+            Holder<DamageType> holder = serverPlayer.level().registryAccess()
+                    .registryOrThrow(Registries.DAMAGE_TYPE)
+                    .getHolderOrThrow(HexagonyDamageTypes.HIDDEN);
             serverPlayer.hurt(
-                    new DamageSource(holder, castingEnvironment.getCastingEntity()),
-                    1);
+                    new DamageSource(holder),
+                    MIND_GRAFT_DAMAGE);
 
             // Out of range
             if (!castingEnvironment.canEditBlockAt(pos)) {
@@ -115,6 +123,9 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                 throw new MishapImmuneEntity(sacrifice);
             }
 
+            // TODO:
+            // Peek at my unenlightened mixin and take the mishap context and error message code from there?
+
             // Mind has already been used
             if (hexagony$isGrafted(serverPlayer)) {
                 ServerLevel serverLevel = (ServerLevel) serverPlayer.level();
@@ -123,7 +134,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                         serverLevel,
                         VillagerType.PLAINS
                 );
-                villager.setCustomName(Component.literal("Bob"));
+                // villager.setCustomName(Component.literal("Bob"));
                 throw new MishapAlreadyBrainswept(villager);
             }
 
@@ -136,51 +147,71 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                         serverLevel,
                         VillagerType.PLAINS
                 );
-                villager.setCustomName(Component.literal("Bob"));
+                // TODO: do I need to add a name?
+                // villager.setCustomName(Component.literal("Bob"));
                 throw new MishapBadBrainsweep(villager, pos);
             }
-            // Actually, once it's filled, it becomes type BlockFullMindAnchor... No need to check or even have this property...
-            // if (state.getValue(BlockFullMindAnchor.Companion.getFILLED())) return; // if filled, return.
-            // currently set to redstone powered
-            // world.setBlock(pos, block.defaultBlockState().setValue(FILLED, true), 3)
 
-            // Should I simulate after all?
-            long remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, true);
-
-            // TODO: what error here?
-            // No error?
-            if (remainingToCast > 0) return;
-
-            grantAdvancement(serverPlayer, "graft_attempted");
             // remove stack entirely?
             // Hmm... this seems anti-Hexcasting though...
             // TODO: remove only relevant parts of stack based on how cast went
-            clearEntireStack(castingEnvironment);
+            hexagony$clearEntireStack(castingEnvironment);
 
-            // use a less flashy spell?
-            SpellAction.Result fakeResult = OpLightning.INSTANCE.execute(List.of(new Vec3Iota(vecPos)), castingEnvironment);
-            cir.setReturnValue(fakeResult);
 
-            // todo: make this cleaner
-            remainingToCast = castingEnvironment.extractMedia(MIND_GRAFT_COST, false);
-            if (serverPlayer.getHealth() > 0) {
-                cir.cancel();
+            // I couldn't think of a better way to get a fake SpellAction.Result to feed to cir.setReturnValue
+            cir.setReturnValue(hexagony$consumeMediaGetResult(serverPlayer, 0));
+            cir.cancel();
+
+            // slurp up all mana, do this here because I want to consume Flay Mind?
+            // Simulate it instead of casting.
+            long simulatedRemainingMedia = castingEnvironment.extractMedia(MIND_GRAFT_COST, true);
+
+            // Only grant attempt if the caster survived in the first place
+            if (simulatedRemainingMedia > 0) {
+                grantAdvancement(serverPlayer, "graft_attempted");
+            }
+
+            // Kill or don't kill player, it doesn't matter.
+            if (simulatedRemainingMedia != 0) {
+                castingEnvironment.extractMedia(MIND_GRAFT_COST, false);
                 return;
             }
 
+            // Do not know what to do but to start, lets move the players position into the target position
+            serverPlayer.moveTo(vecPos.add(0.5,0.5,0.5));
+
             hexagony$theatrics(castingEnvironment, sacrifice, pos);
 
-            hexagony$mindAnchorServerPlayer(serverPlayer, serverPlayer.serverLevel(), pos);
-
+            graftPlayer(serverPlayer, state, pos);
             grantAdvancement(serverPlayer, "graft_succeeded");
-            cir.cancel();
             // I don't think we can ever end up here without going into the if statement with ServerPlayer...
         }
     }
 
+    static private void graftPlayer(ServerPlayer serverPlayer, BlockState state, BlockPos pos) {
+        ServerLevel serverLevel = serverPlayer.serverLevel();
+        // Create the anchor, todo: get reference to the blockentity?
+        hexagony$mindAnchorServerPlayer(serverPlayer, pos);
+
+    }
 
     @Unique
-    static private void clearEntireStack(CastingEnvironment castingEnvironment) {
+    static private SpellAction.Result hexagony$consumeMediaGetResult(ServerPlayer serverPlayer, long cost) {
+        return new SpellAction.Result(
+                new OpFlight.Spell(
+                        OpFlight.Type.LimitTime,
+                        serverPlayer,
+                        0),
+                0,
+                List.of(),
+                0
+
+        );
+    }
+
+
+    @Unique
+    static private void hexagony$clearEntireStack(CastingEnvironment castingEnvironment) {
         List<Iota> stack = at.petrak.hexcasting.xplat.IXplatAbstractions.INSTANCE
                 .getStaffcastVM(
                         (ServerPlayer) castingEnvironment.getCastingEntity(),
@@ -208,18 +239,15 @@ public abstract class PlayerEntityOpBrainsweepMixin {
     }
 
     @Unique
-    static private void hexagony$mindAnchorServerPlayer(ServerPlayer serverPlayer, ServerLevel level, BlockPos pos) {
-        // IXplatAbstractions.Companion.getINSTANCE().setBrainsweepAddlData(entity, true);
-        serverPlayer.sendSystemMessage(Component.nullToEmpty("Helo!!!!! Mind broken!!!"));
-
+    static private void hexagony$mindAnchorServerPlayer(ServerPlayer serverPlayer, BlockPos pos) {
         // world.setBlock(pos, block.defaultBlockState().setValue(FILLED, true), 3);
+        ServerLevel serverLevel = serverPlayer.serverLevel();
         Block myBlock = HexagonyBlocks.INSTANCE.getMIND_ANCHOR_FULL().getValue();
 
         BlockState state = myBlock.defaultBlockState();
-        level.setBlock(pos, state, 3);
-        BlockEntity be = level.getBlockEntity(pos);
+        serverLevel.setBlock(pos, state, 3);
+        BlockEntity be = serverLevel.getBlockEntity(pos);
         if (be instanceof BlockEntityFullMindAnchor) {
-            serverPlayer.sendSystemMessage(Component.nullToEmpty("Block WAS instance of, should be OK!!"));
             ((BlockEntityFullMindAnchor) be)
                     .setPlayer(
                         serverPlayer.getGameProfile(),
@@ -227,9 +255,6 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                     );
             be.setChanged(); // mark dirty so it saves
         }
-        serverPlayer.sendSystemMessage(Component.nullToEmpty(be.toString()));
-
-        serverPlayer.sendSystemMessage(Component.nullToEmpty("POST setting block entity"));
     }
 
     @Unique
@@ -259,14 +284,17 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         }
 
         // world shatters
-        castingEnvironment.getWorld().playSound(
-                null,
-                sacrifice,
-                SoundEvents.GLASS_BREAK, // spooky
-                SoundSource.AMBIENT,
-                1.5f,
-                0.5f
-        );
+        ServerLevel serverLevel = ((ServerPlayer) sacrifice).serverLevel();
+        for (ServerPlayer player : serverLevel.players()) {
+            castingEnvironment.getWorld().playSound(
+                    null,
+                    player,
+                    SoundEvents.GLASS_BREAK, // spooky
+                    SoundSource.AMBIENT,
+                    1.5f,
+                    0.5f
+            );
+        }
     }
 
 
