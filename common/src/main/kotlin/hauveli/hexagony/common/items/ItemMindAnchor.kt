@@ -2,6 +2,7 @@ package hauveli.hexagony.common.items
 
 import at.petrak.hexcasting.annotations.SoftImplement
 import at.petrak.hexcasting.api.casting.circles.BlockEntityAbstractImpetus.TAG_MEDIA
+import at.petrak.hexcasting.api.utils.hasCompound
 import at.petrak.hexcasting.common.lib.HexAttributes
 
 import com.google.common.collect.HashMultimap
@@ -40,22 +41,25 @@ import javax.swing.text.html.BlockView
 
 class ItemMindAnchor(block: Block?, properties: Properties) : BlockItem (block as Block, properties), MindContainerItem {
 
-    /*
+    override fun useOnRelease(stack: ItemStack): Boolean {
+        return super.useOnRelease(stack)
+    }
+
     override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slotId: Int, isSelected: Boolean) {
         super.inventoryTick(stack, level, entity, slotId, isSelected)
         val server = level.server
         val tag = stack.tag
         if (server != null &&
             tag != null &&
-            tag.hasUUID(TAG_STORED_PLAYER)) {
-            MindAnchorManager.moveAnchor(
+            tag.hasCompound("BlockEntityTag")) {
+            val compound = tag.getCompound("BlockEntityTag")
+            MindAnchorManager.trackItemStack(
                 server,
-                tag.getUUID(TAG_STORED_PLAYER),
+                compound.getUUID(TAG_STORED_PLAYER),
                 entity
             )
         }
     }
-    */
 
     /*
     override fun place(context: BlockPlaceContext): InteractionResult? {

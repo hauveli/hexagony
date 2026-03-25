@@ -10,7 +10,6 @@
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "mindanchor.InterfaceIotaGetPayloadMixin",
     "mindanchor.MindAnchorIndestructibleAtItemEntityHurtMixin",
-    "mindanchor.MindAnchorPlayerAddItemMixin",
     "mindanchor.MindAnchorPlayerDropMixin",
     "mindanchor.PlayerEntityOpBrainsweepMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",
