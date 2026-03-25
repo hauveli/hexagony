@@ -12,6 +12,7 @@ import at.petrak.hexcasting.common.casting.actions.spells.great.OpBrainsweep;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
 import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor;
+import hauveli.hexagony.mind_anchor.MindAnchorManager;
 import hauveli.hexagony.registry.HexagonyBlocks;
 import hauveli.hexagony.registry.HexagonyDamageTypes;
 import net.minecraft.core.BlockPos;
@@ -210,8 +211,16 @@ public abstract class PlayerEntityOpBrainsweepMixin {
     static private void graftPlayer(ServerPlayer serverPlayer, BlockState state, BlockPos pos) {
         ServerLevel serverLevel = serverPlayer.serverLevel();
         // Create the anchor, todo: get reference to the blockentity?
-        hexagony$mindAnchorServerPlayer(serverPlayer, pos);
-
+        hexagony$mindAnchorServerPlayerToPos(serverPlayer, pos);
+        // Begin tracking of mind anchor
+        BlockEntity be = serverLevel.getBlockEntity(pos);
+        if (be != null) {
+            MindAnchorManager.INSTANCE.trackBlock(
+                    serverLevel.getServer(),
+                    serverPlayer.getUUID(),
+                    be
+                    );
+        }
     }
 
     @Unique
@@ -268,7 +277,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
     }
 
     @Unique
-    static private void hexagony$mindAnchorServerPlayer(ServerPlayer serverPlayer, BlockPos pos) {
+    static private void hexagony$mindAnchorServerPlayerToPos(ServerPlayer serverPlayer, BlockPos pos) {
         // world.setBlock(pos, block.defaultBlockState().setValue(FILLED, true), 3);
         ServerLevel serverLevel = serverPlayer.serverLevel();
         Block myBlock = HexagonyBlocks.INSTANCE.getMIND_ANCHOR_FULL().getValue();

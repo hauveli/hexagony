@@ -41,8 +41,9 @@ import javax.swing.text.html.BlockView
 
 class ItemMindAnchor(block: Block?, properties: Properties) : BlockItem (block as Block, properties), MindContainerItem {
 
-    override fun useOnRelease(stack: ItemStack): Boolean {
-        return super.useOnRelease(stack)
+    // because I do not want to deal with bundle/shulker shenanigans...
+    override fun canFitInsideContainerItems(): Boolean {
+        return false
     }
 
     override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slotId: Int, isSelected: Boolean) {
