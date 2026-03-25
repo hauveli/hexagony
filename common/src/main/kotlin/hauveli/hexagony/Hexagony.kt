@@ -11,6 +11,13 @@ import hauveli.hexagony.registry.HexagonyBlocks
 import hauveli.hexagony.registry.HexagonyDamageTypes
 import hauveli.hexagony.registry.HexagonyItems
 
+/*
+TODO: lore
+Why does Nature not always know where the mind anchor is? (it's because I could not figure out a clean way to track it without costing a lot)
+Should I just make it impossible to mine by anyone but the person who placed it?
+
+ */
+
 object Hexagony {
     const val MODID = "hexagony"
 
