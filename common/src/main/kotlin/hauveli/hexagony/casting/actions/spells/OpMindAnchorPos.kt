@@ -19,17 +19,18 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
-object OpCongratulate : ConstMediaAction  {
+object OpMindAnchorPos : ConstMediaAction  {
     override val argc = 0
 
     override fun execute(args: List<Iota>, env: CastingEnvironment): List<Iota> {
-        val target = args.getEntity(0, argc)
-        env.assertEntityInRange(target)
-        val pos = getPosition(target.uuid)
-        if (pos == null) {
-            return listOf(GarbageIota())
-        } else {
-            return listOf(Vec3Iota(pos))
+        val target = env.castingEntity
+        if (target != null) {
+            env.assertEntityInRange(target)
+            val pos = getPosition(target.uuid)
+            if (pos != null) {
+                return listOf(Vec3Iota(pos))
+            }
         }
+        return listOf(GarbageIota())
     }
 }

@@ -13,13 +13,28 @@
               "source": "block_entity",
               "ops": [
                 {
-                  "source": "number",
-                  "target": "BlockEntityTag.number",
+                  "source": "stored_player",
+                  "target": "BlockEntityTag.stored_player",
+                  "op": "replace"
+                },
+                {
+                  "source": "stored_player_profile",
+                  "target": "BlockEntityTag.stored_player_profile",
+                  "op": "replace"
+                },
+                {
+                  "source": "media",
+                  "target": "BlockEntityTag.media",
                   "op": "replace"
                 }
               ]
             }
           ]
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
         }
       ]
     }

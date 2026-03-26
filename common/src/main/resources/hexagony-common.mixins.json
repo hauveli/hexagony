@@ -9,7 +9,6 @@
     "MixinDatagenMain",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "mindanchor.AddFreshEntityServerLevelMixin",
-    "mindanchor.MindAnchorIndestructibleAtItemEntityHurtMixin",
     "mindanchor.MindAnchorInventorySlotMixin",
     "mindanchor.PlayerEntityOpBrainsweepMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",

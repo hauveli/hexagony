@@ -1,5 +1,7 @@
 package hauveli.hexagony.mind_anchor
 
+import at.petrak.hexcasting.api.casting.iota.GarbageIota
+import at.petrak.hexcasting.api.casting.iota.Vec3Iota
 import net.minecraft.core.BlockPos
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
@@ -76,7 +78,7 @@ object MindAnchorManager {
         return runtime[uuid]
     }
 
-    fun getPosition(uuid: UUID): Vec3 {
+    fun getPosition(uuid: UUID): Vec3? {
         val rt = runtime[uuid]
         val be = rt?.blockEntity
         val ie = rt?.itemEntity
@@ -89,6 +91,6 @@ object MindAnchorManager {
             return it.position() // this is actually a PLAYER
         }
         // I really hope this isn't reached in normal circumstances...
-        return Vec3(0.0,0.0,0.0)
+        return null
     }
 }

@@ -26,6 +26,9 @@ public abstract class AddFreshEntityServerLevelMixin {
         if (entity instanceof ItemEntity itemEntity) {
             if (itemEntity.getItem().getItem() == HexagonyItems.MIND_ANCHOR_FULL.getValue()) {
                 //UUID mindUUID = itemEntity.getItem().getTag().getCompound("BlockEntityTag").getUUID(TAG_STORED_PLAYER);
+                itemEntity.setNoGravity(true);
+                itemEntity.setInvulnerable(true);
+                itemEntity.setUnlimitedLifetime();
                 MindAnchorManager.INSTANCE.trackItemEntity(
                         entity.getServer(),
                         itemEntity.getItem().getTag().getCompound("BlockEntityTag").getUUID(TAG_STORED_PLAYER),
