@@ -13,7 +13,7 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     HexRegistries.ACTION,
     { HexActions.REGISTRY },
 ) {
-    val MIND_ANCHOR_POS = make("mind_anchor_pos", HexDir.WEST, "eed", OpMindAnchorPos)
+    val MIND_ANCHOR_POS = make("mind_anchor/pos", HexDir.WEST, "qaqqaeeqe", OpMindAnchorPos)
 
     val GREAT_CONGRATULATE = make("congratulate/great", HexDir.EAST, "qwwqqqwwqwded", OpCongratulate)
 

@@ -4,11 +4,11 @@
   "overrides": [
     {
       "predicate": { "custom_model_data": 270439 },
-      "model": "hexagony:item/advancement_graft_attempted"
+      "model": "hexagony:item/advancements/graft_attempted"
     },
     {
       "predicate": { "custom_model_data": 270441 },
-      "model": "hexagony:item/advancement_graft_succeeded"
+      "model": "hexagony:item/advancements/graft_succeeded"
     }
   ]
 }

@@ -1,0 +1,16 @@
+{
+  name: "hexagony.book.patterns.spells.mind_anchor_spells",
+  category: "hexcasting:patterns/spells",
+  icon: "hexagony:broke",
+  advancement: "hexcasting:root",
+  pages: [
+    {
+      type: "hexcasting:pattern",
+      op_id: "hexagony:mind_anchor/pos",
+      anchor: "hexagony:mind_anchor/pos",
+      input: "entity",
+      output: "",
+      text: "hexagony.book.patterns.spells.mind_anchor_spells.mind_anchor/pos",
+    },
+  ],
+}

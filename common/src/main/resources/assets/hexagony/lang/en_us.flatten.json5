@@ -19,13 +19,13 @@
     book: {
       patterns: {
         spells: {
-          dummy_spells: {
-            "": "Dummy Spells",
-            congratulate: "Remove an entity from the stack, then congratulate them.",
+          mind_anchor_spells: {
+            "": "Mind Anchor Spells",
+            "mind_anchor/pos": "Get the current position of your mind anchor. Returns garbage if not found.",
           },
         },
         great_spells: {
-          dummy_great_spells: {
+          mind_anchor_great_spells: {
             "": "Dummy Great Spells",
             "congratulate/great": "Same as $(l:patterns/spells/dummy_spells#hexagony:congratulate)$(action)Congratulate/$, but as a great spell.",
           },
@@ -37,7 +37,7 @@
   hexcasting: {
     action: {
       "hexagony:": {
-        congratulate: "Congratulate Player",
+        "mind_anchor/pos": "Locate Mind Anchor",
         "congratulate/great": "Great Congrats!",
       },
 
@@ -45,7 +45,7 @@
       // you don't need to add an entry for every pattern - the above value will be used as a default
       book: {
         "hexagony:": {
-          congratulate: "Congratulate",
+          "mind_anchor/pos": "Locate",
         },
       },
     },
