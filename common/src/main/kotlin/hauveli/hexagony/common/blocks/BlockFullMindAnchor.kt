@@ -73,12 +73,14 @@ class BlockFullMindAnchor(properties: Properties) :
         return InteractionResult.PASS
     }
 
+    /*
     override fun playerWillDestroy(pLevel: Level, pPos: BlockPos, state: BlockState, player: Player) {
         if (pLevel !is ServerLevel
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor) return
         // TODO: if player is in creative, OR if item has empty tag, break as usual?
         summonItem(pLevel as ServerLevel, pPos)
     }
+     */
 
     override fun setPlacedBy(level: Level, pos: BlockPos, state: BlockState, placer: LivingEntity?, stack: ItemStack) {
         super.setPlacedBy(level, pos, state, placer, stack)

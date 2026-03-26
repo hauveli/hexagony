@@ -8,9 +8,9 @@
   "mixins": [
     "MixinDatagenMain",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
-    "mindanchor.InterfaceIotaGetPayloadMixin",
+    "mindanchor.AddFreshEntityServerLevelMixin",
     "mindanchor.MindAnchorIndestructibleAtItemEntityHurtMixin",
-    "mindanchor.MindAnchorPlayerDropMixin",
+    "mindanchor.MindAnchorInventorySlotMixin",
     "mindanchor.PlayerEntityOpBrainsweepMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",
     "overcast.RemovePenaltyAtHeadStopSleepInBedMixin"

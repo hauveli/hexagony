@@ -7,6 +7,7 @@ import net.minecraft.world.Container
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.npc.Villager
+import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
@@ -36,6 +37,17 @@ object MindAnchorScanner {
                 }
             }
 
+            /*
+            level.blockTicks
+            // Idk how to make it check for just blockEntities
+            val result = mutableListOf<BlockEntity>()
+
+            // Iterate all loaded chunks
+            level.chunkSource.chunkMap.getChunks().forEach { chunkHolder ->
+                val chunk = chunkHolder.getTickingChunk() ?: return@forEach
+                result += chunk.blockEntities.values
+            }
+            */
         }
 
         return null
