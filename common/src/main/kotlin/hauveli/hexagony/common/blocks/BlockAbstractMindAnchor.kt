@@ -47,7 +47,7 @@ abstract class BlockAbstractMindAnchor(properties: Properties) : BlockCircleComp
     ): Boolean {
         // FACING is the direction media EXITS from, so we can't have media entering in that direction
         // so, flip it
-        return enterDir != bs.getValue<Direction?>(FACING).getOpposite()
+        return enterDir != bs.getValue(FACING).opposite
     }
 
     override fun possibleExitDirections(pos: BlockPos?, bs: BlockState, world: Level?): EnumSet<Direction?> {
@@ -62,12 +62,14 @@ abstract class BlockAbstractMindAnchor(properties: Properties) : BlockCircleComp
         return 0.5f
     }
 
+    @Deprecated("Deprecated in Java")
     override fun tick(pState: BlockState, pLevel: ServerLevel, pPos: BlockPos, pRandom: RandomSource) {
         if (pLevel.getBlockEntity(pPos) is BlockEntityAbstractImpetus && pState.getValue(ENERGIZED)) {
             // hmm... where is tile even coming from? I've checked the code and can not find it...
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onRemove(
         pState: BlockState,
         pLevel: Level,
@@ -75,7 +77,7 @@ abstract class BlockAbstractMindAnchor(properties: Properties) : BlockCircleComp
         pNewState: BlockState,
         pIsMoving: Boolean
     ) {
-        if (!pNewState.`is`(pState.getBlock())
+        if (!pNewState.`is`(pState.block)
             && pLevel.getBlockEntity(pPos) is BlockEntityAbstractImpetus
         ) {
             // do something else?
@@ -93,12 +95,14 @@ abstract class BlockAbstractMindAnchor(properties: Properties) : BlockCircleComp
         return placeStateDirAndSneak(this.defaultBlockState(), pContext)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun rotate(pState: BlockState, pRot: Rotation): BlockState {
-        return pState.setValue(FACING, pRot.rotate(pState.getValue<Direction?>(FACING)))
+        return pState.setValue(FACING, pRot.rotate(pState.getValue(FACING)))
     }
 
+    @Deprecated("Deprecated in Java")
     override fun mirror(pState: BlockState, pMirror: Mirror): BlockState {
-        return pState.rotate(pMirror.getRotation(pState.getValue<Direction?>(FACING)))
+        return pState.rotate(pMirror.getRotation(pState.getValue(FACING)))
     }
 
     companion object {

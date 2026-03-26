@@ -100,6 +100,7 @@ class BlockFullMindAnchor(properties: Properties) :
         }
     }
 
+     @Deprecated("Deprecated in Java")
      override fun attack(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player) {
         if (pLevel is ServerLevel
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor
@@ -108,6 +109,7 @@ class BlockFullMindAnchor(properties: Properties) :
         }
     }
 
+     @Deprecated("Deprecated in Java")
      override fun tick(pState: BlockState, pLevel: ServerLevel, pPos: BlockPos, pRandom: RandomSource) {
         // I don't undertsand the purpose of the code below
         if (pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor) {
@@ -116,6 +118,7 @@ class BlockFullMindAnchor(properties: Properties) :
         }
     }
 
+     @Deprecated("Deprecated in Java")
      override fun neighborChanged(
         pState: BlockState, pLevel: Level, pPos: BlockPos, pBlock: Block, pFromPos: BlockPos,
         pIsMoving: Boolean
