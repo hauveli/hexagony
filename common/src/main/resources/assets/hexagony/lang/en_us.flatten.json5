@@ -17,11 +17,18 @@
 
   hexagony: {
     book: {
+      "mind_anchor": {
+        page: {
+          "1": "I finally understand now blablabla lorem ipsum dolor sit amet and baddabing baddaboom I have no body and I must exist"
+        }
+      },
       patterns: {
         spells: {
           mind_anchor_spells: {
             "": "Mind Anchor Spells",
             "mind_anchor/pos": "Get the current position of your mind anchor. Returns garbage if not found.",
+            "mind_anchor/state": "Get the current powered state of your mind anchor. Returns garbage if not found.",
+            "mind_anchor/signal": "Get the current redstone signal strength of your mind anchor. Returns garbage if not found."
           },
         },
         great_spells: {
@@ -45,7 +52,10 @@
       // you don't need to add an entry for every pattern - the above value will be used as a default
       book: {
         "hexagony:": {
-          "mind_anchor/pos": "Locate",
+          "mind_anchor/pos": "Anchor Reflection Position",
+          "mind_anchor/state": "Anchor Reflection State",
+          "mind_anchor/signal": "Anchor Reflection Signal",
+          // "mind_anchor/holder": "Anchor Reflection Holder", // scout? honestly, don't need it, can get position then capture entity or block at position...
         },
       },
     },

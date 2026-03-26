@@ -19,7 +19,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
-object OpMindAnchorPos : ConstMediaAction  {
+object OpDetach : ConstMediaAction  {
     override val argc = 0
 
     override fun execute(args: List<Iota>, env: CastingEnvironment): List<Iota> {

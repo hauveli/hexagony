@@ -1,8 +1,8 @@
 {
   name: "hexagony.book.patterns.great_spells.mind_anchor_great_spells",
   category: "hexcasting:patterns/great_spells",
-  icon: "hexagony:woke",
-  advancement: "hexcasting:root",
+  icon: "minecraft:heart_of_the_sea{CustomModelData:270441}",
+  advancement: "hexagony:graft_succeeded",
   pages: [
     {
       type: "hexcasting:pattern",

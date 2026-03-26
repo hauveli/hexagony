@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
   "textures": {
-    "layer0": "hexagony:advancements/graft_succeeded"
+    "layer0": "hexagony:item/advancements/graft_succeeded"
   }
 }
