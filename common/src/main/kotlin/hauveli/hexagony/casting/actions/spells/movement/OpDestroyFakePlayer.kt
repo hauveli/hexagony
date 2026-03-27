@@ -15,6 +15,7 @@ import at.petrak.hexcasting.api.casting.mishaps.MishapBadCaster
 import at.petrak.hexcasting.api.casting.mishaps.MishapEntityTooFarAway
 import at.petrak.hexcasting.api.casting.mishaps.MishapOthersName
 import at.petrak.hexcasting.api.misc.MediaConstants
+import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
@@ -82,13 +83,16 @@ object OpDestroyFakeplayer : SpellAction {
         throw IllegalStateException()
     }
 
-    private class Spell(private val player: ServerPlayer?) : RenderedSpell {
+    private class Spell(private val target: ServerPlayer?) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
             val server = env.getWorld().getServer()
             // val sourceStack = server.createCommandSourceStack()
             // server.getCommands().performPrefixedCommand(sourceStack, "player " + FakeplayerUtils.getUsernameString(player) + " kill")
             // TODO: Deatch player
-            player?.sendSystemMessage(Component.nullToEmpty("Totally Detached the player!!!"))
+            target?.sendSystemMessage(Component.nullToEmpty("Totally Detached the player!!!"))
+            if (target?.uuid == null) return
+            // PlayerControlData.get(server).getOrCreate(target.uuid).drop(true)
+            target.kill()
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

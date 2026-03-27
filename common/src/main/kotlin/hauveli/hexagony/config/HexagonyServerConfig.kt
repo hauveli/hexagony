@@ -1,6 +1,7 @@
 package hauveli.hexagony.config
 
 import dev.architectury.event.events.common.PlayerEvent
+import dev.architectury.event.events.common.TickEvent
 import me.shedaniel.autoconfig.AutoConfig
 import me.shedaniel.autoconfig.ConfigData
 import me.shedaniel.autoconfig.ConfigHolder
@@ -14,6 +15,7 @@ import me.shedaniel.autoconfig.serializer.Toml4jConfigSerializer
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.world.InteractionResult
 import hauveli.hexagony.Hexagony
+import hauveli.hexagony.common.control.PlayerActionAPI.onServerTick
 import hauveli.hexagony.networking.msg.MsgSyncConfigS2C
 
 object HexagonyServerConfig {
@@ -34,11 +36,19 @@ object HexagonyServerConfig {
 
         // prevent this holder from saving the server config; that happens in the client config gui
         holder.registerSaveListener { _, _ -> InteractionResult.FAIL }
+        TickEvent.Server.SERVER_POST.register {
+                server ->
+            onServerTick(server)
+        }
     }
 
     fun initServer() {
         PlayerEvent.PLAYER_JOIN.register { player ->
             MsgSyncConfigS2C(holder.config.server).sendToPlayer(player)
+        }
+        TickEvent.Server.SERVER_POST.register {
+                server ->
+            onServerTick(server)
         }
     }
 

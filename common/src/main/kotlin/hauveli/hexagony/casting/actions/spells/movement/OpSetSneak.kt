@@ -1,27 +1,19 @@
 package hauveli.hexagony.casting.actions.spells.movement
 
-import at.petrak.hexcasting.api.casting.ParticleSpray
 import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import at.petrak.hexcasting.api.casting.RenderedSpell
-import at.petrak.hexcasting.api.casting.castables.Action
 import at.petrak.hexcasting.api.casting.castables.SpellAction
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
-import at.petrak.hexcasting.api.casting.eval.OperationResult
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
-import at.petrak.hexcasting.api.casting.eval.vm.SpellContinuation
 import at.petrak.hexcasting.api.casting.getBool
 import at.petrak.hexcasting.api.casting.getPlayer
 import at.petrak.hexcasting.api.casting.iota.Iota
-import at.petrak.hexcasting.api.casting.mishaps.MishapBadCaster
-import at.petrak.hexcasting.api.casting.mishaps.MishapEntityTooFarAway
-import at.petrak.hexcasting.api.casting.mishaps.MishapOthersName
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.common.client.PlayerMovementAPI
+import hauveli.hexagony.common.control.PlayerActionAPI
+import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.server.level.PlayerMap
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
-import java.util.List
 
 
 object OpSetSneak : SpellAction {
@@ -75,7 +67,8 @@ object OpSetSneak : SpellAction {
     private class Spell(private val target: ServerPlayer, private val doesSneak: Boolean) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
             val server = target.getServer()
-            PlayerMovementAPI.sneak()
+            if (server == null) return
+            PlayerControlData.get(server).getOrCreate(target.uuid).sneak(doesSneak)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

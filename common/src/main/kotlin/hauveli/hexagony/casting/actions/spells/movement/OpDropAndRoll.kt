@@ -15,6 +15,7 @@ import at.petrak.hexcasting.api.casting.mishaps.MishapBadCaster
 import at.petrak.hexcasting.api.casting.mishaps.MishapEntityTooFarAway
 import at.petrak.hexcasting.api.casting.mishaps.MishapOthersName
 import at.petrak.hexcasting.api.misc.MediaConstants
+import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
@@ -71,7 +72,9 @@ object OpDropAndRoll : SpellAction {
         override fun cast(env: CastingEnvironment) {
             val server = target.getServer()
             // Todo: allow dropping singles using target.drop(false), q vs ctrl+q
-            target.drop(true)
+            // target.drop(true)
+            if (server == null) return
+            PlayerControlData.get(server).getOrCreate(target.uuid).drop(true)
             // val sourceStack = server!!.createCommandSourceStack()
             // server.getCommands().performPrefixedCommand(sourceStack, "player " + FakeplayerUtils.getUsernameString(target) + " dropStack")
         }

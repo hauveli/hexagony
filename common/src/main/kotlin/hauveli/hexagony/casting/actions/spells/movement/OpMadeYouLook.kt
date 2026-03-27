@@ -16,6 +16,7 @@ import at.petrak.hexcasting.api.casting.mishaps.MishapBadCaster
 import at.petrak.hexcasting.api.casting.mishaps.MishapEntityTooFarAway
 import at.petrak.hexcasting.api.casting.mishaps.MishapOthersName
 import at.petrak.hexcasting.api.misc.MediaConstants
+import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
@@ -76,13 +77,14 @@ object OpMadeYouLook : SpellAction {
 
     private class Spell(private val target: ServerPlayer?, private var dir: Vec3) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
+            val server = target?.server ?: return
             // val actor: EntityPlayerActionPack = EntityPlayerActionPack(this.target)
             dir = dir.normalize()
             val pitch = Math.toDegrees(asin(-dir.y)).toFloat()
             val yaw = Math.toDegrees(atan2(-dir.x, dir.z)).toFloat()
-            target?.xRot = pitch
-            target?.yRot = yaw
             // actor.look(yaw, pitch)
+            if (target.uuid == null) return
+            PlayerControlData.get(server).getOrCreate(target.uuid).look(pitch, yaw)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

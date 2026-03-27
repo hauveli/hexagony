@@ -15,8 +15,10 @@ import at.petrak.hexcasting.api.casting.mishaps.MishapBadCaster
 import at.petrak.hexcasting.api.casting.mishaps.MishapBadLocation
 import at.petrak.hexcasting.api.casting.mishaps.MishapOthersName
 import at.petrak.hexcasting.api.misc.MediaConstants
+import hauveli.hexagony.common.control.PlayerControlData
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
@@ -84,46 +86,14 @@ object OpCreateFakeplayer : SpellAction {
 
     private class Spell(private val pos: Vec3, private val entity: Entity?) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
-            /*
+
             val server = env.getWorld().getServer()
-            val sourceStack = server.createCommandSourceStack()
-            var dim = env.getWorld().dimension().toString()
-            dim = dim.substring(dim.lastIndexOf(' ') + 1, dim.indexOf(']'))
-            val gamemode: String?
-            if (env.getCaster()!!.gameMode.isCreative()) gamemode = "creative"
-            else gamemode = "survival"
-            server.getCommands().performPrefixedCommand(
-                sourceStack, ("player " + name + " spawn at " + pos.x + " " + pos.y + " " + pos.z
-                        + " facing 0 0 in " + dim + " in " + gamemode)
-            )
-            // set the origin of a player if it's installed (now suppressed from logs)
-            if (FabricLoader.getInstance().isModLoaded("origins")) server.getCommands().performPrefixedCommand(
-                sourceStack.withSuppressedOutput(),
-                "origin set " + name + " origins:origin origins:human"
-            )
-            // do the same for other lesser origins mods (thanks ashdew-derg!)
-            if (FabricLoader.getInstance().isModLoaded("tinkerers_statures")) server.getCommands()
-                .performPrefixedCommand(
-                    sourceStack.withSuppressedOutput(),
-                    "origin set " + name + " origins:stature tinkerer:unaffected"
-                )
-            if (FabricLoader.getInstance().isModLoaded("origins-classes")) server.getCommands().performPrefixedCommand(
-                sourceStack.withSuppressedOutput(),
-                "origin set " + name + " origins-classes:class origins-classes:nitwit"
-            )
-            if (FabricLoader.getInstance().isModLoaded("aspects")) {
-                server.getCommands().performPrefixedCommand(
-                    sourceStack.withSuppressedOutput(),
-                    "origin set " + name + " aspects:elements aspects:vacuos"
-                )
-                server.getCommands().performPrefixedCommand(
-                    sourceStack.withSuppressedOutput(),
-                    "origin set " + name + " aspects:origins aspects:imp"
-                )
-            }
-             */
+
             // Wow, did not know origins compatibility existed in that, nice.
             // TODO: attach player camera to player, and make keybinds work as expected
+            entity?.sendSystemMessage(Component.nullToEmpty("Totally ATTACHED the player!!!"))
+            if (entity?.uuid == null) return
+            //PlayerControlData.get(server).getOrCreate(entity.uuid).sprint(doesSprint)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

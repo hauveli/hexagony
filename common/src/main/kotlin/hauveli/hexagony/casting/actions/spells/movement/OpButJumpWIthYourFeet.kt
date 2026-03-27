@@ -8,7 +8,8 @@ import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
 import at.petrak.hexcasting.api.casting.getPlayer
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.common.client.PlayerMovementAPI
+import hauveli.hexagony.common.control.PlayerActionAPI
+import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
@@ -63,10 +64,10 @@ object OpJumpButWithYourFeet : SpellAction {
 
     private class Spell(private val target: ServerPlayer) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
-            val server = target.getServer()
+            val server = target.server
             println(target.onGround().toString())
-            if (target.onGround())
-                PlayerMovementAPI.jump()
+            if (target.server == null) return
+            PlayerControlData.get(server).getOrCreate(target.uuid).jump()
             // val sourceStack = server!!.createCommandSourceStack()
             // server.getCommands().performPrefixedCommand(sourceStack, "player " + FakeplayerUtils.getUsernameString(target) + " jump")
         }
