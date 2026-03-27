@@ -1,5 +1,6 @@
 plugins {
     id("hexagony.minecraft")
+    id("org.jetbrains.kotlin.jvm")
 }
 
 architectury {
