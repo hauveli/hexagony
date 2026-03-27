@@ -5,6 +5,7 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.server.MinecraftServer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 
 object PlayerActionAPI {
 
@@ -43,9 +44,12 @@ object PlayerActionAPI {
                     p.xRot = e.shouldLookLeftRight
                 }
                 if (e.shouldJump && p.onGround()) {
-                    println(p.toString())
-                    p.setJumping(true)
                     p.jumpFromGround()
+                    p.addDeltaMovement(
+                        Vec3(
+                            0.0, 0.42 * p.jumpBoostPower, 0.0
+                        )
+                    )
                     // p.jumpBoostPower
                     // shouldJump = false // do I want it to be continuous if no other inputs?
                 }
@@ -101,6 +105,7 @@ object PlayerActionAPI {
 
                 if (e.shouldDrop) {
                     p.drop(e.shouldDropStack)
+                    // p.updateOptions()
                     e.shouldDrop = false
                     //data.setDirty()
                 }

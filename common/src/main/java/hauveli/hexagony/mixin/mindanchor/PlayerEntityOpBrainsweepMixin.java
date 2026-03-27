@@ -50,7 +50,7 @@ import java.util.List;
 
 import at.petrak.hexcasting.api.casting.OperatorUtils;
 
-import static hauveli.hexagony.common.lib.AdvancementProvider.grantAdvancement;
+import static hauveli.hexagony.common.lib.AdvancementProvider.*;
 
 // import static hauveli.hexagony.common.lib.AdvancementProvider.grantAdvancement;
 
