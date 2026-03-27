@@ -1,0 +1,20 @@
+{
+  name: "hexagony.book.patterns.spells.astral_projection_spells",
+  category: "hexcasting:patterns/spells",
+  icon: "minecraft:leather_boots",
+  advancement: "hexagony:graft_succeeded",
+  pages: [
+    {
+      type: "patchouli:text",
+      text: "hexagony.book.astral_projection.page.1",
+    },
+    {
+      type: "hexcasting:pattern",
+      op_id: "hexagony:move/jump",
+      anchor: "hexagony:move/jump",
+      input: "entity",
+      output: "",
+      text: "hexagony.book.patterns.spells.astral_projection_spells.move/jump",
+    },
+  ],
+}

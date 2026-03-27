@@ -32,7 +32,10 @@ class AstralProjectTickCameraMixin {
         // TODO: lerp?
         // what interpolation is used?
         // could use funky lerp if I wanted to....
-        this.setRotation(0,0);
-        this.setPosition(new Vec3(0,10,0));
+        //this.setRotation(0,0);
+        //this.setPosition(new Vec3(0,10,0));
+        /*
+         */
+        //client.player.input.forwardImpulse = 1.0f;
     }
 }
