@@ -7,7 +7,7 @@
     "astralproject.AstralProjectTickCameraMixin"
   ],
   "mixins": [
-    "MixinDatagenMain",
+    "MixinDatagenMain"
     ],
   "server": [
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
