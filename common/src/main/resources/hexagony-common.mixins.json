@@ -7,10 +7,10 @@
     "astralproject.AstralProjectTickCameraMixin"
   ],
   "server": [
-    "mindanchor.AddFreshEntityServerLevelMixin"
   ],
   "mixins": [
     "MixinDatagenMain",
+    "mindanchor.AddFreshEntityServerLevelMixin",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "mindanchor.MindAnchorInventorySlotMixin",
     "mindanchor.PlayerEntityOpBrainsweepMixin",

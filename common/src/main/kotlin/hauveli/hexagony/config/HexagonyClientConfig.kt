@@ -1,6 +1,7 @@
 package hauveli.hexagony.config
 
 import dev.architectury.event.events.client.ClientPlayerEvent
+import dev.architectury.event.events.common.TickEvent
 import me.shedaniel.autoconfig.AutoConfig
 import me.shedaniel.autoconfig.ConfigData
 import me.shedaniel.autoconfig.ConfigHolder
@@ -13,6 +14,7 @@ import me.shedaniel.autoconfig.serializer.PartitioningSerializer.GlobalData
 import me.shedaniel.autoconfig.serializer.Toml4jConfigSerializer
 import net.minecraft.world.InteractionResult
 import hauveli.hexagony.Hexagony
+import hauveli.hexagony.common.control.PlayerActionAPI.onClientTick
 
 object HexagonyClientConfig {
     @JvmStatic

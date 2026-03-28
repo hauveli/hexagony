@@ -1,14 +1,19 @@
 package hauveli.hexagony.common.control
 
+import hauveli.hexagony.networking.HexagonyNetworking
+import hauveli.hexagony.networking.msg.MsgPlayerControlBooleanS2C
+import hauveli.hexagony.networking.msg.MsgPlayerControlFloatS2C
+import net.minecraft.client.Minecraft
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.player.Player
 import java.util.UUID
 
 
 import net.minecraft.world.level.saveddata.SavedData
-
 
 data class PlayerControlEntry (
     val mindUUID: UUID, // lol
@@ -35,8 +40,14 @@ data class PlayerControlEntry (
     var shouldDropStack: Boolean = false
 ) {
 
-    fun jump() {
-        shouldJump = true
+    fun jump(serverPlayer: ServerPlayer) {
+        shouldJump = true // this SHOULD be reflected in the client? hmm... better to set it inside of handler?
+        // FakePlayer must be tagged for this to work, I could not identify any sane way to mark them otherwise.
+        if (serverPlayer.tags.contains("FakePlayer")) return
+        HexagonyNetworking.CHANNEL.sendToPlayer(
+            serverPlayer,
+            MsgPlayerControlBooleanS2C(PlayerControlData.MessageTypeBoolean.SHOULD_JUMP, true)
+        )
     }
 
     fun stop() {
@@ -116,11 +127,19 @@ data class PlayerControlEntry (
         shouldSwapHands = true
     }
 
-    fun moveLongitudinal(walking: Float) {
+    fun moveForwardBackward(serverPlayer: ServerPlayer, walking: Float) {
         shouldMoveForwardBackward = walking
+        if (serverPlayer.tags.contains("FakePlayer")) return
+        HexagonyNetworking.CHANNEL.sendToPlayer(
+            serverPlayer,
+            MsgPlayerControlFloatS2C(
+                PlayerControlData.MessageTypeFloat.SHOULD_MOVE_FORWARD_BACKWARD,
+                walking
+            )
+        )
     }
 
-    fun moveLatitudinal(walking: Float) {
+    fun moveLeftRight(walking: Float) {
         shouldMoveLeftRight = walking
     }
 
@@ -143,6 +162,31 @@ class PlayerControlRuntime () {
 }
 
 class PlayerControlData : SavedData() {
+    enum class MessageTypeBoolean {
+        SHOULD_JUMP,
+        SHOULD_SPRINT,
+        SHOULD_SNEAK,
+        SHOULD_ATTACK,
+        SHOULD_USE,
+        SHOULD_SWAP_HANDS,
+        SHOULD_DROP,
+        SHOULD_DROP_STACK
+    }
+
+    enum class MessageTypeFloat {
+        SHOULD_MOVE_FORWARD_BACKWARD,
+        SHOULD_MOVE_LEFT_RIGHT,
+        SHOULD_LOOK_UP_DOWN,
+        SHOULD_LOOK_LEFT_RIGHT,
+        SHOULD_LOOK_ROLL
+    }
+
+    enum class MessageTypeInt {
+        SHOULD_ATTACK_PERIOD,
+        SHOULD_USE_PERIOD,
+        SHOULD_HOTBAR_SLOT
+    }
+
     val players: MutableMap<UUID, PlayerControlEntry> = mutableMapOf()
 
     fun getOrCreate(uuid: UUID): PlayerControlEntry {
@@ -195,9 +239,41 @@ class PlayerControlData : SavedData() {
 
     companion object {
 
+        lateinit var myEntry: PlayerControlEntry
+
+        fun onJoin() {
+            val player = Minecraft.getInstance().player
+            // whatever, I'll just have each client track their own personal myEntry and then have the server tell the clients what to do
+            // on join or something...
+            myEntry = PlayerControlEntry(
+                mindUUID = player!!.uuid,
+                shouldMoveForwardBackward = 0f,
+                shouldMoveLeftRight = 0f,
+                shouldLookUpDown = 0f,
+                shouldLookLeftRight = 0f,
+                shouldLookRoll = 0f,
+                shouldJump = false,
+                shouldSprint = false,
+                shouldSneak = false,
+                shouldAttack = false,
+                shouldAttackPeriod = 0,
+                shouldUse = false,
+                shouldUsePeriod = 0,
+                shouldSwapHands = false,
+                shouldHotbarSlot = -1,
+                shouldDrop = false,
+                shouldDropStack = false
+            )
+        }
+
+        fun getSelf() : PlayerControlEntry {
+            return myEntry
+        }
+
         private const val NAME = "hexagony_player_controls"
 
         fun get(server: MinecraftServer): PlayerControlData {
+            // Relying on overworld() seems bad but whatever
             return server.overworld().dataStorage.computeIfAbsent(
                 ::load,
                 ::PlayerControlData,

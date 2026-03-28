@@ -1,5 +1,9 @@
 package hauveli.hexagony
 
+import dev.architectury.event.events.client.ClientPlayerEvent
+import dev.architectury.event.events.common.TickEvent
+import hauveli.hexagony.common.control.PlayerActionAPI.onClientTick
+import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.config.HexagonyClientConfig
 import me.shedaniel.autoconfig.AutoConfig
 import net.minecraft.client.gui.screens.Screen
@@ -7,6 +11,19 @@ import net.minecraft.client.gui.screens.Screen
 object HexagonyClient {
     fun init() {
         HexagonyClientConfig.init()
+
+        var registered = false
+        ClientPlayerEvent.CLIENT_PLAYER_JOIN.register {
+            PlayerControlData.onJoin()
+            // Erm... is this safe? Will this re-register an onClientTick method each time a world is left and re-joined?
+            if (!registered) {
+                TickEvent.PLAYER_POST.register { player ->
+                    onClientTick()
+                }
+            }
+            registered = true
+        }
+
     }
 
     fun getConfigScreen(parent: Screen): Screen {

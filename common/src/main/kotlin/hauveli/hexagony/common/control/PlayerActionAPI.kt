@@ -3,18 +3,23 @@ package hauveli.hexagony.common.control
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.server.MinecraftServer
+import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.MoverType
+import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import kotlin.math.sqrt
+
 
 object PlayerActionAPI {
+    // TODO: god there has to be a better way to get the local player's data without duplicating code...
+    // I could just write local to a static UUID, or store it in a static variable somewhere....
+    // then access would be PlayerControlData.myEntry
+    // God so much of the code is duplicated at this point but whatever, I just want it to work...
 
-    /*
-    private val runtime = ConcurrentHashMap<UUID, MindAnchorRuntime>()
-
-    private fun runtime(uuid: UUID) =
-        runtime.computeIfAbsent(uuid) { MindAnchorRuntime() }
-*/
     private val mc: Minecraft
         get() = Minecraft.getInstance()
 
@@ -23,6 +28,258 @@ object PlayerActionAPI {
 
     private val level: Level?
         get() = mc.level
+
+    // Ex. players who connect to the server
+    object Client {
+
+        val e = PlayerControlData.getSelf()
+
+        fun moveForwardBackward(float: Float) {
+            e.shouldMoveForwardBackward = float
+        }
+
+        fun moveLeftRight(float: Float) {
+            e.shouldMoveLeftRight = float
+        }
+
+        fun lookUpDown(float: Float) {
+            e.shouldLookUpDown = float
+        }
+
+        fun lookLeftRight(float: Float) {
+            e.shouldLookLeftRight = float
+        }
+
+        fun attackPeriodic(integer: Int) {
+            e.shouldAttackPeriod = integer
+        }
+
+        fun hotbarSlot(integer: Int) {
+            e.shouldHotbarSlot = integer
+        }
+
+        fun usePeriodic(integer: Int) {
+            e.shouldUsePeriod = integer
+        }
+
+        fun jump(bool: Boolean) {
+            e.shouldJump = bool
+        }
+
+        fun sprint(bool: Boolean) {
+            e.shouldSprint = bool
+        }
+
+        fun sneak(bool: Boolean) {
+            e.shouldSneak = bool
+        }
+
+        fun attack(bool: Boolean) {
+            e.shouldAttack = bool
+        }
+
+        fun use(bool: Boolean) {
+            e.shouldUse = bool
+        }
+
+        fun swapHands(bool: Boolean) {
+            e.shouldSwapHands = bool
+        }
+
+        fun drop(bool: Boolean) {
+            e.shouldDrop = bool
+        }
+
+        fun dropStack(bool: Boolean) {
+            e.shouldDropStack = bool
+        }
+    }
+
+    // Ex. players who live on the server (and do not have clients)
+    object Server {
+
+    }
+
+    /*
+    private val runtime = ConcurrentHashMap<UUID, MindAnchorRuntime>()
+
+    private fun runtime(uuid: UUID) =
+        runtime.computeIfAbsent(uuid) { MindAnchorRuntime() }
+*/
+    object movementCalculation {
+        val SPRINTING = 1.3
+        val WALKING = 1.0
+        val SNEAKING = 0.3
+        val STOPPING = 0.0
+        val ANGLE_DEFAULT = 0.98
+        val ANGLE_STRAFE = 1.0
+        val ANGLE_STRAFE_SNEAK = 0.98 * sqrt(2.0)
+        val SLIPPERINESS_DEFAULT = 0.6
+        val SLIPPERINESS_SLIME = 0.8
+        val SLIPPERINESS_ICE = 0.98
+        val SLIPPERINESS_AIRBORNE = 0.0
+        val SPEED_INCREASE_PER_LEVEL = 0.2
+        val SLOWNESS_DECREASE_PER_LEVEL = 0.15
+
+        var velocity_old = 0.0
+    }
+
+    fun getInputVector(
+        relative: Vec3,
+        motionScaler: Float,
+        facing: Float
+    ): Vec3 {
+
+        var input = relative
+
+        val lengthSqr = input.lengthSqr()
+        if (lengthSqr > 1.0) {
+            input = input.normalize()
+        }
+
+        val scaled = input.scale(motionScaler.toDouble())
+
+        val radians = facing * (Math.PI.toFloat() / 180f)
+
+        val sin = Mth.sin(radians)
+        val cos = Mth.cos(radians)
+
+        return Vec3(
+            scaled.x * cos - scaled.z * sin,
+            scaled.y,
+            scaled.z * cos + scaled.x * sin
+        )
+    }
+
+    private fun customMovement(entity: LivingEntity, input: Vec3) {
+        val speed: Float = entity.speed //.getAttributeValue(Attributes.MOVEMENT_SPEED)
+
+        // Normalize input
+        val moveInput = if (input.lengthSqr() > 1.0)
+            input.normalize()
+        else
+            input
+
+        // Convert input relative to rotation
+        val rotated = getInputVector(
+            moveInput,
+            speed,
+            entity.yRot
+        )
+
+        // Apply acceleration
+        entity.deltaMovement = entity.deltaMovement.add(rotated)
+
+        // Apply gravity
+        if (!entity.isNoGravity) {
+            entity.deltaMovement = entity.deltaMovement.add(0.0, -0.08, 0.0)
+        }
+
+        // Move with collisions
+        // entity.move(MoverType.SELF, entity.deltaMovement)
+
+        // Apply friction
+        val friction = if (entity.onGround())
+            (entity.level().getBlockState(entity.blockPosition().below()).block.friction * 0.91f)
+        else
+            0.91f
+
+        entity.deltaMovement = entity.deltaMovement.multiply(friction.toDouble(), 0.98, friction.toDouble())
+    }
+
+    val SPEED_MULT = 4.0
+
+    fun onClientTick() {
+        val p = player ?: return
+        val e = PlayerControlData.myEntry
+        // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
+        if (e.shouldMoveForwardBackward != 0f) {
+            if (e.shouldMoveForwardBackward > 0) {
+                p.travel(Vec3(0.0,0.0, p.speed.toDouble() * SPEED_MULT))
+                //customMovement(p,Vec3(0.0,0.0,1.0))
+                // p.addDeltaMovement(Vec3(1.0,0.0,0.0))
+            } else {
+                p.travel(Vec3(0.0,0.0,-1.0))
+                //customMovement(p,Vec3(0.0,0.0,-1.0))
+            }
+        }
+        if (e.shouldMoveLeftRight != 0f) {
+            if (e.shouldMoveLeftRight > 0) {
+                customMovement(p,Vec3(1.0,0.0,0.0))
+                // p.addDeltaMovement(Vec3(1.0,0.0,0.0))
+            } else {
+                customMovement(p,Vec3(-1.0,0.0,0.0))
+            }
+        }
+        if (e.shouldLookUpDown != 0f) {
+            p.yRot = e.shouldLookUpDown
+        }
+        if (e.shouldLookLeftRight != 0f) {
+            p.xRot = e.shouldLookLeftRight
+        }
+        if (e.shouldJump && p.onGround()) {
+            player?.jumpFromGround()
+        }
+        if (e.shouldSprint && p.canSprint()) {
+            p.isSprinting = true
+        }
+        if (e.shouldSneak) {
+            p.input.shiftKeyDown = true
+            p.isShiftKeyDown = true
+        }
+
+        if (e.shouldAttack) {
+            // p.swing is local
+            if (e.shouldAttackPeriod == -1) {
+                p.swinging = true
+                p.swing(player!!.usedItemHand) // Momentary
+                e.shouldAttack = false
+            } else if (e.shouldAttackPeriod == 0) {
+                p.swinging = true
+                p.swing(player!!.usedItemHand) // Momentary
+            } else if ((level!!.gameTime % e.shouldAttackPeriod) == 0L) {
+                p.swinging = true
+                p.swing(player!!.usedItemHand) // Momentary
+            }
+        }
+
+        if (e.shouldUse) {
+            if (e.shouldUsePeriod == -1) {
+                // TODO: do I really want to do it this way?
+                // Hmm...
+                mc.options.keyUse.isDown = true // Hmm.... I don't think I can use .isDown because it would conflict...
+                e.shouldUse = false
+            } else if (e.shouldUsePeriod == 0) {
+                p.swing(player!!.usedItemHand) // Continuous
+            } else if ((level!!.gameTime % e.shouldUsePeriod) == 0L) {
+                p.swing(player!!.usedItemHand) // Periodic
+            }
+        }
+
+
+        if (e.shouldHotbarSlot != -1) {
+            p.inventory.selected = e.shouldHotbarSlot + 1
+            e.shouldHotbarSlot = -1 // reset, no reason to be persistent?
+        }
+
+        if (e.shouldSwapHands) {
+            // PlayerActionPacketAPI.swapHands(p)
+            val tempItemStack = p.getItemInHand(InteractionHand.MAIN_HAND)
+            p.setItemInHand(InteractionHand.MAIN_HAND, p.getItemInHand(InteractionHand.OFF_HAND))
+            p.setItemInHand(InteractionHand.OFF_HAND, tempItemStack)
+            e.shouldSwapHands = false
+            //data.setDirty()
+        }
+
+        if (e.shouldDrop) {
+            p.drop(e.shouldDropStack)
+            // p.updateOptions()
+            e.shouldDrop = false
+            //data.setDirty()
+        }
+        // Todo: smarter way to mark dirty?
+        // data.setDirty()
+    }
 
     fun onServerTick(server: MinecraftServer) {
         val data = PlayerControlData.get(server)
@@ -43,13 +300,16 @@ object PlayerActionAPI {
                 if (e.shouldLookLeftRight != 0f) {
                     p.xRot = e.shouldLookLeftRight
                 }
-                if (e.shouldJump && p.onGround()) {
+                if (e.shouldJump) {
+                    // If player is of type REAL and not a bot, we send a packet, otherwise we manipulate directly
+                    /*
                     p.jumpFromGround()
                     p.addDeltaMovement(
                         Vec3(
                             0.0, 0.42 * p.jumpBoostPower, 0.0
                         )
                     )
+                    */
                     // p.jumpBoostPower
                     // shouldJump = false // do I want it to be continuous if no other inputs?
                 }

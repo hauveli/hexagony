@@ -65,9 +65,8 @@ object OpJumpButWithYourFeet : SpellAction {
     private class Spell(private val target: ServerPlayer) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
             val server = target.server
-            println(target.onGround().toString())
             if (target.server == null) return
-            PlayerControlData.get(server).getOrCreate(target.uuid).jump()
+            PlayerControlData.get(server).getOrCreate(target.uuid).jump(target)
             // val sourceStack = server!!.createCommandSourceStack()
             // server.getCommands().performPrefixedCommand(sourceStack, "player " + FakeplayerUtils.getUsernameString(target) + " jump")
         }

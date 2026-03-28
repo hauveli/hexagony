@@ -66,9 +66,8 @@ object OpWalkAMileInTheseLouisVuittons : SpellAction {
 
     private class Spell(private val target: ServerPlayer, private val walking: Int) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
-            val server = target.getServer()
-            if (server == null) return
-            PlayerControlData.get(server).getOrCreate(target.uuid).moveLatitudinal(walking.toFloat())
+            val server = target.getServer() ?: return
+            PlayerControlData.get(server).getOrCreate(target.uuid).moveForwardBackward(target, walking.toFloat())
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

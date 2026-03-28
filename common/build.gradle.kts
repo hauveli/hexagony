@@ -6,7 +6,14 @@ plugins {
 architectury {
     common("fabric", "forge")
 }
-
+/*
+loom {
+    // Name of your refmap file
+    mixin {
+        defaultRefmapName.set ("mixins.hexagony.refmap.json")
+    }
+}
+*/
 dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(kotlin("reflect"))

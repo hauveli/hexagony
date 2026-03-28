@@ -65,19 +65,30 @@ object HexagonyServerConfig {
 
     @Config(name = "server")
     class ServerConfig : ConfigData {
-        @Tooltip
-        var dummyServerConfigOption: Int = 64
-            private set
-
         fun encode(buf: FriendlyByteBuf) {
             buf.writeInt(dummyServerConfigOption)
+            buf.writeDouble(recoveryPerRest)
+            buf.writeDouble(maximumHealthPenaltyMultiplier)
+            buf.writeDouble(overcastDamagePenaltyMultiplier)
+            buf.writeDouble(overcastDamagePenaltyAdditionalDamage)
+            buf.writeBoolean(requireScrollForEnlightenment)
+            buf.writeUtf(overcastAttributeName)
         }
 
         fun decode(buf: FriendlyByteBuf): ServerConfig {
             dummyServerConfigOption = buf.readInt()
+            recoveryPerRest = buf.readDouble()
+            maximumHealthPenaltyMultiplier = buf.readDouble()
+            overcastDamagePenaltyMultiplier = buf.readDouble()
+            overcastDamagePenaltyAdditionalDamage = buf.readDouble()
+            requireScrollForEnlightenment = buf.readBoolean()
+            overcastAttributeName = buf.readUtf()
             return this
         }
 
+        @Tooltip
+        var dummyServerConfigOption: Int = 64
+            private set
         @Tooltip
         var recoveryPerRest: Double = 1.0
             private set
