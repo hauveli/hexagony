@@ -7,15 +7,16 @@
     "astralproject.AstralProjectTickCameraMixin"
   ],
   "mixins": [
-    "MixinDatagenMain"
-    ],
-  "server": [
-    "enlightenment.RequireScrollMishapUnenlightenedMixin",
+    "MixinDatagenMain",
     "mindanchor.AddFreshEntityServerLevelMixin",
+    "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "mindanchor.MindAnchorInventorySlotMixin",
     "mindanchor.PlayerEntityOpBrainsweepMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",
     "overcast.RemovePenaltyAtHeadStopSleepInBedMixin"
+    ],
+  "server": [
+    "mindanchor.AddFreshEntityServerLevelMixin"
   ],
   "plugin": "hauveli.hexagony.mixin.HexagonyMixinConfigPlugin",
   "injectors": {
