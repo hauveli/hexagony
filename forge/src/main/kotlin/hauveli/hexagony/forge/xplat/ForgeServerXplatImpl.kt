@@ -34,7 +34,7 @@ import java.util.function.Supplier
 
 // https://github.com/FallingColors/HexMod/blob/532fe9a60138544112e096812c7aefb78b3d7364/Forge/src/main/java/at/petrak/hexcasting/forge/xplat/ForgeXplatImpl.java
 
-class ForgeXplatImpl() : IXplatAbstractions {
+class ForgeServerXplatImpl() : IXplatAbstractions {
     override fun platform(): Platform {
         return Platform.FORGE
     }
@@ -104,7 +104,9 @@ class ForgeXplatImpl() : IXplatAbstractions {
         factory: BiFunction<BlockPos, BlockState, T>,
         vararg blocks: Block
     ): BlockEntityType<T> {
-        return BlockEntityType.Builder.of(factory::apply, *blocks).build(null)
+        return BlockEntityType.Builder
+            .of(factory::apply, *blocks)
+            .build(null)
     }
 
     companion object {

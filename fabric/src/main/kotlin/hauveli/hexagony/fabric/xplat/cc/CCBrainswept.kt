@@ -21,7 +21,7 @@ class CCBrainswept(owner: LivingEntity?) : Component, AutoSyncedComponent {
     }
 
     override fun applySyncPacket(buf: FriendlyByteBuf?) {
-        super<AutoSyncedComponent>.applySyncPacket(buf)
+        super.applySyncPacket(buf)
         if (owner is Mob && brainswept) owner.removeFreeWill()
     }
 
