@@ -8,6 +8,8 @@
   ],
   "mixins": [
     "MixinDatagenMain",
+    ],
+  "server": [
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "mindanchor.AddFreshEntityServerLevelMixin",
     "mindanchor.MindAnchorInventorySlotMixin",
