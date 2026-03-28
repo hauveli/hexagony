@@ -6,6 +6,9 @@
   "client": [
     "astralproject.AstralProjectTickCameraMixin"
   ],
+  "server": [
+    "mindanchor.AddFreshEntityServerLevelMixin"
+  ],
   "mixins": [
     "MixinDatagenMain",
     "mindanchor.AddFreshEntityServerLevelMixin",
@@ -14,9 +17,6 @@
     "mindanchor.PlayerEntityOpBrainsweepMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",
     "overcast.RemovePenaltyAtHeadStopSleepInBedMixin"
-    ],
-  "server": [
-    "mindanchor.AddFreshEntityServerLevelMixin"
   ],
   "plugin": "hauveli.hexagony.mixin.HexagonyMixinConfigPlugin",
   "injectors": {
