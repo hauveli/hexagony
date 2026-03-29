@@ -84,7 +84,7 @@ object OpMadeYouLook : SpellAction {
             val yaw = Math.toDegrees(atan2(-dir.x, dir.z)).toFloat()
             // actor.look(yaw, pitch)
             if (target.uuid == null) return
-            PlayerControlData.get(server).getOrCreate(target.uuid).look(pitch, yaw)
+            PlayerControlData.get(server).getOrCreate(target.uuid).look(target, pitch, yaw)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

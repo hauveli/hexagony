@@ -74,7 +74,7 @@ object OpDropAndRoll : SpellAction {
             // Todo: allow dropping singles using target.drop(false), q vs ctrl+q
             // target.drop(true)
             if (server == null) return
-            PlayerControlData.get(server).getOrCreate(target.uuid).drop(true)
+            PlayerControlData.get(server).getOrCreate(target.uuid).drop(target, true)
             // val sourceStack = server!!.createCommandSourceStack()
             // server.getCommands().performPrefixedCommand(sourceStack, "player " + FakeplayerUtils.getUsernameString(target) + " dropStack")
         }

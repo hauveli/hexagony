@@ -66,7 +66,7 @@ object OpStopAll : SpellAction {
         override fun cast(env: CastingEnvironment) {
             val server = target.getServer()
             if (server == null) return
-            PlayerControlData.get(server).getOrCreate(target.uuid).stop()
+            PlayerControlData.get(server).getOrCreate(target.uuid).stop(target)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

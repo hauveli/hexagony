@@ -66,7 +66,7 @@ object OpSwapHands : SpellAction {
         override fun cast(env: CastingEnvironment) {
             val server = target.getServer()
             if (server == null) return
-            PlayerControlData.get(server).getOrCreate(target.uuid).swapHands()
+            PlayerControlData.get(server).getOrCreate(target.uuid).swapHands(target)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

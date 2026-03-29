@@ -71,9 +71,9 @@ object OpAttack : SpellAction {
             // val sourceStack = server!!.createCommandSourceStack()
             // val username: String? = FakeplayerUtils.getUsernameString(target)
             when (frequency) {
-                0 -> PlayerControlData.get(server).getOrCreate(target.uuid).attackContinuous()
-                -1 -> PlayerControlData.get(server).getOrCreate(target.uuid).attackOnce()
-                else -> PlayerControlData.get(server).getOrCreate(target.uuid).attackPeriodic(frequency)
+                0 -> PlayerControlData.get(server).getOrCreate(target.uuid).attackContinuous(target)
+                -1 -> PlayerControlData.get(server).getOrCreate(target.uuid).attackOnce(target)
+                else -> PlayerControlData.get(server).getOrCreate(target.uuid).attackPeriodic(target, frequency)
             }
         }
 

@@ -69,9 +69,9 @@ object OpUseItem : SpellAction {
             val server = target.getServer()
             if (server == null) return
             when (frequency) {
-                0 -> PlayerControlData.get(server).getOrCreate(target.uuid).useContinuous()
-                -1 -> PlayerControlData.get(server).getOrCreate(target.uuid).useOnce()
-                else -> PlayerControlData.get(server).getOrCreate(target.uuid).usePeriodic(frequency)
+                0 -> PlayerControlData.get(server).getOrCreate(target.uuid).useContinuous(target)
+                -1 -> PlayerControlData.get(server).getOrCreate(target.uuid).useOnce(target)
+                else -> PlayerControlData.get(server).getOrCreate(target.uuid).usePeriodic(target, frequency)
             }
 
         }

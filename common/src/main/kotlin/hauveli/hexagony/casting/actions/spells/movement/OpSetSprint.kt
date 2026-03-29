@@ -67,7 +67,7 @@ object OpSetSprint : SpellAction {
         override fun cast(env: CastingEnvironment) {
             val server = target.getServer()
             if (server == null) return
-            PlayerControlData.get(server).getOrCreate(target.uuid).sprint(doesSprint)
+            PlayerControlData.get(server).getOrCreate(target.uuid).sprint(target, doesSprint)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

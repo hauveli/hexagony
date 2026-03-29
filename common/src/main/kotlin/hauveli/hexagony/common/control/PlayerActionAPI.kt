@@ -34,6 +34,25 @@ object PlayerActionAPI {
 
         val e = PlayerControlData.getSelf()
 
+        fun stop(bool: Boolean) {
+            e.shouldMoveForwardBackward = 0f
+            e.shouldMoveLeftRight = 0f
+            e.shouldLookUpDown = 0f
+            e.shouldLookLeftRight = 0f
+            e.shouldLookRoll = 0f
+            e.shouldJump = false
+            e.shouldSprint = false
+            e.shouldSneak = false
+            e.shouldAttack = false
+            e.shouldAttackPeriod = 0
+            e.shouldUse = false
+            e.shouldUsePeriod = 0
+            e.shouldSwapHands = false
+            e.shouldHotbarSlot = -1
+            e.shouldDrop = false
+            e.shouldDropStack = false
+        }
+
         fun moveForwardBackward(float: Float) {
             e.shouldMoveForwardBackward = float
         }
@@ -48,6 +67,10 @@ object PlayerActionAPI {
 
         fun lookLeftRight(float: Float) {
             e.shouldLookLeftRight = float
+        }
+
+        fun lookRoll(float: Float) {
+            e.shouldLookRoll = float
         }
 
         fun attackPeriodic(integer: Int) {
@@ -124,6 +147,8 @@ object PlayerActionAPI {
         var velocity_old = 0.0
     }
 
+    val SPEED_MULT = 4.0
+
     fun getInputVector(
         relative: Vec3,
         motionScaler: Float,
@@ -146,14 +171,13 @@ object PlayerActionAPI {
 
         return Vec3(
             scaled.x * cos - scaled.z * sin,
-            scaled.y,
+            0.0, //scaled.y,
             scaled.z * cos + scaled.x * sin
         )
     }
 
     private fun customMovement(entity: LivingEntity, input: Vec3) {
         val speed: Float = entity.speed //.getAttributeValue(Attributes.MOVEMENT_SPEED)
-
         // Normalize input
         val moveInput = if (input.lengthSqr() > 1.0)
             input.normalize()
@@ -167,49 +191,54 @@ object PlayerActionAPI {
             entity.yRot
         )
 
-        // Apply acceleration
-        entity.deltaMovement = entity.deltaMovement.add(rotated)
-
-        // Apply gravity
-        if (!entity.isNoGravity) {
-            entity.deltaMovement = entity.deltaMovement.add(0.0, -0.08, 0.0)
-        }
 
         // Move with collisions
         // entity.move(MoverType.SELF, entity.deltaMovement)
 
         // Apply friction
-        val friction = if (entity.onGround())
-            (entity.level().getBlockState(entity.blockPosition().below()).block.friction * 0.91f)
-        else
-            0.91f
-
-        entity.deltaMovement = entity.deltaMovement.multiply(friction.toDouble(), 0.98, friction.toDouble())
+        if (entity.onGround()) {
+            // Apply acceleration as is
+            rotated.multiply(SPEED_MULT,1.0,SPEED_MULT)
+            // Apply friction as is
+            val friction = (entity.level().getBlockState(entity.blockPosition().below()).block.friction * 0.91)
+            rotated.multiply(friction, 1.0, friction)
+        } else {
+            // Apply friction WITHOUT acceleration, and actually, decelerate instead
+            rotated.multiply(0.02,1.0,0.02)
+        }
+        // todo: make else if in game versions where the bug is fixed
+        if (entity.isShiftKeyDown) {
+            rotated.multiply(
+                movementCalculation.SNEAKING,
+                1.0,
+                movementCalculation.SNEAKING
+            )
+        }
+        if (entity.isSprinting) {
+            rotated.multiply(
+                movementCalculation.SPRINTING,
+                1.0,
+                movementCalculation.SPRINTING
+                )
+        }
+        // Maximum length of rotated must be 4 or 5 ish?
+        if (rotated.lengthSqr() > 25) {
+            rotated.normalize().multiply(4.0,1.0,4.0)
+        }
+        entity.addDeltaMovement(rotated)
     }
-
-    val SPEED_MULT = 4.0
 
     fun onClientTick() {
         val p = player ?: return
         val e = PlayerControlData.myEntry
         // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
-        if (e.shouldMoveForwardBackward != 0f) {
-            if (e.shouldMoveForwardBackward > 0) {
-                p.travel(Vec3(0.0,0.0, p.speed.toDouble() * SPEED_MULT))
-                //customMovement(p,Vec3(0.0,0.0,1.0))
-                // p.addDeltaMovement(Vec3(1.0,0.0,0.0))
-            } else {
-                p.travel(Vec3(0.0,0.0,-1.0))
-                //customMovement(p,Vec3(0.0,0.0,-1.0))
-            }
-        }
-        if (e.shouldMoveLeftRight != 0f) {
-            if (e.shouldMoveLeftRight > 0) {
-                customMovement(p,Vec3(1.0,0.0,0.0))
-                // p.addDeltaMovement(Vec3(1.0,0.0,0.0))
-            } else {
-                customMovement(p,Vec3(-1.0,0.0,0.0))
-            }
+        if (e.shouldMoveForwardBackward != 0f || e.shouldMoveLeftRight != 0f) {
+            p.input.forwardImpulse = e.shouldMoveForwardBackward
+            customMovement(p,
+                Vec3(
+                    e.shouldMoveLeftRight.toDouble(),
+                    0.0,
+                    e.shouldMoveForwardBackward.toDouble()))
         }
         if (e.shouldLookUpDown != 0f) {
             p.yRot = e.shouldLookUpDown

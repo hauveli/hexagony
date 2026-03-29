@@ -68,7 +68,7 @@ object OpSetSneak : SpellAction {
         override fun cast(env: CastingEnvironment) {
             val server = target.getServer()
             if (server == null) return
-            PlayerControlData.get(server).getOrCreate(target.uuid).sneak(doesSneak)
+            PlayerControlData.get(server).getOrCreate(target.uuid).sneak(target, doesSneak)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {
