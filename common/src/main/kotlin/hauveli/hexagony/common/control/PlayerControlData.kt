@@ -41,17 +41,6 @@ data class PlayerControlEntry (
     var shouldDrop: Boolean = false,
     var shouldDropStack: Boolean = false
 ) {
-
-    fun jump(serverPlayer: ServerPlayer) {
-        shouldJump = true // this SHOULD be reflected in the client? hmm... better to set it inside of handler?
-        // FakePlayer must be tagged for this to work, I could not identify any sane way to mark them otherwise.
-        if (serverPlayer.tags.contains("FakePlayer")) return
-        HexagonyNetworking.CHANNEL.sendToPlayer(
-            serverPlayer,
-            MsgPlayerControlBooleanS2C(PlayerControlData.MessageTypeBoolean.SHOULD_JUMP, true)
-        )
-    }
-
     fun stop(serverPlayer: ServerPlayer) {
         shouldMoveForwardBackward = 0f
         shouldMoveLeftRight = 0f
@@ -77,6 +66,16 @@ data class PlayerControlEntry (
                 PlayerControlData.MessageTypeBoolean.SHOULD_STOP,
                 true
             )
+        )
+    }
+
+    fun jump(serverPlayer: ServerPlayer) {
+        shouldJump = true // this SHOULD be reflected in the client? hmm... better to set it inside of handler?
+        // FakePlayer must be tagged for this to work, I could not identify any sane way to mark them otherwise.
+        if (serverPlayer.tags.contains("FakePlayer")) return
+        HexagonyNetworking.CHANNEL.sendToPlayer(
+            serverPlayer,
+            MsgPlayerControlBooleanS2C(PlayerControlData.MessageTypeBoolean.SHOULD_JUMP, true)
         )
     }
 
@@ -122,14 +121,15 @@ data class PlayerControlEntry (
         HexagonyNetworking.CHANNEL.sendToPlayer(
             serverPlayer,
             MsgPlayerControlBooleanS2C(
-                PlayerControlData.MessageTypeBoolean.SHOULD_SWAP_HANDS,
-                shouldSwapHands
+                PlayerControlData.MessageTypeBoolean.SHOULD_ATTACK,
+                shouldAttack
             )
         )
     }
 
     fun attackPeriodic(serverPlayer: ServerPlayer, period: Int) {
         shouldAttackPeriod = period
+        this.attackOnce(serverPlayer)
         if (serverPlayer.tags.contains("FakePlayer")) return
         HexagonyNetworking.CHANNEL.sendToPlayer(
             serverPlayer,
@@ -138,7 +138,6 @@ data class PlayerControlEntry (
                 shouldAttackPeriod
             )
         )
-        this.attackOnce(serverPlayer)
     }
 
     fun attackContinuous(serverPlayer: ServerPlayer) {
@@ -151,14 +150,15 @@ data class PlayerControlEntry (
         HexagonyNetworking.CHANNEL.sendToPlayer(
             serverPlayer,
             MsgPlayerControlBooleanS2C(
-                PlayerControlData.MessageTypeBoolean.SHOULD_SWAP_HANDS,
-                shouldSwapHands
+                PlayerControlData.MessageTypeBoolean.SHOULD_USE,
+                shouldUse
             )
         )
     }
 
     fun usePeriodic(serverPlayer: ServerPlayer, period: Int) {
         shouldUsePeriod = period
+        this.useOnce(serverPlayer)
         if (serverPlayer.tags.contains("FakePlayer")) return
         HexagonyNetworking.CHANNEL.sendToPlayer(
             serverPlayer,
@@ -167,7 +167,6 @@ data class PlayerControlEntry (
                 shouldUsePeriod
             )
         )
-        this.useOnce(serverPlayer)
     }
 
     fun useContinuous(serverPlayer: ServerPlayer) {

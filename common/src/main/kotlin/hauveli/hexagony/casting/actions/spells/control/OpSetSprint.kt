@@ -1,4 +1,4 @@
-package hauveli.hexagony.casting.actions.spells.movement
+package hauveli.hexagony.casting.actions.spells.control
 
 import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import at.petrak.hexcasting.api.casting.RenderedSpell
@@ -9,14 +9,12 @@ import at.petrak.hexcasting.api.casting.getBool
 import at.petrak.hexcasting.api.casting.getPlayer
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.common.control.PlayerActionAPI
 import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 
-
-object OpSetSneak : SpellAction {
+object OpSetSprint : SpellAction {
     override val argc: Int
         get() = 2
 
@@ -40,9 +38,9 @@ object OpSetSneak : SpellAction {
             )
         )
         */
-        val doesSneak = args.getBool(1, argc)
+        val doesSprint = args.getBool(1, argc)
         return SpellAction.Result(
-            OpSetSneak.Spell(target, doesSneak),
+            OpSetSprint.Spell(target, doesSprint),
             MediaConstants.DUST_UNIT / 10,
             listOf(burst(target.position().add(0.0, target.getEyeHeight() / 2.0, 0.0), 1.0, 10)),
             1
@@ -64,11 +62,11 @@ object OpSetSneak : SpellAction {
         throw IllegalStateException()
     }
 
-    private class Spell(private val target: ServerPlayer, private val doesSneak: Boolean) : RenderedSpell {
+    private class Spell(private val target: ServerPlayer, private val doesSprint: Boolean) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
             val server = target.getServer()
             if (server == null) return
-            PlayerControlData.get(server).getOrCreate(target.uuid).sneak(target, doesSneak)
+            PlayerControlData.get(server).getOrCreate(target.uuid).sprint(target, doesSprint)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

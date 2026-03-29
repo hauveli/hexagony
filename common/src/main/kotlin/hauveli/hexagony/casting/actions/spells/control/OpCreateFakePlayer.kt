@@ -1,28 +1,18 @@
-package hauveli.hexagony.casting.actions.spells.movement
+package hauveli.hexagony.casting.actions.spells.control
 
-import at.petrak.hexcasting.api.casting.ParticleSpray
 import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import at.petrak.hexcasting.api.casting.RenderedSpell
-import at.petrak.hexcasting.api.casting.castables.Action
 import at.petrak.hexcasting.api.casting.castables.SpellAction
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
-import at.petrak.hexcasting.api.casting.eval.OperationResult
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
-import at.petrak.hexcasting.api.casting.eval.vm.SpellContinuation
 import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.Iota
-import at.petrak.hexcasting.api.casting.mishaps.MishapBadCaster
-import at.petrak.hexcasting.api.casting.mishaps.MishapBadLocation
-import at.petrak.hexcasting.api.casting.mishaps.MishapOthersName
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.common.control.PlayerControlData
-import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
-import java.util.List
 
 object OpCreateFakeplayer : SpellAction {
     override val argc: Int

@@ -1,4 +1,4 @@
-package hauveli.hexagony.casting.actions.spells
+package hauveli.hexagony.casting.actions.spells.trepannation
 
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.iota.Iota
@@ -6,18 +6,10 @@ import at.petrak.hexcasting.api.casting.castables.ConstMediaAction
 import at.petrak.hexcasting.api.casting.iota.GarbageIota
 import at.petrak.hexcasting.api.casting.iota.Vec3Iota
 import com.mojang.authlib.GameProfile
-import hauveli.hexagony.common.client.FreeCamAPI
 import hauveli.hexagony.mind_anchor.MindAnchorManager.getPosition
 import net.minecraft.client.Minecraft
-import net.minecraft.client.telemetry.TelemetryProperty
-import net.minecraft.commands.arguments.GameModeArgument
-import net.minecraft.core.UUIDUtil
-import net.minecraft.server.commands.GameModeCommand
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.server.level.ServerPlayerGameMode
-import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.level.GameType
-import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
 object OpMindAnchorPosition : ConstMediaAction  {

@@ -1,22 +1,24 @@
-package hauveli.hexagony.casting.actions.spells.movement
+package hauveli.hexagony.casting.actions.spells.control
 
 import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import at.petrak.hexcasting.api.casting.RenderedSpell
 import at.petrak.hexcasting.api.casting.castables.SpellAction
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
-import at.petrak.hexcasting.api.casting.getIntBetween
 import at.petrak.hexcasting.api.casting.getPlayer
+import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.common.control.PlayerActionAPI
 import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.Vec3
+import kotlin.math.asin
+import kotlin.math.atan2
 
 
-object OpSelectHotbar : SpellAction {
+object OpMadeYouLook : SpellAction {
     override val argc: Int
         get() = 2
 
@@ -40,9 +42,9 @@ object OpSelectHotbar : SpellAction {
             )
         )
         */
-        val slot = args.getIntBetween(1, 1, 9, argc)
+        val dir = args.getVec3(1, argc)
         return SpellAction.Result(
-            Spell(target, slot),
+            Spell(target, dir),
             MediaConstants.DUST_UNIT / 10,
             listOf(burst(target.position().add(0.0, target.getEyeHeight() / 2.0, 0.0), 1.0, 10)),
             1
@@ -57,6 +59,7 @@ object OpSelectHotbar : SpellAction {
         return true
     }
 
+
     override fun execute(
         args: kotlin.collections.List<Iota>,
         castingEnvironment: CastingEnvironment
@@ -64,11 +67,16 @@ object OpSelectHotbar : SpellAction {
         throw IllegalStateException()
     }
 
-    private class Spell(private val target: ServerPlayer, private val slot: Int) : RenderedSpell {
+    private class Spell(private val target: ServerPlayer?, private var dir: Vec3) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
-            val server = target.getServer()
-            if (server == null) return
-            PlayerControlData.get(server).getOrCreate(target.uuid).hotbar(target, slot)
+            val server = target?.server ?: return
+            // val actor: EntityPlayerActionPack = EntityPlayerActionPack(this.target)
+            dir = dir.normalize()
+            val pitch = Math.toDegrees(asin(-dir.y)).toFloat()
+            val yaw = Math.toDegrees(atan2(-dir.x, dir.z)).toFloat()
+            // actor.look(yaw, pitch)
+            if (target.uuid == null) return
+            PlayerControlData.get(server).getOrCreate(target.uuid).look(target, pitch, yaw)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {
@@ -77,7 +85,8 @@ object OpSelectHotbar : SpellAction {
         }
     }
 
-/*
+    /*
+
     override fun operate(
         castingEnvironment: CastingEnvironment,
         castingImage: CastingImage,
@@ -85,5 +94,6 @@ object OpSelectHotbar : SpellAction {
     ): OperationResult {
         return operate.operate(this, castingEnvironment, castingImage, spellContinuation)
     }
+
     */
 }

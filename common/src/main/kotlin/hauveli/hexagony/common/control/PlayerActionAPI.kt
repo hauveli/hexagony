@@ -2,14 +2,20 @@ package hauveli.hexagony.common.control
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.MoverType
+import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -46,9 +52,9 @@ object PlayerActionAPI {
             e.shouldSprint = false
             e.shouldSneak = false
             e.shouldAttack = false
-            e.shouldAttackPeriod = 0
+            e.shouldAttackPeriod = -1
             e.shouldUse = false
-            e.shouldUsePeriod = 0
+            e.shouldUsePeriod = -1
             e.shouldSwapHands = false
             e.shouldHotbarSlot = -1
             e.shouldDrop = false
@@ -80,6 +86,7 @@ object PlayerActionAPI {
         }
 
         fun attackPeriodic(integer: Int) {
+            println("Wow! ${integer}")
             e.shouldAttackPeriod = integer
         }
 
@@ -104,6 +111,7 @@ object PlayerActionAPI {
         }
 
         fun attack(bool: Boolean) {
+            println("Wow! ${bool}")
             e.shouldAttack = bool
         }
 
@@ -214,6 +222,97 @@ object PlayerActionAPI {
         entity.addDeltaMovement(rotated.multiply(finalMult,1.0,finalMult))
     }
 
+    private var breaking = false
+    // Do I want to implement this for server-only players as well? I think I do but I'm tired...
+    fun emulateLeftClick() {
+        val p = player ?: return
+        val gameMode = mc.gameMode ?: return
+        val hit = mc.hitResult ?: return
+
+        when (hit.type) {
+            HitResult.Type.ENTITY -> {
+                val entity = (hit as EntityHitResult).entity
+                gameMode.attack(p, entity)
+                p.swing(InteractionHand.MAIN_HAND)
+            }
+
+            HitResult.Type.BLOCK -> {
+                val blockHit = hit as BlockHitResult
+                if (breaking) {
+                    if (gameMode.destroyStage != 10) {
+                        gameMode.continueDestroyBlock(blockHit.blockPos, blockHit.direction)
+                    }
+                    /*
+                    else {
+                        gameMode.destroyBlock(blockHit.blockPos)
+                        breaking = false
+                    }
+                    */
+                } else {
+                    gameMode.startDestroyBlock(blockHit.blockPos, blockHit.direction)
+                    breaking = true
+                }
+                p.swing(InteractionHand.MAIN_HAND)
+            }
+
+            HitResult.Type.MISS -> {
+                if (breaking) {
+                    gameMode.stopDestroyBlock()
+                    breaking = false
+                }
+                p.swing(InteractionHand.MAIN_HAND)
+            }
+        }
+    }
+
+    private var using = false
+    fun emulateRightClick() {
+        val p = player ?: return
+        val gameMode = mc.gameMode ?: return
+        val hit = mc.hitResult ?: return
+
+        val stack = p.getItemInHand(InteractionHand.MAIN_HAND)
+
+        when (hit.type) {
+            HitResult.Type.ENTITY -> {
+                val entity = (hit as EntityHitResult).entity
+
+                // Interact with entity
+                // Main hand first
+                //gameMode.useItem(p, InteractionHand.MAIN_HAND)
+                gameMode.interact(p, entity, InteractionHand.MAIN_HAND)
+
+                // Swing hand for animation
+                p.swing(InteractionHand.MAIN_HAND)
+            }
+
+            HitResult.Type.BLOCK -> {
+                val blockHit = hit as BlockHitResult
+                val pos = blockHit.blockPos
+                val direction = blockHit.direction
+
+                // Place or use item on block
+                gameMode.useItemOn(p, InteractionHand.MAIN_HAND, blockHit)
+
+                // Optional: for continuous use (like eating or charging bow)
+                if (p.isUsingItem) {
+                    using = true
+                } else if (using) {
+                    gameMode.releaseUsingItem(p)
+                    using = false
+                }
+
+                p.swing(InteractionHand.MAIN_HAND)
+            }
+
+            HitResult.Type.MISS -> {
+                // Use item in air
+                gameMode.useItem(p, InteractionHand.MAIN_HAND)
+                p.swing(InteractionHand.MAIN_HAND)
+            }
+        }
+    }
+
     fun onClientTick() {
         val p = player ?: return
         val e = PlayerControlData.myEntry
@@ -234,25 +333,31 @@ object PlayerActionAPI {
             player?.jumpFromGround()
         }
         if (e.shouldSprint && p.canSprint()) {
-            p.isSprinting = true
+            if (!p.isSprinting)
+                p.isSprinting = true
         }
         if (e.shouldSneak) {
-            p.input.shiftKeyDown = true
-            p.isShiftKeyDown = true
+            // p.isCrouching
+            if (!p.input.shiftKeyDown)
+                p.input.shiftKeyDown = true
+            if (!p.isShiftKeyDown) {
+                p.isShiftKeyDown = true
+            }
+            p.pose = Pose.CROUCHING
         }
 
         if (e.shouldAttack) {
             // p.swing is local
             if (e.shouldAttackPeriod == -1) {
-                p.swinging = true
-                p.swing(player!!.usedItemHand) // Momentary
+                // p.swinging = true
+                emulateLeftClick() // Momentary
                 e.shouldAttack = false
             } else if (e.shouldAttackPeriod == 0) {
-                p.swinging = true
-                p.swing(player!!.usedItemHand) // Momentary
-            } else if ((level!!.gameTime % e.shouldAttackPeriod) == 0L) {
-                p.swinging = true
-                p.swing(player!!.usedItemHand) // Momentary
+                // p.swinging = true
+                emulateLeftClick() // Momentary
+            } else if ((p.level().gameTime % e.shouldAttackPeriod) == 0L) {
+                // p.swinging = true
+                emulateLeftClick() // Momentary
             }
         }
 
@@ -260,18 +365,18 @@ object PlayerActionAPI {
             if (e.shouldUsePeriod == -1) {
                 // TODO: do I really want to do it this way?
                 // Hmm...
-                mc.options.keyUse.isDown = true // Hmm.... I don't think I can use .isDown because it would conflict...
+                emulateRightClick() // Hmm.... I don't think I can use .isDown because it would conflict...
                 e.shouldUse = false
             } else if (e.shouldUsePeriod == 0) {
-                p.swing(player!!.usedItemHand) // Continuous
-            } else if ((level!!.gameTime % e.shouldUsePeriod) == 0L) {
-                p.swing(player!!.usedItemHand) // Periodic
+                emulateRightClick() // Continuous
+            } else if ((p.level().gameTime % e.shouldUsePeriod) == 0L) {
+                emulateRightClick() // Periodic
             }
         }
 
 
         if (e.shouldHotbarSlot != -1) {
-            p.inventory.selected = e.shouldHotbarSlot + 1
+            p.inventory.selected = e.shouldHotbarSlot - 1
             e.shouldHotbarSlot = -1 // reset, no reason to be persistent?
         }
 
@@ -339,12 +444,12 @@ object PlayerActionAPI {
 
                         // TODO: do I really want to do it this way?
                         // Hmm...
-                        p.swing(player!!.usedItemHand) // Momentary
+                        p.swing(p.usedItemHand) // Momentary
                         e.shouldAttack = false
                     } else if (e.shouldAttackPeriod == 0) {
-                        p.swing(player!!.usedItemHand) // Continuous
-                    } else if ((level!!.gameTime % e.shouldAttackPeriod) == 0L) {
-                        p.swing(player!!.usedItemHand) // Periodic
+                        p.swing(p.usedItemHand) // Continuous
+                    } else if ((p.level().gameTime % e.shouldAttackPeriod) == 0L) {
+                        p.swing(p.usedItemHand) // Periodic
                     }
                 }
 
@@ -352,12 +457,12 @@ object PlayerActionAPI {
                     if (e.shouldUsePeriod == -1) {
                         // TODO: do I really want to do it this way?
                         // Hmm...
-                        mc.options.keyUse.isDown = true // Hmm.... I don't think I can use .isDown because it would conflict...
+                        //mc.options.keyUse.isDown = true // Hmm.... I don't think I can use .isDown because it would conflict...
                         e.shouldUse = false
                     } else if (e.shouldUsePeriod == 0) {
-                        p.swing(player!!.usedItemHand) // Continuous
+                        //p.swing(player!!.usedItemHand) // Continuous
                     } else if ((level!!.gameTime % e.shouldUsePeriod) == 0L) {
-                        p.swing(player!!.usedItemHand) // Periodic
+                        //p.swing(player!!.usedItemHand) // Periodic
                     }
                 }
 

@@ -1,31 +1,29 @@
-package hauveli.hexagony.casting.actions.spells.movement
+package hauveli.hexagony.casting.actions.spells.control
 
 import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import at.petrak.hexcasting.api.casting.RenderedSpell
 import at.petrak.hexcasting.api.casting.castables.SpellAction
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
-import at.petrak.hexcasting.api.casting.getInt
 import at.petrak.hexcasting.api.casting.getPlayer
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.common.control.PlayerActionAPI
-import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 
-object OpAttack : SpellAction {
+object OpDestroyFakeplayer : SpellAction {
     override val argc: Int
-        get() = 2
+        get() = 1
 
     override fun executeWithUserdata(
         args: kotlin.collections.List<Iota>,
         env: CastingEnvironment,
         tags: CompoundTag
     ): SpellAction.Result {
-        val target = args.getPlayer(0, argc)
-        if (!env.isEntityInRange(target)) {
+        val player = args.getPlayer(0, argc)
+        if (!env.isEntityInRange(player)) {
             // JavaMishapThrower.throwMishap(MishapEntityTooFarAway(player))
         }
         val caster: Entity? = env.getCastingEntity()
@@ -39,12 +37,24 @@ object OpAttack : SpellAction {
             )
         )
         */
-        val frequency = args.getInt(1, argc)
+        // TODO: make the advancement have a success variant? Might not be needed though...
+        /*
+        if (caster!!.getStringUUID() == player.getStringUUID() && caster.javaClass == ServerPlayer::class.java) {
+            // easter egg joke advancement! I love modding.
+            val server = env.getWorld().getServer()
+            val sourceStack = server.createCommandSourceStack().withSuppressedOutput()
+            server.getCommands().performPrefixedCommand(
+                sourceStack,
+                "advancement grant " + FakeplayerUtils.getUsernameString(caster as ServerPlayer) + " only minecraft:movesthemind/try_banish_self"
+            )
 
+            JavaMishapThrower.throwMishap(MishapOthersName(caster))
+        }
+        */
         return SpellAction.Result(
-            OpAttack.Spell(target, frequency),
-            MediaConstants.DUST_UNIT / 10,
-            listOf(burst(target.position().add(0.0, target.getEyeHeight() / 2.0, 0.0), 1.0, 10)),
+            Spell(player),
+            MediaConstants.DUST_UNIT * 5,
+            listOf(burst(player.position().add(0.0, player.getEyeHeight() / 2.0, 0.0), 1.0, 10)),
             1
         )
     }
@@ -64,17 +74,16 @@ object OpAttack : SpellAction {
         throw IllegalStateException()
     }
 
-    private  class Spell(private val target: ServerPlayer, private val frequency: Int) : RenderedSpell {
+    private class Spell(private val target: ServerPlayer?) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
-            val server = target.getServer()
-            if (server == null) return
-            // val sourceStack = server!!.createCommandSourceStack()
-            // val username: String? = FakeplayerUtils.getUsernameString(target)
-            when (frequency) {
-                0 -> PlayerControlData.get(server).getOrCreate(target.uuid).attackContinuous(target)
-                -1 -> PlayerControlData.get(server).getOrCreate(target.uuid).attackOnce(target)
-                else -> PlayerControlData.get(server).getOrCreate(target.uuid).attackPeriodic(target, frequency)
-            }
+            val server = env.getWorld().getServer()
+            // val sourceStack = server.createCommandSourceStack()
+            // server.getCommands().performPrefixedCommand(sourceStack, "player " + FakeplayerUtils.getUsernameString(player) + " kill")
+            // TODO: Deatch player
+            target?.sendSystemMessage(Component.nullToEmpty("Totally Detached the player!!!"))
+            if (target?.uuid == null) return
+            // PlayerControlData.get(server).getOrCreate(target.uuid).drop(true)
+            target.kill()
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {

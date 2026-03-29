@@ -6,13 +6,12 @@ import at.petrak.hexcasting.api.casting.math.HexDir
 import at.petrak.hexcasting.api.casting.math.HexPattern
 import at.petrak.hexcasting.common.lib.HexRegistries
 import at.petrak.hexcasting.common.lib.hex.HexActions
-import hauveli.hexagony.casting.actions.spells.movement.*
+import hauveli.hexagony.casting.actions.spells.control.*
 import hauveli.hexagony.casting.actions.spells.OpCongratulate
-import hauveli.hexagony.casting.actions.spells.OpMindAnchorPosition
-import hauveli.hexagony.casting.actions.spells.OpMindAnchorPowered
-import hauveli.hexagony.casting.actions.spells.OpMindAnchorSignalStrength
-import hauveli.hexagony.casting.actions.spells.movement.OpJumpButWithYourFeet
-import hauveli.hexagony.registry.HexagonyActions.make
+import hauveli.hexagony.casting.actions.spells.trepannation.OpMindAnchorPosition
+import hauveli.hexagony.casting.actions.spells.trepannation.OpMindAnchorPowered
+import hauveli.hexagony.casting.actions.spells.trepannation.OpMindAnchorSignalStrength
+import hauveli.hexagony.casting.actions.spells.control.OpJumpButWithYourFeet
 
 
 object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(

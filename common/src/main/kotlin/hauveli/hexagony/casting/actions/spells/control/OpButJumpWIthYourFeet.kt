@@ -1,4 +1,4 @@
-package hauveli.hexagony.casting.actions.spells.movement
+package hauveli.hexagony.casting.actions.spells.control
 
 import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import at.petrak.hexcasting.api.casting.RenderedSpell
@@ -8,7 +8,6 @@ import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
 import at.petrak.hexcasting.api.casting.getPlayer
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.common.control.PlayerActionAPI
 import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer

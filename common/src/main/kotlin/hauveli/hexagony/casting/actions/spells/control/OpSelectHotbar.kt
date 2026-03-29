@@ -1,22 +1,21 @@
-package hauveli.hexagony.casting.actions.spells.movement
+package hauveli.hexagony.casting.actions.spells.control
 
 import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import at.petrak.hexcasting.api.casting.RenderedSpell
 import at.petrak.hexcasting.api.casting.castables.SpellAction
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
-import at.petrak.hexcasting.api.casting.getInt
+import at.petrak.hexcasting.api.casting.getIntBetween
 import at.petrak.hexcasting.api.casting.getPlayer
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.common.control.PlayerActionAPI
 import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 
 
-object OpUseItem : SpellAction {
+object OpSelectHotbar : SpellAction {
     override val argc: Int
         get() = 2
 
@@ -27,22 +26,22 @@ object OpUseItem : SpellAction {
     ): SpellAction.Result {
         val target = args.getPlayer(0, argc)
         if (!env.isEntityInRange(target)) {
-            //  JavaMishapThrower.throwMishap(MishapEntityTooFarAway(target))
+            // JavaMishapThrower.throwMishap(MishapEntityTooFarAway(player))
         }
         val caster: Entity? = env.getCastingEntity()
         if (caster !is ServerPlayer) {
             // JavaMishapThrower.throwMishap(MishapBadCaster())
         }
         /*
-        if (!FakeplayerUtils.canBid(caster as ServerPlayer?, target)) JavaMishapThrower.throwMishap(
+        if (!FakeplayerUtils.canBid(caster as ServerPlayer?, player)) JavaMishapThrower.throwMishap(
             MishapOthersName(
-                target
+                player
             )
         )
         */
-        val frequency = args.getInt(1, argc)
+        val slot = args.getIntBetween(1, 1, 9, argc)
         return SpellAction.Result(
-            OpUseItem.Spell(target, frequency),
+            Spell(target, slot),
             MediaConstants.DUST_UNIT / 10,
             listOf(burst(target.position().add(0.0, target.getEyeHeight() / 2.0, 0.0), 1.0, 10)),
             1
@@ -64,16 +63,11 @@ object OpUseItem : SpellAction {
         throw IllegalStateException()
     }
 
-    private class Spell(private val target: ServerPlayer, private val frequency: Int) : RenderedSpell {
+    private class Spell(private val target: ServerPlayer, private val slot: Int) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
             val server = target.getServer()
             if (server == null) return
-            when (frequency) {
-                0 -> PlayerControlData.get(server).getOrCreate(target.uuid).useContinuous(target)
-                -1 -> PlayerControlData.get(server).getOrCreate(target.uuid).useOnce(target)
-                else -> PlayerControlData.get(server).getOrCreate(target.uuid).usePeriodic(target, frequency)
-            }
-
+            PlayerControlData.get(server).getOrCreate(target.uuid).hotbar(target, slot)
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {
@@ -82,8 +76,7 @@ object OpUseItem : SpellAction {
         }
     }
 
-    /*
-
+/*
     override fun operate(
         castingEnvironment: CastingEnvironment,
         castingImage: CastingImage,
@@ -91,7 +84,5 @@ object OpUseItem : SpellAction {
     ): OperationResult {
         return operate.operate(this, castingEnvironment, castingImage, spellContinuation)
     }
-
     */
-
 }
