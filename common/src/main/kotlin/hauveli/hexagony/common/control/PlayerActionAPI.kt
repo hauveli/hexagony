@@ -11,6 +11,7 @@ import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import kotlin.math.min
 import kotlin.math.sqrt
 
 
@@ -129,25 +130,6 @@ object PlayerActionAPI {
     private fun runtime(uuid: UUID) =
         runtime.computeIfAbsent(uuid) { MindAnchorRuntime() }
 */
-    object movementCalculation {
-        val SPRINTING = 1.3
-        val WALKING = 1.0
-        val SNEAKING = 0.3
-        val STOPPING = 0.0
-        val ANGLE_DEFAULT = 0.98
-        val ANGLE_STRAFE = 1.0
-        val ANGLE_STRAFE_SNEAK = 0.98 * sqrt(2.0)
-        val SLIPPERINESS_DEFAULT = 0.6
-        val SLIPPERINESS_SLIME = 0.8
-        val SLIPPERINESS_ICE = 0.98
-        val SLIPPERINESS_AIRBORNE = 0.0
-        val SPEED_INCREASE_PER_LEVEL = 0.2
-        val SLOWNESS_DECREASE_PER_LEVEL = 0.15
-
-        var velocity_old = 0.0
-    }
-
-    val SPEED_MULT = 4.0
 
     fun getInputVector(
         relative: Vec3,
@@ -176,6 +158,26 @@ object PlayerActionAPI {
         )
     }
 
+    object movementCalculation {
+        val SPRINTING = 1.3
+        val WALKING = 1.0
+        val SNEAKING = 0.3
+        val STOPPING = 0.0
+        val ANGLE_DEFAULT = 0.98
+        val ANGLE_STRAFE = 1.0
+        val ANGLE_STRAFE_SNEAK = 0.98 * sqrt(2.0)
+        val SLIPPERINESS_DEFAULT = 0.6
+        val SLIPPERINESS_SLIME = 0.8
+        val SLIPPERINESS_ICE = 0.98
+        val SLIPPERINESS_AIRBORNE = 0.0
+        val SPEED_INCREASE_PER_LEVEL = 0.2
+        val SLOWNESS_DECREASE_PER_LEVEL = 0.15
+
+        var velocity_old = 0.0
+    }
+
+    val SPEED_MULT = 1
+
     private fun customMovement(entity: LivingEntity, input: Vec3) {
         val speed: Float = entity.speed //.getAttributeValue(Attributes.MOVEMENT_SPEED)
         // Normalize input
@@ -187,45 +189,24 @@ object PlayerActionAPI {
         // Convert input relative to rotation
         val rotated = getInputVector(
             moveInput,
-            speed,
+            speed, // entity.speed is taken into account here, but I don't know which things this includes...
             entity.yRot
         )
 
-
-        // Move with collisions
-        // entity.move(MoverType.SELF, entity.deltaMovement)
-
-        // Apply friction
-        if (entity.onGround()) {
-            // Apply acceleration as is
-            rotated.multiply(SPEED_MULT,1.0,SPEED_MULT)
-            // Apply friction as is
-            val friction = (entity.level().getBlockState(entity.blockPosition().below()).block.friction * 0.91)
-            rotated.multiply(friction, 1.0, friction)
-        } else {
-            // Apply friction WITHOUT acceleration, and actually, decelerate instead
-            rotated.multiply(0.02,1.0,0.02)
-        }
         // todo: make else if in game versions where the bug is fixed
-        if (entity.isShiftKeyDown) {
-            rotated.multiply(
-                movementCalculation.SNEAKING,
-                1.0,
-                movementCalculation.SNEAKING
-            )
+        val sneakMult = if (entity.isShiftKeyDown) movementCalculation.SNEAKING else 1.0
+        val sprintMult = if (entity.isSprinting) movementCalculation.SPRINTING else 1.0
+        val viscosityMult = if (entity.isInWater || entity.isInLava) 0.3 else 1.0
+        val groundAccel = if (entity.onGround()) {
+            SPEED_MULT * (entity.level().getBlockState(entity.blockPosition().below()).block.friction * 0.91)
+        } else {
+            0.15
         }
-        if (entity.isSprinting) {
-            rotated.multiply(
-                movementCalculation.SPRINTING,
-                1.0,
-                movementCalculation.SPRINTING
-                )
-        }
+
         // Maximum length of rotated must be 4 or 5 ish?
-        if (rotated.lengthSqr() > 25) {
-            rotated.normalize().multiply(4.0,1.0,4.0)
-        }
-        entity.addDeltaMovement(rotated)
+        val finalMult = min(sneakMult * sprintMult * groundAccel * viscosityMult, 3.0)
+        println(finalMult)
+        entity.addDeltaMovement(rotated.multiply(finalMult,1.0,finalMult))
     }
 
     fun onClientTick() {
@@ -233,7 +214,7 @@ object PlayerActionAPI {
         val e = PlayerControlData.myEntry
         // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
         if (e.shouldMoveForwardBackward != 0f || e.shouldMoveLeftRight != 0f) {
-            p.input.forwardImpulse = e.shouldMoveForwardBackward
+            // p.input.forwardImpulse = e.shouldMoveForwardBackward
             customMovement(p,
                 Vec3(
                     e.shouldMoveLeftRight.toDouble(),
