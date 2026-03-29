@@ -41,6 +41,7 @@ object PlayerActionAPI {
             e.shouldLookUpDown = 0f
             e.shouldLookLeftRight = 0f
             e.shouldLookRoll = 0f
+            e.shouldLook = false
             e.shouldJump = false
             e.shouldSprint = false
             e.shouldSneak = false
@@ -72,6 +73,10 @@ object PlayerActionAPI {
 
         fun lookRoll(float: Float) {
             e.shouldLookRoll = float
+        }
+
+        fun look(bool: Boolean) {
+            e.shouldLook = bool
         }
 
         fun attackPeriodic(integer: Int) {
@@ -221,11 +226,9 @@ object PlayerActionAPI {
                     0.0,
                     e.shouldMoveForwardBackward.toDouble()))
         }
-        if (e.shouldLookUpDown != 0f) {
-            p.yRot = e.shouldLookUpDown
-        }
-        if (e.shouldLookLeftRight != 0f) {
-            p.xRot = e.shouldLookLeftRight
+        if (e.shouldLook) {
+            p.yRot = e.shouldLookLeftRight
+            p.xRot = e.shouldLookUpDown
         }
         if (e.shouldJump && p.onGround()) {
             player?.jumpFromGround()

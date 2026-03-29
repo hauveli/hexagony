@@ -1,0 +1,126 @@
+{
+  name: "hexagony.book.patterns.spells.control_spells",
+  "category": "hexcasting:patterns/spells",
+  "icon": "minecraft:player_head",
+  "sortnum": 0,
+  "advancement": "hexcasting:root",
+  "read_by_default": false,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      text: "hexagony.book.control.page.1"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/stopall",
+      "anchor": "hexagony:move/stopall",
+      "input": "player",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/stopall"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:create",
+      "anchor": "hexagony:create",
+      "input": "vec",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.create"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:destroy",
+      "anchor": "hexagony:destroy",
+      "input": "player",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.destroy"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/walk",
+      "anchor": "hexagony:move/walk",
+      "input": "player, num",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/walk"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/strafe",
+      "anchor": "hexagony:move/strafe",
+      "input": "player, num",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/strafe"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/look",
+      "anchor": "hexagony:move/look",
+      "input": "player, vec",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/look"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/jump",
+      "anchor": "hexagony:move/jump",
+      "input": "player",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/jump"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/sneak",
+      "anchor": "hexagony:move/sneak",
+      "input": "player, bool",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/sneak"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/sprint",
+      "anchor": "hexagony:move/sprint",
+      "input": "player, bool",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/sprint"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/use",
+      "anchor": "hexagony:move/use",
+      "input": "player, num",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/use"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/attack",
+      "anchor": "hexagony:move/attack",
+      "input": "player, num",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/attack"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/hotbar",
+      "anchor": "hexagony:move/hotbar",
+      "input": "player, num",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/hotbar"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/swap_hands",
+      "anchor": "hexagony:move/swap_hands",
+      "input": "player",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/swap_hands"
+    },
+    {
+      "type": "hexcasting:pattern",
+      "op_id": "hexagony:move/drop",
+      "anchor": "hexagony:move/drop",
+      "input": "player",
+      "output": "",
+      "text": "hexagony.book.patterns.spells.control_spells.move/drop"
+    }
+  ]
+}

@@ -24,6 +24,7 @@ data class PlayerControlEntry (
     var shouldLookUpDown: Float = 0f, // pitch
     var shouldLookLeftRight: Float = 0f, // yaw
     var shouldLookRoll: Float = 0f, // roll if I can find a use?
+    var shouldLook: Boolean = false, // to force look
     var shouldJump: Boolean = false, // space
     var shouldSprint: Boolean = false, // ctrl
     var shouldSneak: Boolean = false, // shift
@@ -57,6 +58,7 @@ data class PlayerControlEntry (
         shouldLookUpDown = 0f
         shouldLookLeftRight = 0f
         shouldLookRoll = 0f
+        shouldLook = false
         shouldJump = false
         shouldSprint = false
         shouldSneak = false
@@ -98,6 +100,18 @@ data class PlayerControlEntry (
             MsgPlayerControlBooleanS2C(
                 PlayerControlData.MessageTypeBoolean.SHOULD_SNEAK,
                 shouldSneak
+            )
+        )
+    }
+
+    fun lookForced(serverPlayer: ServerPlayer) {
+        shouldLook = true
+        if (serverPlayer.tags.contains("FakePlayer")) return
+        HexagonyNetworking.CHANNEL.sendToPlayer(
+            serverPlayer,
+            MsgPlayerControlBooleanS2C(
+                PlayerControlData.MessageTypeBoolean.SHOULD_LOOK,
+                shouldLook
             )
         )
     }
@@ -215,6 +229,7 @@ data class PlayerControlEntry (
     fun look(serverPlayer: ServerPlayer, pitch: Float, yaw: Float) {
         shouldLookUpDown = pitch
         shouldLookLeftRight = yaw
+        this.lookForced(serverPlayer)
         if (serverPlayer.tags.contains("FakePlayer")) return
         HexagonyNetworking.CHANNEL.sendToPlayer(
             serverPlayer,
@@ -271,6 +286,7 @@ class PlayerControlData : SavedData() {
         SHOULD_JUMP,
         SHOULD_SPRINT,
         SHOULD_SNEAK,
+        SHOULD_LOOK,
         SHOULD_ATTACK,
         SHOULD_USE,
         SHOULD_SWAP_HANDS,
@@ -318,6 +334,7 @@ class PlayerControlData : SavedData() {
             e.putFloat("shouldLookLeftRight", entry.shouldLookLeftRight)
             e.putFloat("shouldLookRoll", entry.shouldLookRoll)
 
+            e.putBoolean("shouldLook", entry.shouldLook)
             e.putBoolean("shouldJump", entry.shouldJump)
             e.putBoolean("shouldSprint", entry.shouldSprint)
             e.putBoolean("shouldSneak", entry.shouldSneak)
@@ -357,6 +374,7 @@ class PlayerControlData : SavedData() {
                 shouldLookUpDown = 0f,
                 shouldLookLeftRight = 0f,
                 shouldLookRoll = 0f,
+                shouldLook = false,
                 shouldJump = false,
                 shouldSprint = false,
                 shouldSneak = false,
@@ -404,6 +422,7 @@ class PlayerControlData : SavedData() {
                         e.getFloat("shouldLookUpDown"),
                         e.getFloat("shouldLookLeftRight"),
                         e.getFloat("shouldLookRoll"),
+                        e.getBoolean("shouldLook"),
                         e.getBoolean("shouldJump"),
                         e.getBoolean("shouldSprint"),
                         e.getBoolean("shouldSneak"),

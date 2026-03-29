@@ -45,6 +45,9 @@ fun HexagonyMessageS2C.applyOnClient(ctx: PacketContext) = ctx.queue {
                 PlayerControlData.MessageTypeBoolean.SHOULD_DROP_STACK -> {
                     PlayerActionAPI.Client.dropStack(bool)
                 }
+                PlayerControlData.MessageTypeBoolean.SHOULD_LOOK -> {
+                    PlayerActionAPI.Client.look(bool)
+                }
             }
         }
 
