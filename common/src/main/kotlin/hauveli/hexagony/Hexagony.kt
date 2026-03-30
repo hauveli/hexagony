@@ -1,5 +1,7 @@
 package hauveli.hexagony
 
+import dev.architectury.event.events.common.LifecycleEvent
+import hauveli.hexagony.common.craft.GraphCraftingRuntimeImport
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -37,6 +39,12 @@ object Hexagony {
         )
         // It works and I'm lazy?
         HexagonyNetworking.init()
+
+        LifecycleEvent.SERVER_STARTED.register({
+            server ->
+            // custom weirdo recipe stuff
+            GraphCraftingRuntimeImport.init(server.overworld().level)
+        })
     }
 
     fun initServer() {

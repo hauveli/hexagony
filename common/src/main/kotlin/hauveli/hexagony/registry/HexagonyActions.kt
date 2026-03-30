@@ -12,12 +12,15 @@ import hauveli.hexagony.casting.actions.spells.trepannation.OpMindAnchorPosition
 import hauveli.hexagony.casting.actions.spells.trepannation.OpMindAnchorPowered
 import hauveli.hexagony.casting.actions.spells.trepannation.OpMindAnchorSignalStrength
 import hauveli.hexagony.casting.actions.spells.control.OpJumpButWithYourFeet
+import hauveli.hexagony.casting.actions.spells.craft.OpCraft
 
 
 object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     HexRegistries.ACTION,
     { HexActions.REGISTRY },
 ) {
+    // cool!!!!!
+    val CRAFT = make( "craft", HexDir.NORTH_WEST,"add", OpCraft)
 
 
     // With a mind anchor, create attaches player to their body
