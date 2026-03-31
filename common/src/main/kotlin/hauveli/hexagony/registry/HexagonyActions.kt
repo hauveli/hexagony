@@ -20,7 +20,7 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     { HexActions.REGISTRY },
 ) {
     // cool!!!!!
-    val CRAFT = make( "craft", HexDir.NORTH_WEST,"add", OpCraft)
+    val CRAFT = make( "craft", HexDir.NORTH_WEST,"daqedeqadedaqedeqad", OpCraft)
 
 
     // With a mind anchor, create attaches player to their body

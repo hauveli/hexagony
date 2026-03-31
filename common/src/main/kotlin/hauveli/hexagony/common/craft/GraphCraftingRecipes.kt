@@ -2,8 +2,6 @@ package hauveli.hexagony.common.craft
 
 import hauveli.hexagony.common.craft.GraphCrafting.ItemNode
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
-import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.crafting.CraftingRecipe
@@ -18,7 +16,7 @@ import kotlin.math.pow
     instead, I think just using distance-based nodes is easier to code, so I'm doing that.
     Bonus feature: it's also easily made n-dimensional, if minecraft ever adds higher dimensions!
  */
-object GraphCraftingRuntimeImport {
+object GraphCraftingRecipes {
     // recipes here is what matters, and init
     lateinit var recipes: MutableList<Pair<Recipe<*>, ItemNodeVanilla>>
 
@@ -31,11 +29,6 @@ object GraphCraftingRuntimeImport {
                 val centerNode = fromCraftingRecipe(recipe)
                 if (centerNode != null) {
                     list.add(Pair(recipe, centerNode))
-                    if (recipe.id.path.equals("iron_block")) {
-                        println(centerNode.validIngredients.toList().toString())
-                        println(centerNode.neighbors.toList().toString())
-                        println(centerNode.neighbors.size)
-                    }
                 }
             }
         }
@@ -155,127 +148,9 @@ object GraphCraftingRuntimeImport {
         return centerNode
     }
 
-    fun matchesIngredient(stack: ItemStack, valid: Array<ItemStack>): Boolean {
-        return valid.any { recipeStack ->
-            ItemStack.isSameItemSameTags(stack, recipeStack)
-        }
-    }
-
-    /*
-        TODO:
-        Match sets:
-        [ROOT] = [X]
-        [xA;xB;xC;xD]
-        [a1;a2] [b1;b2;b3] [c1;c2;c3] [d;1]
-
-        root is trivial
-        finding that [X] matches any of [xLetter] is trivial
-        finding which [letterNumber] matches which [xLetter] is not
-        however, by keeping track of this and exhausting the options, it's possible to match each node up to its parent
-     */
-
-    fun worldLabel(node: ItemNode): String =
-        node.stack.item.toString()
-
-    fun recipeLabel(node: ItemNodeVanilla): String =
-        node.validIngredients
-            .map { it.item.toString() }
-            .sorted()
-            .joinToString("|")
-
-    fun <T> collectGraph(
-        root: T,
-        getNeighbors: (T) -> List<T>
-    ): List<T> {
-
-        val visited = mutableSetOf<T>()
-        val stack = ArrayDeque<T>()
-        stack.add(root)
-
-        while (stack.isNotEmpty()) {
-            val node = stack.removeLast()
-            if (visited.add(node)) {
-                stack.addAll(getNeighbors(node))
-            }
-        }
-
-        return visited.toList()
-    }
-
-    fun <T> canonicalForm(
-        node: T,
-        getNeighbors: (T) -> List<T>,
-        getLabel: (T) -> String,
-        parent: T? = null
-    ): String {
-
-        val childForms = mutableListOf<String>()
-
-        for (neighbor in getNeighbors(node)) {
-            if (neighbor == parent) continue
-
-            childForms += canonicalForm(
-                neighbor,
-                getNeighbors,
-                getLabel,
-                node
-            )
-        }
-
-        childForms.sort()
-
-        return buildString {
-            append(getLabel(node))
-            append("(")
-            append(childForms.joinToString(","))
-            append(")")
-        }
-    }
-
-    fun <T> canonicalWithVisited(
-        root: T,
-        getNeighbors: (T) -> List<T>,
-        getLabel: (T) -> String
-    ): String {
-
-        val visited = mutableSetOf<T>()
-
-        fun dfs(node: T): String {
-            if (!visited.add(node)) {
-                return "#"
-            }
-
-            val childForms = getNeighbors(node)
-                .map { dfs(it) }
-                .sorted()
-
-            return buildString {
-                append(getLabel(node))
-                append("(")
-                append(childForms.joinToString(","))
-                append(")")
-            }
-        }
-
-        return dfs(root)
-    }
-
-    fun <T> graphCanonicalLabel(
-        nodes: List<T>,
-        getNeighbors: (T) -> List<T>,
-        getLabel: (T) -> String
-    ): String {
-
-        val forms = nodes.map { root ->
-            canonicalWithVisited(root, getNeighbors, getLabel)
-        }
-
-        return forms.minOrNull()!!
-    }
-
     fun nodesAreEqual(rootWorld: ItemNode, rootRecipe: ItemNodeVanilla) : Boolean {
         if (rootWorld.neighbors.size != rootRecipe.neighbors.size) return false
-        if (!rootRecipe.validIngredients.any( {ingredient -> rootWorld.stack.item == ingredient.item })) return false
+        if (!rootRecipe.validIngredients.any( {ingredient -> ItemStack.isSameItemSameTags(rootWorld.stack, ingredient)})) return false
         return true
     }
 

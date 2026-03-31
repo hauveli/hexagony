@@ -6,23 +6,16 @@ import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.casting.castables.SpellAction
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
-import at.petrak.hexcasting.api.casting.getInt
 import at.petrak.hexcasting.api.casting.getList
-import at.petrak.hexcasting.api.casting.getPlayer
 import at.petrak.hexcasting.api.casting.iota.EntityIota
-import at.petrak.hexcasting.api.casting.iota.Vec3Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.casting.actions.spells.control.OpUseItem
-import hauveli.hexagony.common.control.PlayerControlData
-import hauveli.hexagony.common.craft.GraphCraftingRuntimeImport.matchRecipe
+import hauveli.hexagony.common.craft.GraphCraftingRecipes.matchRecipe
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
-import net.minecraft.world.phys.Vec3
 
 object OpCraft : SpellAction  {
     override val argc = 1

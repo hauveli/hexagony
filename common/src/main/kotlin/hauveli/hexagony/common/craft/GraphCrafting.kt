@@ -1,10 +1,7 @@
 package hauveli.hexagony.common.craft
 
-import hauveli.hexagony.common.craft.GraphCraftingRuntimeImport.ItemNodeVanilla
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
-import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import kotlin.math.pow
 
@@ -107,6 +104,7 @@ object GraphCrafting {
         return centerNode
     }
 
+    /*
     fun createExampleRecipe(): GraphRecipes.GraphRecipe {
         val center = GraphRecipes.RecipeNode(Items.DIAMOND)
         val left = GraphRecipes.RecipeNode(Items.IRON_INGOT)
@@ -120,4 +118,5 @@ object GraphCrafting {
 
         return GraphRecipes.GraphRecipe(center)
     }
+    */
 }

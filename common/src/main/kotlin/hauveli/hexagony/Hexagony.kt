@@ -1,7 +1,8 @@
 package hauveli.hexagony
 
 import dev.architectury.event.events.common.LifecycleEvent
-import hauveli.hexagony.common.craft.GraphCraftingRuntimeImport
+import hauveli.hexagony.common.craft.GraphCraftingRecipes
+import hauveli.hexagony.common.craft.GraphRecipeLoader
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -10,8 +11,9 @@ import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.registry.HexagonyActions
 import hauveli.hexagony.registry.HexagonyBlockEntities
 import hauveli.hexagony.registry.HexagonyBlocks
-import hauveli.hexagony.registry.HexagonyDamageTypes
 import hauveli.hexagony.registry.HexagonyItems
+import net.minecraft.server.packs.resources.ResourceManager
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener
 
 /*
 TODO: lore
@@ -43,7 +45,8 @@ object Hexagony {
         LifecycleEvent.SERVER_STARTED.register({
             server ->
             // custom weirdo recipe stuff
-            GraphCraftingRuntimeImport.init(server.overworld().level)
+            GraphCraftingRecipes.init(server.overworld().level)
+            GraphRecipeLoader.loadAll() // TODO: only run this once somehow...
         })
     }
 
