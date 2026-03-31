@@ -14,7 +14,8 @@ object GraphCrafting {
         val entity: ItemEntity,
         val pos: Vec3,
         val stack: ItemStack,
-        val neighbors: MutableList<ItemNode> = mutableListOf()
+        val neighbors: MutableList<ItemNode> = mutableListOf(),
+        val nodeList: MutableList<ItemNode> = mutableListOf()
     )
 
     fun distanceSquared(a: Vec3, b: Vec3): Double {
@@ -98,7 +99,10 @@ object GraphCrafting {
 
         connectNearest(nodes)
 
+        centerNode.nodeList.addAll(nodes)
+
         println(centerNode.neighbors.size)
+        println(centerNode.stack.displayName.toString())
 
         return centerNode
     }

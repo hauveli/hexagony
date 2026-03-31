@@ -10,6 +10,7 @@ import net.minecraft.world.item.crafting.CraftingRecipe
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.phys.Vec3
+import kotlin.math.abs
 import kotlin.math.pow
 
 /*
@@ -44,7 +45,8 @@ object GraphCraftingRuntimeImport {
     class ItemNodeVanilla(
         val validIngredients: Array<ItemStack>,
         val pos: Vec3,
-        val neighbors: MutableList<ItemNodeVanilla> = mutableListOf()
+        val neighbors: MutableList<ItemNodeVanilla> = mutableListOf(),
+        val nodeList: MutableList<ItemNodeVanilla> = mutableListOf()
     )
 
     fun distanceSquared(a: Vec3, b: Vec3): Double {
@@ -103,7 +105,7 @@ object GraphCraftingRuntimeImport {
                         nearest.add(other)
                     }
 
-                    kotlin.math.abs(dist - minDist) < EPSILON -> {
+                    abs(dist - minDist) < EPSILON -> {
                         nearest.add(other)
                     }
                 }
@@ -148,6 +150,8 @@ object GraphCraftingRuntimeImport {
         // centerNode is referenced in nodes
         connectNearest(nodes)
 
+        centerNode.nodeList.addAll(nodes)
+
         return centerNode
     }
 
@@ -157,47 +161,164 @@ object GraphCraftingRuntimeImport {
         }
     }
 
-    fun matchNode(
-        world: ItemNode, // items in the world use this
-        recipe: ItemNodeVanilla, // recipes use  this
-        visitedWorld: MutableSet<ItemNode> = mutableSetOf(),
-        visitedRecipe: MutableSet<ItemNodeVanilla> = mutableSetOf()
+    /*
+        TODO:
+        Match sets:
+        [ROOT] = [X]
+        [xA;xB;xC;xD]
+        [a1;a2] [b1;b2;b3] [c1;c2;c3] [d;1]
+
+        root is trivial
+        finding that [X] matches any of [xLetter] is trivial
+        finding which [letterNumber] matches which [xLetter] is not
+        however, by keeping track of this and exhausting the options, it's possible to match each node up to its parent
+     */
+
+    fun worldLabel(node: ItemNode): String =
+        node.stack.item.toString()
+
+    fun recipeLabel(node: ItemNodeVanilla): String =
+        node.validIngredients
+            .map { it.item.toString() }
+            .sorted()
+            .joinToString("|")
+
+    fun <T> collectGraph(
+        root: T,
+        getNeighbors: (T) -> List<T>
+    ): List<T> {
+
+        val visited = mutableSetOf<T>()
+        val stack = ArrayDeque<T>()
+        stack.add(root)
+
+        while (stack.isNotEmpty()) {
+            val node = stack.removeLast()
+            if (visited.add(node)) {
+                stack.addAll(getNeighbors(node))
+            }
+        }
+
+        return visited.toList()
+    }
+
+    fun <T> canonicalForm(
+        node: T,
+        getNeighbors: (T) -> List<T>,
+        getLabel: (T) -> String,
+        parent: T? = null
+    ): String {
+
+        val childForms = mutableListOf<String>()
+
+        for (neighbor in getNeighbors(node)) {
+            if (neighbor == parent) continue
+
+            childForms += canonicalForm(
+                neighbor,
+                getNeighbors,
+                getLabel,
+                node
+            )
+        }
+
+        childForms.sort()
+
+        return buildString {
+            append(getLabel(node))
+            append("(")
+            append(childForms.joinToString(","))
+            append(")")
+        }
+    }
+
+    fun <T> canonicalWithVisited(
+        root: T,
+        getNeighbors: (T) -> List<T>,
+        getLabel: (T) -> String
+    ): String {
+
+        val visited = mutableSetOf<T>()
+
+        fun dfs(node: T): String {
+            if (!visited.add(node)) {
+                return "#"
+            }
+
+            val childForms = getNeighbors(node)
+                .map { dfs(it) }
+                .sorted()
+
+            return buildString {
+                append(getLabel(node))
+                append("(")
+                append(childForms.joinToString(","))
+                append(")")
+            }
+        }
+
+        return dfs(root)
+    }
+
+    fun <T> graphCanonicalLabel(
+        nodes: List<T>,
+        getNeighbors: (T) -> List<T>,
+        getLabel: (T) -> String
+    ): String {
+
+        val forms = nodes.map { root ->
+            canonicalWithVisited(root, getNeighbors, getLabel)
+        }
+
+        return forms.minOrNull()!!
+    }
+
+    fun nodesAreEqual(rootWorld: ItemNode, rootRecipe: ItemNodeVanilla) : Boolean {
+        if (rootWorld.neighbors.size != rootRecipe.neighbors.size) return false
+        if (!rootRecipe.validIngredients.any( {ingredient -> rootWorld.stack.item == ingredient.item })) return false
+        return true
+    }
+
+    fun neighborhoodIsEqual(
+        nodeWorld: ItemNode,
+        nodeRecipe: ItemNodeVanilla,
+        visited: MutableSet<Pair<ItemNode, ItemNodeVanilla>> = mutableSetOf()
     ): Boolean {
-        // recursion oopsie avoidance
-        if (!visitedWorld.add(world)) return false
-        if (!visitedRecipe.add(recipe)) return false
 
-        // must have at least one match in valid ingredients
-        if (!matchesIngredient(world.stack, recipe.validIngredients))
-            return false
+        if (!visited.add(nodeWorld to nodeRecipe)) {
+            return true // already validated this pair
+        }
 
-        // neighbor count must match
-        if (world.neighbors.size != recipe.neighbors.size)
-            return false
+        if (!nodesAreEqual(nodeWorld, nodeRecipe)) return false
 
-        // match each recipe neighbor to a world neighbor
-        val unmatchedWorldNeighbors = world.neighbors.toMutableList()
+        val unmatchedRecipeNeighbors = nodeRecipe.neighbors.toMutableList()
 
-        for (recipeNeighbor in recipe.neighbors) {
-            val match = unmatchedWorldNeighbors.firstOrNull { worldNeighbor ->
-                matchNode(
-                    worldNeighbor,
-                    recipeNeighbor,
-                    visitedWorld.toMutableSet(),
-                    visitedRecipe.toMutableSet()
-                )
+        for (worldNeighbor in nodeWorld.neighbors) {
+            val match = unmatchedRecipeNeighbors.firstOrNull {
+                nodesAreEqual(worldNeighbor, it) &&
+                        neighborhoodIsEqual(worldNeighbor, it, visited)
             } ?: return false
 
-            unmatchedWorldNeighbors.remove(match)
+            unmatchedRecipeNeighbors.remove(match)
         }
 
         return true
     }
 
+    fun matchGraphs(
+        worldRoot: ItemNode,
+        recipeRoot: ItemNodeVanilla
+    ): Boolean {
+
+        val equal = neighborhoodIsEqual(worldRoot, recipeRoot)
+
+        return equal
+    }
+
     fun matchRecipe(entities: List<ItemEntity>): Recipe<*>? {
         val worldGraph = GraphCrafting.buildGraph(entities)
         for (recipe in recipes) {
-            if (matchNode(worldGraph, recipe.second) ) return recipe.first
+            if ( matchGraphs(worldGraph, recipe.second) ) return recipe.first
         }
         return null
     }

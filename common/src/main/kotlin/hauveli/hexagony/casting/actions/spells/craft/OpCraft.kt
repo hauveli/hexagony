@@ -15,10 +15,13 @@ import at.petrak.hexcasting.api.misc.MediaConstants
 import hauveli.hexagony.casting.actions.spells.control.OpUseItem
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.common.craft.GraphCraftingRuntimeImport.matchRecipe
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import net.minecraft.world.phys.Vec3
 
 object OpCraft : SpellAction  {
@@ -71,9 +74,21 @@ object OpCraft : SpellAction  {
             println(itemEntities)
 
             // Now you have List<ItemEntity>
-            val recipe = matchRecipe(itemEntities)
+            val recipe = matchRecipe(itemEntities) ?: return
 
-            println(recipe)
+            println(recipe.id)
+            val level = itemEntities[0].level() ?: return
+            val toCreate = ItemEntity(
+                level,
+                itemEntities[0].position().x,
+                itemEntities[0].position().y,
+                itemEntities[0].position().z,
+                ItemStack(BuiltInRegistries.ITEM.get(recipe.id))
+            )
+            level.addFreshEntity(toCreate)
+            for (itemEntity in itemEntities) {
+                itemEntity.item.count--
+            }
         }
 
         override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {
