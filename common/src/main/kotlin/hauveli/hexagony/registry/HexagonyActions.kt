@@ -22,9 +22,11 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     // cool!!!!!
     val CRAFT = make( "craft", HexDir.NORTH_WEST,"daqedeqadedaqedeqad", OpCraft)
 
+    // I've kept the names from moves the mind because it doesn't affect the code and is maybe respectful
 
     // With a mind anchor, create attaches player to their body
     val CREATE = make( "create", HexDir.NORTH_WEST,"edeaqqwwawwqq", OpCreateFakeplayer)
+
     // With a mind anchor, destroy detaches player from their body (astral projection)
     // While astral projecting, the body can still be controlled independently.
     // However, targeting the playerEntity will teleport and affect their astral body, NOT their physical body.

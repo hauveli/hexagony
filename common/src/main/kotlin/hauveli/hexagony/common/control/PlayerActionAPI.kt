@@ -1,5 +1,6 @@
 package hauveli.hexagony.common.control
 
+import hauveli.hexagony.common.bilocation.FreeCameraEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
@@ -40,6 +41,14 @@ object PlayerActionAPI {
     object Client {
 
         val e = PlayerControlData.getSelf()
+
+        fun detach(bool: Boolean) {
+            FreeCameraEntity.detachCamera(mc)
+        }
+
+        fun attach(bool: Boolean) {
+            FreeCameraEntity.reattachCamera(mc)
+        }
 
         fun stop(bool: Boolean) {
             e.shouldMoveForwardBackward = 0f

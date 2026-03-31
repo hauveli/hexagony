@@ -2,10 +2,12 @@ package hauveli.hexagony
 
 import dev.architectury.event.events.client.ClientPlayerEvent
 import dev.architectury.event.events.common.TickEvent
+import hauveli.hexagony.common.bilocation.FreeCameraEntity.Companion.updateFreeCam
 import hauveli.hexagony.common.control.PlayerActionAPI.onClientTick
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.config.HexagonyClientConfig
 import me.shedaniel.autoconfig.AutoConfig
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 
 object HexagonyClient {
@@ -19,11 +21,11 @@ object HexagonyClient {
             if (!registered) {
                 TickEvent.PLAYER_POST.register { player ->
                     onClientTick()
+                    updateFreeCam()
                 }
             }
             registered = true
         }
-
     }
 
     fun getConfigScreen(parent: Screen): Screen {

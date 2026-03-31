@@ -1,5 +1,6 @@
 package hauveli.hexagony.common.control
 
+import hauveli.hexagony.common.bilocation.FreeCameraEntity
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.networking.msg.MsgPlayerControlBooleanS2C
 import hauveli.hexagony.networking.msg.MsgPlayerControlFloatS2C
@@ -11,6 +12,7 @@ import net.minecraft.nbt.Tag
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.GameType
 import java.util.UUID
 
 
@@ -66,6 +68,24 @@ data class PlayerControlEntry (
                 PlayerControlData.MessageTypeBoolean.SHOULD_STOP,
                 true
             )
+        )
+    }
+
+    fun detach(serverPlayer: ServerPlayer) {
+        serverPlayer.setGameMode(GameType.SPECTATOR)
+        if (serverPlayer.tags.contains("FakePlayer")) return
+        HexagonyNetworking.CHANNEL.sendToPlayer(
+            serverPlayer,
+            MsgPlayerControlBooleanS2C(PlayerControlData.MessageTypeBoolean.SHOULD_DETACH, true)
+        )
+    }
+
+    fun attach(serverPlayer: ServerPlayer) {
+        serverPlayer.setGameMode(GameType.SURVIVAL)
+        if (serverPlayer.tags.contains("FakePlayer")) return
+        HexagonyNetworking.CHANNEL.sendToPlayer(
+            serverPlayer,
+            MsgPlayerControlBooleanS2C(PlayerControlData.MessageTypeBoolean.SHOULD_ATTACH, true)
         )
     }
 
@@ -281,6 +301,8 @@ class PlayerControlRuntime () {
 class PlayerControlData : SavedData() {
     // TODO: all prefixed with should, I should remove that...
     enum class MessageTypeBoolean {
+        SHOULD_DETACH,
+        SHOULD_ATTACH,
         SHOULD_STOP,
         SHOULD_JUMP,
         SHOULD_SPRINT,

@@ -18,6 +18,12 @@ fun HexagonyMessageS2C.applyOnClient(ctx: PacketContext) = ctx.queue {
         // add more client-side message handlers here
         is MsgPlayerControlBooleanS2C -> {
             when (action) {
+                PlayerControlData.MessageTypeBoolean.SHOULD_DETACH -> {
+                    PlayerActionAPI.Client.detach(bool)
+                }
+                PlayerControlData.MessageTypeBoolean.SHOULD_ATTACH -> {
+                    PlayerActionAPI.Client.attach(bool)
+                }
                 PlayerControlData.MessageTypeBoolean.SHOULD_STOP -> {
                     PlayerActionAPI.Client.stop(bool)
                 }
