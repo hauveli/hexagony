@@ -1,5 +1,6 @@
 package hauveli.hexagony.common.bilocation
 
+import at.petrak.hexcasting.common.lib.HexAttributes
 import net.minecraft.client.Camera
 import net.minecraft.client.CameraType
 import net.minecraft.client.ClientRecipeBook
@@ -69,8 +70,20 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
         var lastMouseX = 0.0
         var lastMouseY = 0.0
         var backupInput: Input? = null
-        var pitch = 0f
         var active = false
+
+        fun moveTowardsBodyIfNeeded() {
+            val freeCamera = freeCam ?: return
+            val player = originalPlayer ?: return
+            val diff = player.position().subtract(freeCamera.position())
+            val ambitAttr = player.getAttribute(HexAttributes.AMBIT_RADIUS) ?: return
+            val ambit = ambitAttr.value
+            val ambit2 = ambit * ambit
+            if (diff.lengthSqr() < ambit2) return
+            val mult = (1 - ambit2 / diff.lengthSqr())
+            freeCamera.setDeltaMovement(diff.x * mult, diff.y * mult, diff.z * mult)
+            freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
+        }
 
         fun detachCamera(client: Minecraft) {
             val player = client.player ?: return
@@ -78,7 +91,7 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             val freeCamera = FreeCameraEntity(client)
             freeCamera.xRot = player.xRot
             freeCamera.yRot = player.yRot
-            freeCamera.setPos(player.position())
+            freeCamera.setPos(player.eyePosition)
 
             // set the freecam keybinds to be the keyboard inputs
             //freeCamera.input = KeyboardInput(client.options)
@@ -90,9 +103,10 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             // player.input = Input()
 
 
-            // client.level?.addFreshEntity(freeCamera)
+            client.level?.addFreshEntity(freeCamera)
             client.setCameraEntity(freeCamera)
 
+            //client.options.hideGui = true
             originalPlayer = player
             freeCam = freeCamera
             active = true
@@ -105,8 +119,8 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             val input = freeCamera.input ?: return
 
             // Usually I would like to just overwrite this value but I do not know if doing so calls extra bogus each time...
-            //if (mc.options.cameraType != CameraType.THIRD_PERSON_BACK)
-                // mc.options.setCameraType(CameraType.THIRD_PERSON_BACK)
+            if (mc.options.cameraType != CameraType.THIRD_PERSON_BACK)
+                mc.options.setCameraType(CameraType.THIRD_PERSON_BACK)
 
             var speed = 0.5
 
@@ -133,9 +147,9 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             if (input.jumping) upDown += 1
             if (input.shiftKeyDown) upDown -= 1
 
-            val yaw = freeCamera.yRot + deltaX * sensMult
-            val pitch = (freeCamera.xRot + deltaY * sensMult * inverted).coerceIn(-90.0, 90.0)
-            val yawRad = Math.toRadians(yaw)
+            val yaw = freeCamera.yRot
+            val pitch = (freeCamera.xRot.toDouble()).coerceIn(-90.0, 90.0)
+            val yawRad = Math.toRadians(yaw.toDouble())
             val pitchRad = Math.toRadians(pitch)
 
             /*
@@ -149,28 +163,14 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             val dy = (-sin(pitchRad)) * forward * speed + upDown * speed
             val dz = (cos(yawRad) * cos(pitchRad)) * forward * speed + sin(yawRad) * strafe * speed
 
+
+            freeCamera.setOldPosAndRot()
             freeCamera.setDeltaMovement(dx, dy, dz)
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
 
-            val camera = mc.gameRenderer.mainCamera as CameraExtension
-            camera.`hexagony$bilocationSetCameraPosition`(freeCamera.position())
-            // camera.`hexagony$bilocationSetCameraRotation`(freeCamera.yRot, freeCamera.xRot)
-
-            /*
-            val player = originalPlayer
-            if (player == null) return
-            mc.entityRenderDispatcher.render(
-                player,
-                player.x,
-                player.y,
-                player.z,
-                player.yRot,
-                player.xRot,
-                player.pose,
-
-
-            )
-            */
+            moveTowardsBodyIfNeeded()
+            //val camera = mc.gameRenderer.mainCamera as CameraExtension
+            //camera.`hexagony$bilocationSetCameraPosition`(freeCamera.position())
         }
 
         fun reattachCamera(client: Minecraft) {
@@ -183,6 +183,7 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
                 throw Error("Player existed but had no input field!")
             }
 
+            // client.options.hideGui = false
             freeCam?.discard()
             freeCam = null
             active = false

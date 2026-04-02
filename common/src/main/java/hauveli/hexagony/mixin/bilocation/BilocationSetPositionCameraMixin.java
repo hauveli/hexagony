@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Camera.class)
-abstract class BilocationAntiLerpCameraMixin  implements CameraExtension {
+abstract class BilocationSetPositionCameraMixin implements CameraExtension {
 
     @Shadow
     protected abstract void setPosition(Vec3 pos);
