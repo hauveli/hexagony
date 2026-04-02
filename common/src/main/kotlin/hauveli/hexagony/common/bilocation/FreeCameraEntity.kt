@@ -120,13 +120,8 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             val inverted = if (mc.options.invertYMouse().get()) -1 else 1
 
             // Dude come on mojang really? xpos isnt for xrot but for yrot? man... what is this naming scheme...
-            var deltaX = mc.mouseHandler.xpos() - lastMouseX
-            var deltaY = mc.mouseHandler.ypos() - lastMouseY
-            // baindaid fix for bad issue, todo: make it not snap to mouse position
-            if (abs(deltaX) > 100)
-                deltaX = 0.0
-            if (abs(deltaY) > 100)
-                deltaY = 0.0
+            val deltaX = mc.mouseHandler.xpos() - lastMouseX
+            val deltaY = mc.mouseHandler.ypos() - lastMouseY
             lastMouseX = mc.mouseHandler.xpos()
             lastMouseY = mc.mouseHandler.ypos()
 
@@ -143,10 +138,12 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             val yawRad = Math.toRadians(yaw)
             val pitchRad = Math.toRadians(pitch)
 
+            /*
             freeCamera.setRot(
                 yaw.toFloat(),
                 pitch.toFloat()
             )
+            */
 
             val dx = (-sin(yawRad) * cos(pitchRad)) * forward * speed + cos(yawRad) * strafe * speed
             val dy = (-sin(pitchRad)) * forward * speed + upDown * speed
@@ -157,7 +154,7 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
 
             val camera = mc.gameRenderer.mainCamera as CameraExtension
             camera.`hexagony$bilocationSetCameraPosition`(freeCamera.position())
-            camera.`hexagony$bilocationSetCameraRotation`(freeCamera.yRot, freeCamera.xRot)
+            // camera.`hexagony$bilocationSetCameraRotation`(freeCamera.yRot, freeCamera.xRot)
 
             /*
             val player = originalPlayer
