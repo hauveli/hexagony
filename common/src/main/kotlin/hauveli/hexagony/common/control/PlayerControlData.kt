@@ -1,5 +1,6 @@
 package hauveli.hexagony.common.control
 
+import hauveli.hexagony.common.bilocation.FakeServerPlayer
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.networking.msg.MsgPlayerControlBooleanS2C
@@ -72,7 +73,8 @@ data class PlayerControlEntry (
     }
 
     fun detach(serverPlayer: ServerPlayer) {
-        serverPlayer.setGameMode(GameType.SPECTATOR)
+        // serverPlayer.setGameMode(GameType.SPECTATOR)
+        // FakeServerPlayer.spawnFakeClone (serverPlayer)
         if (serverPlayer.tags.contains("FakePlayer")) return
         HexagonyNetworking.CHANNEL.sendToPlayer(
             serverPlayer,
@@ -80,12 +82,12 @@ data class PlayerControlEntry (
         )
     }
 
-    fun attach(serverPlayer: ServerPlayer) {
-        serverPlayer.setGameMode(GameType.SURVIVAL)
+    fun reattach(serverPlayer: ServerPlayer) {
+        //serverPlayer.setGameMode(GameType.SURVIVAL)
         if (serverPlayer.tags.contains("FakePlayer")) return
         HexagonyNetworking.CHANNEL.sendToPlayer(
             serverPlayer,
-            MsgPlayerControlBooleanS2C(PlayerControlData.MessageTypeBoolean.SHOULD_ATTACH, true)
+            MsgPlayerControlBooleanS2C(PlayerControlData.MessageTypeBoolean.SHOULD_REATTACH, true)
         )
     }
 
@@ -293,16 +295,11 @@ data class PlayerControlEntry (
     }
 }
 
-// Actually, it should all be stored so, none of it is runtime?
-class PlayerControlRuntime () {
-
-}
-
 class PlayerControlData : SavedData() {
     // TODO: all prefixed with should, I should remove that...
     enum class MessageTypeBoolean {
         SHOULD_DETACH,
-        SHOULD_ATTACH,
+        SHOULD_REATTACH,
         SHOULD_STOP,
         SHOULD_JUMP,
         SHOULD_SPRINT,

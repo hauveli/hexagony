@@ -46,7 +46,7 @@ object PlayerActionAPI {
             FreeCameraEntity.detachCamera(mc)
         }
 
-        fun attach(bool: Boolean) {
+        fun reattach(bool: Boolean) {
             FreeCameraEntity.reattachCamera(mc)
         }
 

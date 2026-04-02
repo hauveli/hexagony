@@ -4,14 +4,14 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
-    "astralproject.AstralProjectTickCameraMixin"
+    "bilocation.BilocationAntiLerpCameraMixin"
   ],
   "server": [
   ],
   "mixins": [
     "MixinDatagenMain",
-    "mindanchor.AddFreshEntityServerLevelMixin",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
+    "mindanchor.AddFreshEntityServerLevelMixin",
     "mindanchor.MindAnchorInventorySlotMixin",
     "mindanchor.PlayerEntityOpBrainsweepMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",

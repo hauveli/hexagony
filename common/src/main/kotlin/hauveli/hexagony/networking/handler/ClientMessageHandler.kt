@@ -21,8 +21,8 @@ fun HexagonyMessageS2C.applyOnClient(ctx: PacketContext) = ctx.queue {
                 PlayerControlData.MessageTypeBoolean.SHOULD_DETACH -> {
                     PlayerActionAPI.Client.detach(bool)
                 }
-                PlayerControlData.MessageTypeBoolean.SHOULD_ATTACH -> {
-                    PlayerActionAPI.Client.attach(bool)
+                PlayerControlData.MessageTypeBoolean.SHOULD_REATTACH -> {
+                    PlayerActionAPI.Client.reattach(bool)
                 }
                 PlayerControlData.MessageTypeBoolean.SHOULD_STOP -> {
                     PlayerActionAPI.Client.stop(bool)
