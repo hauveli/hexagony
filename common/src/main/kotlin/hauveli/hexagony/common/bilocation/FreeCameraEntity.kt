@@ -68,7 +68,7 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
         var freeCam: FreeCameraEntity? = null
         var lastMouseX = 0.0
         var lastMouseY = 0.0
-        var yaw = 0f
+        var backupInput: Input? = null
         var pitch = 0f
         var active = false
 
@@ -84,12 +84,14 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             //freeCamera.input = KeyboardInput(client.options)
             // set the player inputs to be empty
 
-            freeCamera.input = player.input
+            backupInput = player.input
+            // freeCamera.input = KeyboardInput(client.options) // player.input
+            freeCamera.input = backupInput
             // player.input = Input()
 
 
             // client.level?.addFreshEntity(freeCamera)
-            // client.setCameraEntity(freeCamera)
+            client.setCameraEntity(freeCamera)
 
             originalPlayer = player
             freeCam = freeCamera
@@ -120,9 +122,10 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             // Dude come on mojang really? xpos isnt for xrot but for yrot? man... what is this naming scheme...
             var deltaX = mc.mouseHandler.xpos() - lastMouseX
             var deltaY = mc.mouseHandler.ypos() - lastMouseY
-            if (abs(deltaX) > 200)
+            // baindaid fix for bad issue, todo: make it not snap to mouse position
+            if (abs(deltaX) > 100)
                 deltaX = 0.0
-            if (abs(deltaY) > 200)
+            if (abs(deltaY) > 100)
                 deltaY = 0.0
             lastMouseX = mc.mouseHandler.xpos()
             lastMouseY = mc.mouseHandler.ypos()
@@ -177,8 +180,8 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             if (!active) return
             val player = originalPlayer ?: return
             client.setCameraEntity(player)
-            if (player.input != null) {
-                player.input = KeyboardInput(client.options)
+            if (backupInput != null) {
+                player.input = backupInput
             } else {
                 throw Error("Player existed but had no input field!")
             }
