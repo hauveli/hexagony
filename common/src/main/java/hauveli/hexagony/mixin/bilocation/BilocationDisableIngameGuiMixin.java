@@ -28,6 +28,7 @@ public abstract class BilocationDisableIngameGuiMixin {
         }
     }
 
+    /*
     @Inject(method = "renderHearts", at = @At("HEAD"), cancellable = true)
     private void hideHearts(GuiGraphics guiGraphics, Player player, int x, int y, int height, int offsetHeartIndex, float maxHealth, int currentHealth, int displayHealth, int absorptionAmount, boolean renderHighlight, CallbackInfo ci) {
         if (FreeCameraEntity.Companion.getActive()) {
@@ -41,6 +42,7 @@ public abstract class BilocationDisableIngameGuiMixin {
             ci.cancel(); // prevents hearts/armor
         }
     }
+    */
 
     @Inject(method = "renderPlayerHealth", at = @At("HEAD"), cancellable = true)
     private void hidePlayerHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
