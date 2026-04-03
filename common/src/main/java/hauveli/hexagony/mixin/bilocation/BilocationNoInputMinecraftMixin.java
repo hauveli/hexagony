@@ -17,7 +17,6 @@ public abstract class BilocationNoInputMinecraftMixin {
     private void hexagony$disableInputs(CallbackInfo ci) {
         if (FreeCameraEntity.Companion.getActive()) {
             Minecraft mc = Minecraft.getInstance();
-            // if (mc.options.keyChat.isDown()) return;
             if (mc.options.keyDrop.isDown()) {
                 mc.options.keyDrop.consumeClick();
             }
@@ -34,6 +33,7 @@ public abstract class BilocationNoInputMinecraftMixin {
                         }
                     }
             );
+            if (mc.options.keyChat.isDown()) return;
             ci.cancel();
         }
     }
