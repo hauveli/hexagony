@@ -1,10 +1,12 @@
 package hauveli.hexagony.common.control
 
+// import at.petrak.hexcasting.ktxt.UseOnContext
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
 import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
@@ -13,6 +15,7 @@ import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
@@ -180,6 +183,7 @@ object PlayerActionAPI {
         )
     }
 
+    // These are from the parkour wiki
     object movementCalculation {
         val SPRINTING = 1.3
         val WALKING = 1.0
@@ -216,6 +220,7 @@ object PlayerActionAPI {
         )
 
         // todo: make else if in game versions where the bug is fixed
+        // i just guesstimated the unlabelled values here based on how it felt to play
         val sneakMult = if (entity.isShiftKeyDown) movementCalculation.SNEAKING else 1.0
         val sprintMult = if (entity.isSprinting) movementCalculation.SPRINTING else 1.0
         val viscosityMult = if (entity.isInWater || entity.isInLava) 0.3 else 1.0
@@ -225,7 +230,7 @@ object PlayerActionAPI {
             0.15
         }
 
-        // Maximum length of rotated must be 4 or 5 ish?
+        // Maximum length of rotated must be 4 or 5 ish? 3 works well enough for the feel of it
         val finalMult = min(sneakMult * sprintMult * groundAccel * viscosityMult, 3.0)
         println(finalMult)
         entity.addDeltaMovement(rotated.multiply(finalMult,1.0,finalMult))
@@ -274,25 +279,37 @@ object PlayerActionAPI {
         }
     }
 
+    // TODO: specify which hand to use in argument
     private var using = false
-    fun emulateRightClick() {
+    fun emulateRightClick(hand: InteractionHand) {
         val p = player ?: return
+        val lp = mc.player ?: return
         val gameMode = mc.gameMode ?: return
         val hit = mc.hitResult ?: return
+        val server = p.server
+        // val serverPlayer = server?.playerList?.getPlayer(p.uuid)
 
-        val stack = p.getItemInHand(InteractionHand.MAIN_HAND)
+        // Todo: determine which hand I am using?
+        // TODO: actually eat food, currently not working, and p.eat() consumes the stack instantly....
 
+        // TODO: check how an item I'm holding is used?
         when (hit.type) {
             HitResult.Type.ENTITY -> {
                 val entity = (hit as EntityHitResult).entity
 
-                // Interact with entity
                 // Main hand first
                 //gameMode.useItem(p, InteractionHand.MAIN_HAND)
-                gameMode.interact(p, entity, InteractionHand.MAIN_HAND)
+                gameMode.interact(p, entity, hand)
 
-                // Swing hand for animation
-                p.swing(InteractionHand.MAIN_HAND)
+                val stack = p.getItemInHand(hand)
+                if (stack.isEdible) {
+                    val l = level
+                    if (l != null) {
+                        lp.eat(l, stack) // when I figure it out, I think letting the player be forced to eat is ok
+                    }
+                } else {
+                    p.swing(hand)
+                }
             }
 
             HitResult.Type.BLOCK -> {
@@ -301,9 +318,9 @@ object PlayerActionAPI {
                 val direction = blockHit.direction
 
                 // Place or use item on block
-                gameMode.useItemOn(p, InteractionHand.MAIN_HAND, blockHit)
+                gameMode.useItemOn(p, hand, blockHit)
 
-                // Optional: for continuous use (like eating or charging bow)
+                // Ok so this is needed for sure, I don't get how to make food work yet though....
                 if (p.isUsingItem) {
                     using = true
                 } else if (using) {
@@ -311,15 +328,32 @@ object PlayerActionAPI {
                     using = false
                 }
 
-                p.swing(InteractionHand.MAIN_HAND)
+                val stack = p.getItemInHand(hand)
+                if (stack.isEdible) {
+                    val l = level
+                    if (l != null) {
+                        lp.eat(l, stack) // when I figure it out, I think letting the player be forced to eat is ok
+                    }
+                } else {
+                    p.swing(hand)
+                }
             }
 
             HitResult.Type.MISS -> {
                 // Use item in air
-                gameMode.useItem(p, InteractionHand.MAIN_HAND)
-                p.swing(InteractionHand.MAIN_HAND)
+                gameMode.useItem(p, hand)
+                val stack = p.getItemInHand(hand)
+                if (stack.isEdible) {
+                    val l = level
+                    if (l != null) {
+                        lp.eat(l, stack) // when I figure it out, I think letting the player be forced to eat is ok
+                    }
+                } else {
+                    p.swing(hand)
+                }
             }
         }
+
     }
 
     fun onClientTick() {
@@ -358,28 +392,26 @@ object PlayerActionAPI {
         if (e.shouldAttack) {
             // p.swing is local
             if (e.shouldAttackPeriod == -1) {
-                // p.swinging = true
                 emulateLeftClick() // Momentary
                 e.shouldAttack = false
             } else if (e.shouldAttackPeriod == 0) {
-                // p.swinging = true
                 emulateLeftClick() // Momentary
             } else if ((p.level().gameTime % e.shouldAttackPeriod) == 0L) {
-                // p.swinging = true
                 emulateLeftClick() // Momentary
             }
         }
 
         if (e.shouldUse) {
+            val hand = InteractionHand.MAIN_HAND
             if (e.shouldUsePeriod == -1) {
                 // TODO: do I really want to do it this way?
                 // Hmm...
-                emulateRightClick() // Hmm.... I don't think I can use .isDown because it would conflict...
+                emulateRightClick(hand) // Hmm.... I don't think I can use .isDown because it would conflict...
                 e.shouldUse = false
             } else if (e.shouldUsePeriod == 0) {
-                emulateRightClick() // Continuous
+                emulateRightClick(hand) // Continuous
             } else if ((p.level().gameTime % e.shouldUsePeriod) == 0L) {
-                emulateRightClick() // Periodic
+                emulateRightClick(hand) // Periodic
             }
         }
 
@@ -471,6 +503,21 @@ object PlayerActionAPI {
                     } else if (e.shouldUsePeriod == 0) {
                         //p.swing(player!!.usedItemHand) // Continuous
                     } else if ((level!!.gameTime % e.shouldUsePeriod) == 0L) {
+
+                        // p.lookAngle
+                        /*
+                        val hit = p.gameMode. .hitResult ?: return
+                        if (hit.type != HitResult.Type.BLOCK) return
+                        hit as BlockHitResult
+                        val useContext = UseOnContext(
+                            p,
+                            InteractionHand.MAIN_HAND,
+                            hit
+                        )
+                        p.useItem.useOn(
+                            useContext
+                        )
+                         */
                         //p.swing(player!!.usedItemHand) // Periodic
                     }
                 }

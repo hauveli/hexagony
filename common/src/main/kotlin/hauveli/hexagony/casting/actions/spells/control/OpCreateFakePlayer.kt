@@ -8,6 +8,8 @@ import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
 import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
+import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.spawnFakeClone
+import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
@@ -78,11 +80,22 @@ object OpCreateFakeplayer : SpellAction {
         override fun cast(env: CastingEnvironment) {
 
             val server = env.getWorld().getServer()
+            val caster = env.castingEntity
 
             // Wow, did not know origins compatibility existed in that, nice.
             // TODO: attach player camera to player, and make keybinds work as expected
-            entity?.sendSystemMessage(Component.nullToEmpty("Totally ATTACHED the player!!!"))
+            // TODO: if player location matches self, ATTACH
             if (entity?.uuid == null) return
+            (entity as ServerPlayer)
+            pos.subtract(entity.position())?.lengthSqr()?.let {
+                if (it < 0.001) {
+                    println("Reattached!")
+                    PlayerControlData.get(server).getOrCreate(entity.uuid).reattach(entity)
+                } else {
+                    println("Spawned fake!")
+                    spawnFakeClone(entity)
+                }
+            }
             //PlayerControlData.get(server).getOrCreate(entity.uuid).sprint(doesSprint)
         }
 

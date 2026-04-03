@@ -14,11 +14,11 @@ class FakeServerPlayer(
     server: MinecraftServer,
     level: ServerLevel,
     val original: ServerPlayer
-) : Player(
+) : ServerPlayer(
+    server,
     level,
-    original.blockPosition(),
-    original.yRot,
-    GameProfile(UUID.randomUUID(), original.name.string)) {
+    GameProfile(UUID.randomUUID(), original.name.toString())
+    ) {
     init {
         moveTo(original.x, original.y, original.z, original.yRot, original.xRot)
 
@@ -27,7 +27,7 @@ class FakeServerPlayer(
             inventory.setItem(i, stack)
         }
 
-        for (slot in EquipmentSlot.values()) {
+        for (slot in EquipmentSlot.entries) {
             val stack = original.getItemBySlot(slot).copy()
             setItemSlot(slot, stack)
         }
@@ -39,11 +39,13 @@ class FakeServerPlayer(
         foodData.setSaturation(original.foodData.saturationLevel)
         foodData.setExhaustion(original.foodData.exhaustionLevel)
         isInvisible = false
+
+        connection = DummyServerGamePacketListenerImpl(server, this)
+        DummyServerGamePacketListenerImpl.sendDummyPlayerInfo(server, this)
     }
 
     override fun tick() {
         super.tick()
-        // Optional: AI or movement logic here
     }
 
     override fun isSpectator(): Boolean {
@@ -54,6 +56,10 @@ class FakeServerPlayer(
         return false
     }
 
+    override fun aiStep() {
+        // empty it
+    }
+
     companion object {
         fun spawnFakeClone(original: ServerPlayer): FakeServerPlayer {
             val server = original.server ?: throw IllegalStateException("Server null")
@@ -61,6 +67,7 @@ class FakeServerPlayer(
 
             val clone = FakeServerPlayer(server, level, original)
 
+            // server.playerList
             level.addFreshEntity(clone)
 
             return clone
