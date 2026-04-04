@@ -459,8 +459,7 @@ class PlayerControlData : SavedData() {
 
         fun removeEntry(uuid: UUID, server: MinecraftServer) {
             val data = get(server)
-            val removed = data.players.remove(uuid)
-            println("Removed: ${removed.toString()}")
+            data.players.remove(uuid)
             data.setDirty()
         }
 

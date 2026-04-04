@@ -106,27 +106,29 @@ class FakeServerPlayer(
     }
 
     fun dieButForReal() {
-        PlayerControlData.removeEntry(this.uuid) // This is important, more than actually dying important.
+        PlayerControlData.removeEntry(uuid, server) // This is important, more than actually dying important.
         removeFakePlayer()
     }
 
+    // I do this just in case it's called from a bad place
     override fun die(source: DamageSource) {
+        PlayerControlData.removeEntry(this.uuid, server) // This is important, more than actually dying important.
         super.die(source)
     }
 
     override fun disconnect() {
-        PlayerControlData.removeEntry(this.uuid) // This is important, more than actually dying important.
+        PlayerControlData.removeEntry(this.uuid, server) // This is important, more than actually dying important.
         super.disconnect()
     }
 
     override fun tickDeath() {
+        PlayerControlData.removeEntry(this.uuid, server) // This is important, more than actually dying important.
         super.tickDeath()
     }
 
     override fun kill() {
-        PlayerControlData.removeEntry(this.uuid) // This is important, more than actually dying important.
+        PlayerControlData.removeEntry(this.uuid, server) // This is important, more than actually dying important.
         super.kill()
-        dieButForReal()
     }
 
     override fun knockback(strength: Double, x: Double, z: Double) {
