@@ -29,21 +29,11 @@ object HexagonyClient {
                     onClientTick()
                     updateFreeCam()
                 }
-                /*
-                if (Minecraft.getInstance().isSingleplayer) {
-                    val level = Minecraft.getInstance().level
-                    if (level != null) {
-                        val server = level.server
-                        if (server != null) {
-                            TickEvent.PLAYER_POST.register { player ->
-                                onServerTick(server)
-                            }
-                        }
-                    }
-                }
-                */
             }
             registered = true
+        }
+        TickEvent.SERVER_POST.register { server ->
+            onServerTick(server)
         }
 
     }

@@ -1,11 +1,13 @@
 package hauveli.hexagony.common.bilocation
 
 import com.mojang.authlib.GameProfile
+import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.player.Player
@@ -68,26 +70,68 @@ class FakeServerPlayer(
     override fun isPushable(): Boolean = true
     // override fun canBeCollidedWith(): Boolean = true
 
+    override fun jumpFromGround() {
+        super.jumpFromGround()
+    }
+
     override fun tick() {
         super.tick()
 
+        // Even have to do gravity because this stupid thing won't even fall without it............
+        // gravity
         if (!onGround()) {
             deltaMovement = deltaMovement.add(0.0, -0.08, 0.0)
         }
 
-        move(MoverType.SELF, deltaMovement)
+        if (deltaMovement.lengthSqr() > 0.0001) {
+            move(MoverType.SELF, deltaMovement)
+            hasImpulse = false
+        }
 
-        deltaMovement = deltaMovement.scale(
-            if (onGround()) 0.6 else 0.91
-        )
+        val friction = if (onGround()) 0.6 else 0.91
+        deltaMovement = deltaMovement.scale(friction)
+
+        if (this.health <= 0) {
+            deathTime++
+            if (deathTime >= 20) {
+                this.dieButForReal()
+            }
+        }
     }
 
-    override fun die(damageSource: DamageSource) {
-        super.die(damageSource)
+    fun removeFakePlayer() {
+        server.playerList.remove(this)
+        serverLevel().removePlayerImmediately(this, RemovalReason.DISCARDED)
+        discard()
+    }
+
+    fun dieButForReal() {
+        PlayerControlData.removeEntry(this.uuid) // This is important, more than actually dying important.
+        removeFakePlayer()
+    }
+
+    override fun die(source: DamageSource) {
+        super.die(source)
+    }
+
+    override fun disconnect() {
+        PlayerControlData.removeEntry(this.uuid) // This is important, more than actually dying important.
+        super.disconnect()
+    }
+
+    override fun tickDeath() {
+        super.tickDeath()
+    }
+
+    override fun kill() {
+        PlayerControlData.removeEntry(this.uuid) // This is important, more than actually dying important.
+        super.kill()
+        dieButForReal()
     }
 
     override fun knockback(strength: Double, x: Double, z: Double) {
         super.knockback(strength, x, z)
+        hasImpulse = true
         val dx = x
         val dz = z
         val scale = Math.sqrt(dx * dx + dz * dz)

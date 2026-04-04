@@ -441,12 +441,13 @@ object PlayerActionAPI {
         // data.setDirty()
     }
 
+    var counter = 0
     fun onServerTick(server: MinecraftServer) {
         val data = PlayerControlData.get(server)
-
-        println("ST")
+        counter++
         data.players.forEach { (uuid, e) ->
             val p = server.playerList.getPlayer(uuid)
+            if (counter % 20 == 0) println("Player: ${p.toString()}")
             if (p != null) {
                 println(p.name)
                 if (!p.tags.contains("FakePlayer")) return@forEach
@@ -466,7 +467,6 @@ object PlayerActionAPI {
                     p.xRot = e.shouldLookLeftRight
                 }
                 if (e.shouldJump) {
-                    p.jumpFromGround()
                     p.setJumping(true)
                     p.jumpFromGround()
                     p.addDeltaMovement(
