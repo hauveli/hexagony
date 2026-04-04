@@ -1,6 +1,7 @@
 package hauveli.hexagony.common.control
 
 // import at.petrak.hexcasting.ktxt.UseOnContext
+import dev.architectury.event.events.common.TickEvent
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
@@ -443,12 +444,17 @@ object PlayerActionAPI {
     fun onServerTick(server: MinecraftServer) {
         val data = PlayerControlData.get(server)
 
+        println("ST")
         data.players.forEach { (uuid, e) ->
             val p = server.playerList.getPlayer(uuid)
             if (p != null) {
+                println(p.name)
+                if (!p.tags.contains("FakePlayer")) return@forEach
+                println("Passed: ${p.name}")
                 // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
                 if (e.shouldMoveForwardBackward != 0f) {
                     p.zza = e.shouldMoveForwardBackward   // forwar hehe pizza
+                    p.setDeltaMovement(p.deltaMovement.add(0.0, 0.0, p.zza.toDouble()))
                 }
                 if (e.shouldMoveLeftRight != 0f) {
                     p.xxa = e.shouldMoveLeftRight   // side
@@ -460,6 +466,14 @@ object PlayerActionAPI {
                     p.xRot = e.shouldLookLeftRight
                 }
                 if (e.shouldJump) {
+                    p.jumpFromGround()
+                    p.setJumping(true)
+                    p.jumpFromGround()
+                    p.addDeltaMovement(
+                        Vec3(
+                            0.0, 0.42 * p.jumpBoostPower, 0.0
+                        )
+                    )
                     // If player is of type REAL and not a bot, we send a packet, otherwise we manipulate directly
                     /*
                     p.jumpFromGround()
@@ -548,5 +562,12 @@ object PlayerActionAPI {
         data.setDirty()
         // Todo: smarter way to mark dirty?
         // data.setDirty()
+    }
+
+    fun initServer() {
+        TickEvent.Server.SERVER_POST.register {
+                server ->
+            onServerTick(server)
+        }
     }
 }

@@ -36,19 +36,11 @@ object HexagonyServerConfig {
 
         // prevent this holder from saving the server config; that happens in the client config gui
         holder.registerSaveListener { _, _ -> InteractionResult.FAIL }
-        TickEvent.Server.SERVER_POST.register {
-                server ->
-            onServerTick(server)
-        }
     }
 
     fun initServer() {
         PlayerEvent.PLAYER_JOIN.register { player ->
             MsgSyncConfigS2C(holder.config.server).sendToPlayer(player)
-        }
-        TickEvent.Server.SERVER_POST.register {
-                server ->
-            onServerTick(server)
         }
     }
 

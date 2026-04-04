@@ -1,6 +1,7 @@
 package hauveli.hexagony
 
 import dev.architectury.event.events.common.LifecycleEvent
+import hauveli.hexagony.common.control.PlayerActionAPI
 import hauveli.hexagony.common.craft.GraphCraftingRecipes
 import hauveli.hexagony.common.craft.GraphRecipeLoader
 import net.minecraft.resources.ResourceLocation
@@ -52,5 +53,6 @@ object Hexagony {
 
     fun initServer() {
         HexagonyServerConfig.initServer()
+        PlayerActionAPI.initServer()
     }
 }

@@ -93,7 +93,7 @@ object OpCreateFakeplayer : SpellAction {
                     PlayerControlData.get(server).getOrCreate(entity.uuid).reattach(entity)
                 } else {
                     println("Spawned fake!")
-                    spawnFakeClone(entity)
+                    spawnFakeClone(entity, pos)
                 }
             }
             //PlayerControlData.get(server).getOrCreate(entity.uuid).sprint(doesSprint)

@@ -6,6 +6,7 @@ import dev.architectury.event.events.common.TickEvent
 import dev.architectury.registry.client.rendering.RenderTypeRegistry
 import hauveli.hexagony.common.bilocation.FreeCameraEntity.Companion.updateFreeCam
 import hauveli.hexagony.common.control.PlayerActionAPI.onClientTick
+import hauveli.hexagony.common.control.PlayerActionAPI.onServerTick
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.config.HexagonyClientConfig
 import me.shedaniel.autoconfig.AutoConfig
@@ -28,6 +29,19 @@ object HexagonyClient {
                     onClientTick()
                     updateFreeCam()
                 }
+                /*
+                if (Minecraft.getInstance().isSingleplayer) {
+                    val level = Minecraft.getInstance().level
+                    if (level != null) {
+                        val server = level.server
+                        if (server != null) {
+                            TickEvent.PLAYER_POST.register { player ->
+                                onServerTick(server)
+                            }
+                        }
+                    }
+                }
+                */
             }
             registered = true
         }
