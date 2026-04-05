@@ -449,13 +449,10 @@ object PlayerActionAPI {
             val p = server.playerList.getPlayer(uuid)
             if (counter % 20 == 0) println("Player: ${p.toString()}")
             if (p != null) {
-                println(p.name)
                 if (!p.tags.contains("FakePlayer")) return@forEach
-                println("Passed: ${p.name}")
                 // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
                 if (e.shouldMoveForwardBackward != 0f) {
                     p.zza = e.shouldMoveForwardBackward   // forwar hehe pizza
-                    p.setDeltaMovement(p.deltaMovement.add(0.0, 0.0, p.zza.toDouble()))
                 }
                 if (e.shouldMoveLeftRight != 0f) {
                     p.xxa = e.shouldMoveLeftRight   // side
@@ -467,13 +464,8 @@ object PlayerActionAPI {
                     p.xRot = e.shouldLookLeftRight
                 }
                 if (e.shouldJump) {
-                    p.setJumping(true)
-                    p.jumpFromGround()
-                    p.addDeltaMovement(
-                        Vec3(
-                            0.0, 0.42 * p.jumpBoostPower, 0.0
-                        )
-                    )
+                    if (p.onGround())
+                        p.jumpFromGround()
                     // If player is of type REAL and not a bot, we send a packet, otherwise we manipulate directly
                     /*
                     p.jumpFromGround()

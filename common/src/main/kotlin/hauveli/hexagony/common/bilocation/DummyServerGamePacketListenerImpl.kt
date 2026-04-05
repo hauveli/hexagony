@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 
 class DummyServerGamePacketListenerImpl(server: MinecraftServer, player: ServerPlayer
-) : ServerGamePacketListenerImpl(server, DummyConnection(PacketFlow.CLIENTBOUND), player) {
+) : ServerGamePacketListenerImpl(server, DummyConnection(PacketFlow.SERVERBOUND), player) {
 
     private var playerInfoSent = false
 
@@ -24,16 +24,18 @@ class DummyServerGamePacketListenerImpl(server: MinecraftServer, player: ServerP
     }
 
     override fun send(packet: Packet<*>, listener: PacketSendListener?) {
-        send(packet)
+        this.send(packet)
         listener?.onSuccess()
     }
 
-    companion object {
-    fun sendDummyPlayerInfo(server: MinecraftServer, player: ServerPlayer) {
-        val infoPacket = ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, player)
-
-        // Directly handle the packet internally so Minecraft sees the player info
-        server.playerList.broadcastAll(infoPacket)
+    override fun isAcceptingMessages(): Boolean {
+        return true
     }
+
+    companion object {
+        fun sendDummyPlayerInfo(server: MinecraftServer, player: ServerPlayer) {
+            val infoPacket = ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, player)
+            server.playerList.broadcastAll(infoPacket)
+        }
     }
 }

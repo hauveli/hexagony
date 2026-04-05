@@ -2,6 +2,7 @@ package hauveli.hexagony
 
 import dev.architectury.event.events.client.ClientPlayerEvent
 import dev.architectury.event.events.client.ClientTooltipEvent
+import dev.architectury.event.events.common.LifecycleEvent
 import dev.architectury.event.events.common.TickEvent
 import dev.architectury.registry.client.rendering.RenderTypeRegistry
 import hauveli.hexagony.common.bilocation.FreeCameraEntity.Companion.updateFreeCam
@@ -13,6 +14,7 @@ import me.shedaniel.autoconfig.AutoConfig
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.renderer.LevelRenderer
+import net.minecraft.server.level.ServerBossEvent
 
 object HexagonyClient {
     fun init() {
@@ -35,7 +37,6 @@ object HexagonyClient {
         TickEvent.SERVER_POST.register { server ->
             onServerTick(server)
         }
-
     }
 
     fun getConfigScreen(parent: Screen): Screen {

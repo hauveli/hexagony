@@ -1,6 +1,10 @@
 package hauveli.hexagony.common.control
 
+import com.mojang.authlib.GameProfile
+import dev.architectury.event.events.common.LifecycleEvent
 import hauveli.hexagony.common.bilocation.FakeServerPlayer
+import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.respawnFakeClone
+import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.spawnFakeClone
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.networking.msg.MsgPlayerControlBooleanS2C
@@ -18,9 +22,12 @@ import java.util.UUID
 
 
 import net.minecraft.world.level.saveddata.SavedData
+import net.minecraft.world.phys.Vec3
 
 data class PlayerControlEntry (
     val mindUUID: UUID, // lol
+    var ownerUUID: UUID = UUID.randomUUID(), // placeholder, equals mindUUID if self, this field is technically unneeded, but here for ease
+    var isFakePlayer: Boolean = false, // default to false
 
     var shouldMoveForwardBackward: Float = 0f, // ws
     var shouldMoveLeftRight: Float = 0f, // ad
@@ -76,7 +83,7 @@ data class PlayerControlEntry (
 
     fun detach(serverPlayer: ServerPlayer) {
         if (serverPlayer.tags.contains("FakePlayer")) {
-            // What would it even mean to "detach" a FakePlayer?
+            serverPlayer.kill()
         } else {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
@@ -88,6 +95,8 @@ data class PlayerControlEntry (
     fun reattach(serverPlayer: ServerPlayer) {
         if (serverPlayer.tags.contains("FakePlayer")) {
             // What would it even mean to "re-attach" a FakePlayer?
+            // It would mean we move the FakePlayer to the player's position, and the player to the FakePlayer's position...
+            // TODO: swapperoo
         } else {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
@@ -328,6 +337,14 @@ data class PlayerControlEntry (
             )
         }
     }
+
+    fun setFake(bool: Boolean) {
+        isFakePlayer = bool
+    }
+
+    fun setOwner(uuid: UUID) {
+        ownerUUID = uuid
+    }
 }
 
 class PlayerControlData : SavedData() {
@@ -380,6 +397,8 @@ class PlayerControlData : SavedData() {
             // I'm too nooby at this time to know enough kotlin to NOT hardcode this but this would be really easy
             // if I knew how I'm sure, just k,v loop
             e.putUUID("mindUUID", entry.mindUUID)
+            e.putUUID("ownerUUID", entry.ownerUUID)
+            e.putBoolean("isFakePlayer", entry.isFakePlayer)
 
             e.putFloat("shouldMoveForwardBackward", entry.shouldMoveForwardBackward)
             e.putFloat("shouldMoveLeftRight", entry.shouldMoveLeftRight)
@@ -422,6 +441,8 @@ class PlayerControlData : SavedData() {
             // on join or something...
             myEntry = PlayerControlEntry(
                 mindUUID = player!!.uuid,
+                ownerUUID = player.uuid,
+                isFakePlayer = false,
                 shouldMoveForwardBackward = 0f,
                 shouldMoveLeftRight = 0f,
                 shouldLookUpDown = 0f,
@@ -473,9 +494,11 @@ class PlayerControlData : SavedData() {
                 val uuid = e.getUUID("mindUUID")
 
                 // todo: is the stored data in bytes? is that why it can't just unpack it in a smart automatic way?
-                data.players[uuid] =
+                val playerEntry =
                     PlayerControlEntry(
                         uuid,
+                        e.getUUID("ownerUUID"),
+                        e.getBoolean("isFakePlayer"),
                         e.getFloat("shouldMoveForwardBackward"),
                         e.getFloat("shouldMoveLeftRight"),
                         e.getFloat("shouldLookUpDown"),
@@ -494,9 +517,34 @@ class PlayerControlData : SavedData() {
                         e.getBoolean("shouldDrop"),
                         e.getBoolean("shouldDropStack"),
                     )
+                if (playerEntry.isFakePlayer) {
+                    serverInit(uuid)
+                }
+                data.players[uuid] = playerEntry
             }
 
             return data
+        }
+
+        fun serverInit(uuid: UUID) {
+            println("Registering event...")
+            LifecycleEvent.SERVER_STARTING.register {
+                server ->
+                val player = ServerPlayer(
+                    server,
+                    server.overworld(),
+                    GameProfile(uuid, "hexagony_report2dev")
+                )
+                val actualPlayer = server.playerList.load(player) ?: return@register
+                println("past player")
+                val pos = actualPlayer.getList("Pos",6)
+                val x = pos.getDouble(0)
+                val y = pos.getDouble(1)
+                val z = pos.getDouble(2)
+                val fake = respawnFakeClone(player, Vec3(x,y,z))
+                // fake.addTag()
+                println("Respawned fake clone: ${fake}")
+            }
         }
     }
 }

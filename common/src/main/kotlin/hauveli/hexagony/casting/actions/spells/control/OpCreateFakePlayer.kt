@@ -88,12 +88,18 @@ object OpCreateFakeplayer : SpellAction {
             if (entity?.uuid == null) return
             (entity as ServerPlayer)
             pos.subtract(entity.position())?.lengthSqr()?.let {
+                val data = PlayerControlData.get(server)
                 if (it < 0.001) {
                     println("Reattached!")
-                    PlayerControlData.get(server).getOrCreate(entity.uuid).reattach(entity)
+                    data.getOrCreate(entity.uuid).reattach(entity)
                 } else {
                     println("Spawned fake!")
-                    spawnFakeClone(entity, pos)
+                    val fakePlayer = spawnFakeClone(entity, pos)
+                    val fakePlayerEntry = data.getOrCreate(fakePlayer.uuid)
+                    fakePlayerEntry.setFake(true)
+                    fakePlayerEntry.setOwner(entity.uuid)
+                    fakePlayer.addTag(entity.uuid.toString()) // hmm.... Might not be needed if persistent?
+                    data.setDirty()
                 }
             }
             //PlayerControlData.get(server).getOrCreate(entity.uuid).sprint(doesSprint)
