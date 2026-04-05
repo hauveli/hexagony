@@ -2,24 +2,22 @@ package hauveli.hexagony.common.bilocation
 
 import com.mojang.authlib.GameProfile
 import hauveli.hexagony.common.control.PlayerControlData
-import net.minecraft.core.BlockPos
-import net.minecraft.core.Vec3i
-import net.minecraft.network.ConnectionProtocol
+import net.minecraft.network.Connection
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.PacketFlow
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
+import net.minecraft.tags.BlockTags
 import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.MoverType
-import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.PlayerTeam
 import net.minecraft.world.scores.Scoreboard
@@ -106,12 +104,30 @@ class FakeServerPlayer(
         return super.hurt(source, amount)
     }
 
+    fun helperFireCheck() {
+        this.tryCheckInsideBlocks()
+        val h = this.blockSpeedFactor
+        this.setDeltaMovement(this.deltaMovement.multiply(h.toDouble(), 1.0, h.toDouble()))
+        if (this.level()
+                .getBlockStatesIfLoaded(this.boundingBox.deflate(1.0E-6))
+                .anyMatch { blockStatex: BlockState? -> blockStatex!!.`is`(BlockTags.FIRE) || blockStatex.`is`(Blocks.LAVA) }
+        ) {
+            this.remainingFireTicks++
+            if (this.remainingFireTicks > 20) {
+                this.setSecondsOnFire(this.remainingFireTicks / 20)
+            }
+        }
+    }
+
     var counter = 0
     override fun tick() {
         super.tick()
         // move() forces it to update. I have no idea how to do this in a better way.
         // figuring this out was rough.
         move(MoverType.SELF, Vec3.ZERO)
+        this.helperFireCheck()
+        // this.doTick()
+
         if (counter == 1000) {
             counter = 0
             println("TICKING: ${this.stringUUID}")
@@ -211,17 +227,14 @@ class FakeServerPlayer(
             val listener = DummyServerGamePacketListenerImpl(server, connection,clone)
             connection.setListener(listener)
 
-            val packet = ClientboundPlayerInfoUpdatePacket(
-                ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER,
-                clone
-            )
-
-            server.playerList.broadcastAll(packet)
             // server.executeIfPossible {  }
 
+            /*
             server.playerList.players.add(clone)
             level.addNewPlayer(clone)
+            //println("FUCKKKKK: ${level.getEntity(clone.uuid)?.isAlwaysTicking}")
 
+            */
             /*
             val field = listener.javaClass.getDeclaredField("awaitingPositionFromClient")
             field.isAccessible = true
@@ -234,6 +247,13 @@ class FakeServerPlayer(
                 clone
             )
              */
+
+            server.playerList.placeNewPlayer(
+                connection,
+                clone
+            )
+            clone.setGameMode(GameType.SURVIVAL)
+            clone.abilities.invulnerable = false
 
             return clone
         }

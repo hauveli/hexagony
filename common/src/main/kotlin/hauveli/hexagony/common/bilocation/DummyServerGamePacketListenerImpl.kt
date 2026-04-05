@@ -39,11 +39,4 @@ class DummyServerGamePacketListenerImpl(server: MinecraftServer, connection: Dum
     override fun isAcceptingMessages(): Boolean {
         return true
     }
-
-    companion object {
-        fun sendDummyPlayerInfo(server: MinecraftServer, player: ServerPlayer) {
-            val infoPacket = ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, player)
-            server.playerList.broadcastAll(infoPacket)
-        }
-    }
 }
