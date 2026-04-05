@@ -3,7 +3,6 @@ package hauveli.hexagony.common.control
 import com.mojang.authlib.GameProfile
 import dev.architectury.event.events.common.LifecycleEvent
 import hauveli.hexagony.common.bilocation.FakeServerPlayer
-import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.respawnFakeClone
 import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.spawnFakeClone
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
 import hauveli.hexagony.networking.HexagonyNetworking
@@ -541,7 +540,7 @@ class PlayerControlData : SavedData() {
                 val x = pos.getDouble(0)
                 val y = pos.getDouble(1)
                 val z = pos.getDouble(2)
-                val fake = respawnFakeClone(player, Vec3(x,y,z))
+                val fake = spawnFakeClone(player, Vec3(x,y,z), player.uuid)
                 // fake.addTag()
                 println("Respawned fake clone: ${fake}")
             }

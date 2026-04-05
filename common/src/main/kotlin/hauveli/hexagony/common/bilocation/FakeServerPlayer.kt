@@ -2,9 +2,13 @@ package hauveli.hexagony.common.bilocation
 
 import com.mojang.authlib.GameProfile
 import hauveli.hexagony.common.control.PlayerControlData
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Vec3i
 import net.minecraft.network.ConnectionProtocol
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.PacketFlow
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -68,19 +72,12 @@ class FakeServerPlayer(
         invulnerableTime = 0
         abilities.invulnerable = false
         isInvulnerable = false
-        wonGame = false
         hurtMarked = false
         remainingFireTicks = 0
 
 
-        setGameMode(GameType.SURVIVAL)
-
         tags.add("FakePlayer") // I don't know if there's a better way to get whether a ServerPlayer is fake or not
         // I could try to check the reply from a packet but that seems like way more effort than this, even if it would be better...
-
-        connection = DummyServerGamePacketListenerImpl(server, this)
-        // (ConnectionProtocol.PLAY)
-        DummyServerGamePacketListenerImpl.sendDummyPlayerInfo(server, this)
     }
 
     override fun isInvulnerable(): Boolean {
@@ -109,20 +106,24 @@ class FakeServerPlayer(
         return super.hurt(source, amount)
     }
 
-    override fun doTick() {
-        // Bypass connection gating
-        super.tick()  // calls Entity.tick()
-    }
-
-    var BAAD = 0
+    var counter = 0
     override fun tick() {
         super.tick()
+        // move() forces it to update. I have no idea how to do this in a better way.
+        // figuring this out was rough.
+        move(MoverType.SELF, Vec3.ZERO)
+        if (counter == 1000) {
+            counter = 0
+            println("TICKING: ${this.stringUUID}")
+        }
+        counter++
 
         // Even have to do gravity because this stupid thing won't even fall without it............
         // gravity
         if (!onGround()) {
             deltaMovement = deltaMovement.add(0.0, -0.08, 0.0)
         }
+        //if (this.)
 
         if (deltaMovement.lengthSqr() > 0.0001) {
             move(MoverType.SELF, deltaMovement)
@@ -135,29 +136,23 @@ class FakeServerPlayer(
         if (this.health <= 0) {
             deathTime++
             if (deathTime >= 20) {
-                this.dieButForReal()
+                this.kill()
+                this.discard()
             }
         }
+    }
+
+    override fun baseTick() {
+        super.baseTick()
     }
 
     override fun isControlledByLocalInstance(): Boolean {
         return true
     }
 
-    override fun aiStep() {
-        super.aiStep()
-
-        if (!level().isClientSide) {
-            if (deltaMovement.lengthSqr() > 0.00001) {
-                move(MoverType.SELF, deltaMovement)
-                setDeltaMovement(deltaMovement.scale(0.91))
-                travel(deltaMovement)
-            }
-        }
-    }
-
     fun hidePlayerName() {
-        val scoreboard: Scoreboard = this.server.scoreboard
+        val ser = this.server ?: return
+        val scoreboard: Scoreboard = ser.scoreboard
 
         val teamName = "hexagony:invisible_name"
         val team: PlayerTeam = scoreboard.getPlayerTeam(teamName) ?: scoreboard.addPlayerTeam(teamName)
@@ -167,31 +162,24 @@ class FakeServerPlayer(
         scoreboard.addPlayerToTeam(this.gameProfile.name, team)
     }
 
-    fun removeFakePlayer() {
-        server.playerList.remove(this)
-        serverLevel().removePlayerImmediately(this, RemovalReason.DISCARDED)
-        discard()
-    }
-
-    fun dieButForReal() {
-        PlayerControlData.removeEntry(uuid, server) // This is important, more than actually dying important.
-        removeFakePlayer()
+    fun stopTracking() {
+        val ser = server ?: return
+        PlayerControlData.removeEntry(uuid, ser) // This is important, more than actually dying important.
     }
 
     // I do this just in case it's called from a bad place
     override fun die(source: DamageSource) {
+        stopTracking()
         super.die(source)
     }
 
-    override fun disconnect() {
-        super.disconnect()
-    }
-
     override fun tickDeath() {
+        stopTracking()
         super.tickDeath()
     }
 
     override fun kill() {
+        stopTracking()
         super.kill()
     }
 
@@ -213,68 +201,39 @@ class FakeServerPlayer(
     }
 
     companion object {
-        fun spawnFakeClone(original: ServerPlayer, pos: Vec3): FakeServerPlayer {
+        fun spawnFakeClone(original: ServerPlayer, pos: Vec3, uuid: UUID): FakeServerPlayer {
             val server = original.server ?: throw IllegalStateException("Server null")
             val level = original.level() as ServerLevel
 
-            val clone = FakeServerPlayer(server, level, original, UUID.randomUUID(), pos)
+            val clone = FakeServerPlayer(server, level, original, uuid, pos)
 
-            level.addNewPlayer(clone)
-            server.playerList.players.add(clone)
-            /*
-            // server.playerList
-            server.playerList.placeNewPlayer(
-                DummyConnection(PacketFlow.SERVERBOUND),
-                clone
-            )
-            */
-            println("acceptinG?")
-            println(clone.connection.isAcceptingMessages)
+            val connection = DummyConnection(PacketFlow.SERVERBOUND)
+            val listener = DummyServerGamePacketListenerImpl(server, connection,clone)
+            connection.setListener(listener)
 
-            val listener = clone.connection
-            val field = listener.javaClass.getDeclaredField("awaitingPositionFromClient")
-            field.isAccessible = true
-            field.set(listener, null)
-
-            return clone
-        }
-
-        fun respawnFakeClone(original: ServerPlayer, pos: Vec3): FakeServerPlayer {
-            val server = original.server ?: throw IllegalStateException("Server null")
-            val level = original.level() as ServerLevel
-
-            val clone = FakeServerPlayer(server, level, original, original.uuid, pos)
-
-            // server.playerList
-            server.playerList.placeNewPlayer(
-                DummyConnection(PacketFlow.SERVERBOUND),
+            val packet = ClientboundPlayerInfoUpdatePacket(
+                ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER,
                 clone
             )
 
-            /*
-            server.playerList.players.forEach {
-    println("Player ${it.name.string} tickCount=${it.tickCount}")
-}
-            server.playerList.players.add(clone)
+            server.playerList.broadcastAll(packet)
+            // server.executeIfPossible {  }
 
+            server.playerList.players.add(clone)
             level.addNewPlayer(clone)
 
-            */
-
-            println("acceptinG?")
-            println(clone.connection.isAcceptingMessages)
-
             /*
-            val listener = clone.connection
             val field = listener.javaClass.getDeclaredField("awaitingPositionFromClient")
             field.isAccessible = true
             field.set(listener, null)
             */
 
-            println("Hurt result: " + clone.hurt(clone.damageSources().generic(), 5f))
-            println("Health after: " + clone.health)
-            println(clone.level().getEntity(clone.id))
-            println(server.playerList.players.contains(clone))
+            /*
+            server.playerList.placeNewPlayer(
+                connection,
+                clone
+            )
+             */
 
             return clone
         }

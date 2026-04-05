@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
+import java.util.UUID
 
 object OpCreateFakeplayer : SpellAction {
     override val argc: Int
@@ -94,7 +95,7 @@ object OpCreateFakeplayer : SpellAction {
                     data.getOrCreate(entity.uuid).reattach(entity)
                 } else {
                     println("Spawned fake!")
-                    val fakePlayer = spawnFakeClone(entity, pos)
+                    val fakePlayer = spawnFakeClone(entity, pos, UUID.randomUUID())
                     val fakePlayerEntry = data.getOrCreate(fakePlayer.uuid)
                     fakePlayerEntry.setFake(true)
                     fakePlayerEntry.setOwner(entity.uuid)

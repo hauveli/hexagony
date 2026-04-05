@@ -5,14 +5,22 @@ import net.minecraft.network.PacketSendListener
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.PacketFlow
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 
-class DummyServerGamePacketListenerImpl(server: MinecraftServer, player: ServerPlayer
-) : ServerGamePacketListenerImpl(server, DummyConnection(PacketFlow.SERVERBOUND), player) {
+class DummyServerGamePacketListenerImpl(server: MinecraftServer, connection: DummyConnection, player: ServerPlayer
+) : ServerGamePacketListenerImpl(server, connection, player) {
 
     private var playerInfoSent = false
+
+    override fun tick() {
+        super.tick()
+    } // ignore network ticks
+    override fun handleMovePlayer(packet: ServerboundMovePlayerPacket) {
+        super.handleMovePlayer(packet)
+    } // ignore movement
 
     override fun send(packet: Packet<*>) {
         // Only send PlayerInfo packet; ignore all others
@@ -24,7 +32,7 @@ class DummyServerGamePacketListenerImpl(server: MinecraftServer, player: ServerP
     }
 
     override fun send(packet: Packet<*>, listener: PacketSendListener?) {
-        this.send(packet)
+        super.send(packet, listener)
         listener?.onSuccess()
     }
 
