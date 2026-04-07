@@ -188,6 +188,8 @@ class FakeServerPlayer(
         }
     }
 
+    // everything below here is from gnembon's fabric carpet mod
+    // https://github.com/gnembon/fabric-carpet/blob/1.20.2/src/main/java/carpet/patches/EntityPlayerMPFake.java
     override fun onEquipItem(slot: EquipmentSlot, previous: ItemStack, stack: ItemStack) {
         if (!isUsingItem) super.onEquipItem(slot, previous, stack)
     }
