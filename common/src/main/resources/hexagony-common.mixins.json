@@ -15,6 +15,7 @@
     "MixinDatagenMain",
     "bilocation.BilocationAntiTurnEntityMixin",
     "bilocation.BilocationSelectedSlotInventoryMixin",
+    "control.KnockbackServerPlayerMixin",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "mindanchor.AddFreshEntityServerLevelMixin",
     "mindanchor.MindAnchorInventorySlotMixin",

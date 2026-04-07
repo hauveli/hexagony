@@ -2,18 +2,26 @@ package hauveli.hexagony.common.bilocation
 
 import com.mojang.authlib.GameProfile
 import hauveli.hexagony.common.control.PlayerControlData
-import net.minecraft.network.Connection
+import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.network.protocol.PacketFlow
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
+import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
+import net.minecraft.network.protocol.game.ServerboundClientCommandPacket
 import net.minecraft.server.MinecraftServer
+import net.minecraft.server.TickTask
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.tags.BlockTags
+import net.minecraft.tags.FluidTags
 import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.MoverType
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.food.FoodData
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.Blocks
@@ -24,59 +32,16 @@ import net.minecraft.world.scores.Scoreboard
 import net.minecraft.world.scores.Team
 import java.util.*
 
+
 class FakeServerPlayer(
     server: MinecraftServer,
     level: ServerLevel,
-    original: ServerPlayer,
-    uuid: UUID,
-    pos: Vec3
+    uuid: UUID
 ) : ServerPlayer(
     server,
     level,
     GameProfile(uuid, "Homunculus")
     ) {
-    init {
-        moveTo(pos.x, pos.y, pos.z, 0f, 0f)
-
-        /*
-        println(original.scoreboardName) // Player###
-        println(original.name.toString()) // literal{Player###}
-        println(original.customName.toString()) // null
-         */
-
-        // this shadows the items?
-        for (i in 0 until original.inventory.containerSize) {
-            val stack: ItemStack = original.inventory.getItem(i).copy()
-            inventory.setItem(i, stack)
-        }
-
-        for (slot in EquipmentSlot.entries) {
-            val stack = original.getItemBySlot(slot).copy()
-            setItemSlot(slot, stack)
-        }
-
-        experienceLevel = original.experienceLevel
-        experienceProgress = original.experienceProgress
-        health = original.health
-        foodData.foodLevel = original.foodData.foodLevel
-        foodData.setSaturation(original.foodData.saturationLevel)
-        foodData.setExhaustion(original.foodData.exhaustionLevel)
-
-        isInvisible = false
-        isCustomNameVisible = false
-        customName = Component.literal("Homunculus")
-        hidePlayerName()
-
-        invulnerableTime = 0
-        abilities.invulnerable = false
-        isInvulnerable = false
-        hurtMarked = false
-        remainingFireTicks = 0
-
-
-        tags.add("FakePlayer") // I don't know if there's a better way to get whether a ServerPlayer is fake or not
-        // I could try to check the reply from a packet but that seems like way more effort than this, even if it would be better...
-    }
 
     override fun isInvulnerable(): Boolean {
         return false
@@ -96,66 +61,8 @@ class FakeServerPlayer(
     override fun isPushable(): Boolean = true
     // override fun canBeCollidedWith(): Boolean = true
 
-    override fun jumpFromGround() {
-        super.jumpFromGround()
-    }
-
     override fun hurt(source: DamageSource, amount: Float): Boolean {
         return super.hurt(source, amount)
-    }
-
-    fun helperFireCheck() {
-        this.tryCheckInsideBlocks()
-        val h = this.blockSpeedFactor
-        this.setDeltaMovement(this.deltaMovement.multiply(h.toDouble(), 1.0, h.toDouble()))
-        if (this.level()
-                .getBlockStatesIfLoaded(this.boundingBox.deflate(1.0E-6))
-                .anyMatch { blockStatex: BlockState? -> blockStatex!!.`is`(BlockTags.FIRE) || blockStatex.`is`(Blocks.LAVA) }
-        ) {
-            this.remainingFireTicks++
-            if (this.remainingFireTicks > 20) {
-                this.setSecondsOnFire(this.remainingFireTicks / 20)
-            }
-        }
-    }
-
-    var counter = 0
-    override fun tick() {
-        super.tick()
-        // move() forces it to update. I have no idea how to do this in a better way.
-        // figuring this out was rough.
-        move(MoverType.SELF, Vec3.ZERO)
-        this.helperFireCheck()
-        // this.doTick()
-
-        if (counter == 1000) {
-            counter = 0
-            println("TICKING: ${this.stringUUID}")
-        }
-        counter++
-
-        // Even have to do gravity because this stupid thing won't even fall without it............
-        // gravity
-        if (!onGround()) {
-            deltaMovement = deltaMovement.add(0.0, -0.08, 0.0)
-        }
-        //if (this.)
-
-        if (deltaMovement.lengthSqr() > 0.0001) {
-            move(MoverType.SELF, deltaMovement)
-            hasImpulse = false
-        }
-
-        val friction = if (onGround()) 0.6 else 0.91
-        deltaMovement = deltaMovement.scale(friction)
-
-        if (this.health <= 0) {
-            deathTime++
-            if (deathTime >= 20) {
-                this.kill()
-                this.discard()
-            }
-        }
     }
 
     override fun baseTick() {
@@ -166,6 +73,7 @@ class FakeServerPlayer(
         return true
     }
 
+    // player nametag visibility
     fun hidePlayerName() {
         val ser = this.server ?: return
         val scoreboard: Scoreboard = ser.scoreboard
@@ -183,37 +91,11 @@ class FakeServerPlayer(
         PlayerControlData.removeEntry(uuid, ser) // This is important, more than actually dying important.
     }
 
-    // I do this just in case it's called from a bad place
-    override fun die(source: DamageSource) {
-        stopTracking()
-        super.die(source)
-    }
-
-    override fun tickDeath() {
-        stopTracking()
-        super.tickDeath()
-    }
-
     override fun kill() {
         stopTracking()
         super.kill()
-    }
-
-    override fun knockback(strength: Double, x: Double, z: Double) {
-        // super.knockback(strength, x, z)
-        hasImpulse = true
-        val dx = x
-        val dz = z
-        val scale = Math.sqrt(dx * dx + dz * dz)
-
-        if (scale > 0.0) {
-            val motionX = dx / scale * strength
-            val motionZ = dz / scale * strength
-
-            deltaMovement = deltaMovement.add(-motionX, 0.4, -motionZ)
-
-            hasImpulse = true
-        }
+        super.disconnect()
+        super.discard()
     }
 
     companion object {
@@ -221,41 +103,148 @@ class FakeServerPlayer(
             val server = original.server ?: throw IllegalStateException("Server null")
             val level = original.level() as ServerLevel
 
-            val clone = FakeServerPlayer(server, level, original, uuid, pos)
+            val clone = FakeServerPlayer(server, level, uuid)
+
+            clone.moveTo(pos.x, pos.y, pos.z, 0f, 0f)
+
+            /*
+            println(original.scoreboardName) // Player###
+            println(original.name.toString()) // literal{Player###}
+            println(original.customName.toString()) // null
+             */
+
+            // this shadows the items?
+            for (i in 0 until original.inventory.containerSize) {
+                val stack: ItemStack = original.inventory.getItem(i).copy()
+                clone.inventory.setItem(i, stack)
+            }
+
+            for (slot in EquipmentSlot.entries) {
+                val stack = original.getItemBySlot(slot).copy()
+                clone.setItemSlot(slot, stack)
+            }
+
+            clone.experienceLevel = original.experienceLevel
+            clone.experienceProgress = original.experienceProgress
+            clone.health = original.health
+            clone.foodData.foodLevel = original.foodData.foodLevel
+            clone.foodData.setSaturation(original.foodData.saturationLevel)
+            clone.foodData.setExhaustion(original.foodData.exhaustionLevel)
+
+            clone.isInvisible = false
+            clone.isCustomNameVisible = false
+            clone.customName = Component.literal("Homunculus")
+            clone.hidePlayerName()
+
+            clone.invulnerableTime = 0
+            clone.abilities.invulnerable = false
+            clone.isInvulnerable = false
+            clone.hurtMarked = false
+            clone.remainingFireTicks = 0
+            // I could try to check the reply from a packet but that seems like way more effort than this, even if it would be better...
+
+
+            clone.abilities.walkingSpeed = original.abilities.walkingSpeed
+            clone.abilities.flyingSpeed = original.abilities.flyingSpeed
+            clone.abilities.mayfly = original.abilities.mayfly
+            clone.abilities.mayBuild = original.abilities.mayBuild
+            clone.abilities.instabuild = original.abilities.instabuild
+            clone.abilities.invulnerable = original.abilities.invulnerable
+            clone.abilities.flying = original.abilities.flying
+
+            clone.setMaxUpStep( original.maxUpStep() )
+
+            clone.remainingFireTicks = original.remainingFireTicks
+
+            clone.attributes.load( original.attributes.save() )
+
+            clone.abilities.invulnerable = false
 
             val connection = DummyConnection(PacketFlow.SERVERBOUND)
             val listener = DummyServerGamePacketListenerImpl(server, connection,clone)
             connection.setListener(listener)
-
-            // server.executeIfPossible {  }
-
-            /*
-            server.playerList.players.add(clone)
-            level.addNewPlayer(clone)
-            //println("FUCKKKKK: ${level.getEntity(clone.uuid)?.isAlwaysTicking}")
-
-            */
-            /*
-            val field = listener.javaClass.getDeclaredField("awaitingPositionFromClient")
-            field.isAccessible = true
-            field.set(listener, null)
-            */
-
-            /*
             server.playerList.placeNewPlayer(
                 connection,
                 clone
             )
-             */
+            // clone.getAttribute(Attributes.)
 
-            server.playerList.placeNewPlayer(
-                connection,
-                clone
-            )
+
+            clone.setGameMode(original.gameMode.gameModeForPlayer)
+
+            // fuck creative mode
             clone.setGameMode(GameType.SURVIVAL)
-            clone.abilities.invulnerable = false
+            clone.stopRiding()
+            clone.tags.add("FakePlayer") // I don't know if there's a better way to get whether a ServerPlayer is fake or not
+
+            server.playerList
+                .broadcastAll(ClientboundTeleportEntityPacket( clone )) //instance.dimension);
+            server.playerList.broadcastAll(
+                ClientboundRotateHeadPacket(clone, (clone.yHeadRot * 256 / 360).toInt().toByte()),
+                level.dimension()
+            )
 
             return clone
         }
+    }
+
+    override fun onEquipItem(slot: EquipmentSlot, previous: ItemStack, stack: ItemStack) {
+        if (!isUsingItem) super.onEquipItem(slot, previous, stack)
+    }
+
+    override fun tick() {
+        if (this.getServer()!!.tickCount % 10 == 0) {
+            this.connection.resetPosition()
+            this.serverLevel().chunkSource.move(this)
+        }
+        try {
+            super.tick()
+            this.doTick()
+        } catch (ignored: NullPointerException) {
+            // happens with that paper port thingy - not sure what that would fix, but hey
+            // the game not gonna crash violently.
+        }
+    }
+
+    private fun shakeOff() {
+        if (vehicle is Player) stopRiding()
+        for (passenger in indirectPassengers) {
+            if (passenger is Player) passenger.stopRiding()
+        }
+    }
+
+    override fun die(cause: DamageSource) {
+        shakeOff()
+        super.die(cause)
+        health = 20f
+        this.foodData = FoodData()
+        kill()
+    }
+
+    override fun getIpAddress(): String {
+        return "127.0.0.1"
+    }
+
+    override fun allowsListing(): Boolean {
+        return false
+    }
+
+    override fun checkFallDamage(y: Double, onGround: Boolean, state: BlockState, pos: BlockPos) {
+        doCheckFallDamage(0.0, y, 0.0, onGround)
+    }
+
+    override fun changeDimension(serverLevel: ServerLevel): Entity? {
+        super.changeDimension(serverLevel)
+        if (wonGame) {
+            val p = ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.PERFORM_RESPAWN)
+            connection.handleClientCommand(p)
+        }
+
+        // If above branch was taken, *this* has been removed and replaced, the new instance has been set
+        // on 'our' connection (which is now theirs, but we still have a ref).
+        if (connection.player.isChangingDimension) {
+            connection.player.hasChangedDimension()
+        }
+        return connection.player
     }
 }

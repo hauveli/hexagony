@@ -8,6 +8,7 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.tags.FluidTags
 import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
@@ -203,7 +204,7 @@ object PlayerActionAPI {
         var velocity_old = 0.0
     }
 
-    val SPEED_MULT = 1
+    val SPEED_MULT = 0.6
 
     private fun customMovement(entity: LivingEntity, input: Vec3) {
         val speed: Float = entity.speed //.getAttributeValue(Attributes.MOVEMENT_SPEED)
@@ -451,11 +452,19 @@ object PlayerActionAPI {
             if (p != null) {
                 if (!p.tags.contains("FakePlayer")) return@forEach
                 // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
-                if (e.shouldMoveForwardBackward != 0f) {
-                    p.zza = e.shouldMoveForwardBackward   // forwar hehe pizza
-                }
-                if (e.shouldMoveLeftRight != 0f) {
-                    p.xxa = e.shouldMoveLeftRight   // side
+                if (e.shouldSprint && p.canSprint()) {
+                    p.isSprinting = true
+                } else { p.isSprinting = false }
+                if (e.shouldSneak) {
+                    p.isShiftKeyDown = true
+                } else { p.isShiftKeyDown = false }
+                if (e.shouldMoveForwardBackward != 0f || e.shouldMoveLeftRight != 0f) {
+                    // p.input.forwardImpulse = e.shouldMoveForwardBackward
+                    customMovement(p,
+                        Vec3(
+                            e.shouldMoveLeftRight.toDouble(),
+                            0.0,
+                            e.shouldMoveForwardBackward.toDouble()))
                 }
                 if (e.shouldLookUpDown != 0f) {
                     p.yRot = e.shouldLookUpDown
@@ -464,26 +473,9 @@ object PlayerActionAPI {
                     p.xRot = e.shouldLookLeftRight
                 }
                 if (e.shouldJump) {
-                    if (p.onGround())
-                        p.jumpFromGround()
-                    // If player is of type REAL and not a bot, we send a packet, otherwise we manipulate directly
-                    /*
                     p.jumpFromGround()
-                    p.addDeltaMovement(
-                        Vec3(
-                            0.0, 0.42 * p.jumpBoostPower, 0.0
-                        )
-                    )
-                    */
-                    // p.jumpBoostPower
-                    // shouldJump = false // do I want it to be continuous if no other inputs?
                 }
-                if (e.shouldSprint && p.canSprint()) {
-                    p.isSprinting = true
-                }
-                if (e.shouldSneak) {
-                    p.isShiftKeyDown = true
-                }
+                p.move(MoverType.SELF, p.deltaMovement.add(p.xxa.toDouble(), 0.0, p.zza.toDouble()))
 
                 if (e.shouldAttack) {
                     // p.swing is local
