@@ -91,9 +91,8 @@ class FakeServerPlayer(
         PlayerControlData.removeEntry(uuid, ser) // This is important, more than actually dying important.
     }
 
-    override fun kill() {
+    private fun removeForReal() {
         stopTracking()
-        super.kill()
         super.disconnect()
         super.discard()
     }
@@ -188,7 +187,7 @@ class FakeServerPlayer(
         }
     }
 
-    // everything below here is from gnembon's fabric carpet mod
+    // everything below here is from gnembon's fabric carpet mod (or modified version of it)
     // https://github.com/gnembon/fabric-carpet/blob/1.20.2/src/main/java/carpet/patches/EntityPlayerMPFake.java
     override fun onEquipItem(slot: EquipmentSlot, previous: ItemStack, stack: ItemStack) {
         if (!isUsingItem) super.onEquipItem(slot, previous, stack)
@@ -202,6 +201,12 @@ class FakeServerPlayer(
         try {
             super.tick()
             this.doTick()
+            if (isDeadOrDying) {
+                shakeOff()
+                if (deathTime >= 20) {
+                    removeForReal()
+                }
+            }
         } catch (ignored: NullPointerException) {
             // happens with that paper port thingy - not sure what that would fix, but hey
             // the game not gonna crash violently.
@@ -213,14 +218,6 @@ class FakeServerPlayer(
         for (passenger in indirectPassengers) {
             if (passenger is Player) passenger.stopRiding()
         }
-    }
-
-    override fun die(cause: DamageSource) {
-        shakeOff()
-        super.die(cause)
-        health = 20f
-        this.foodData = FoodData()
-        kill()
     }
 
     override fun getIpAddress(): String {

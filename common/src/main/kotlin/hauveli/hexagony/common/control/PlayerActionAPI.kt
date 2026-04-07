@@ -442,6 +442,8 @@ object PlayerActionAPI {
         // data.setDirty()
     }
 
+    // Most of this, don't have to do every tick...
+
     var counter = 0
     fun onServerTick(server: MinecraftServer) {
         val data = PlayerControlData.get(server)
@@ -458,13 +460,11 @@ object PlayerActionAPI {
                 if (e.shouldSneak) {
                     p.isShiftKeyDown = true
                 } else { p.isShiftKeyDown = false }
-                if (e.shouldMoveForwardBackward != 0f || e.shouldMoveLeftRight != 0f) {
-                    // p.input.forwardImpulse = e.shouldMoveForwardBackward
-                    customMovement(p,
-                        Vec3(
-                            e.shouldMoveLeftRight.toDouble(),
-                            0.0,
-                            e.shouldMoveForwardBackward.toDouble()))
+                if (e.shouldMoveForwardBackward != 0f) {
+                    p.zza = e.shouldMoveForwardBackward
+                }
+                if (e.shouldMoveLeftRight != 0f) {
+                    p.xxa = e.shouldMoveLeftRight
                 }
                 if (e.shouldLookUpDown != 0f) {
                     p.yRot = e.shouldLookUpDown
@@ -473,9 +473,14 @@ object PlayerActionAPI {
                     p.xRot = e.shouldLookLeftRight
                 }
                 if (e.shouldJump) {
-                    p.jumpFromGround()
+                    if (p.onGround()) {
+                        p.jumpFromGround()
+                    } else if (p.isInWater || p.isInLava) {
+                        p.setJumping(true)
+                    } else {
+                        p.setJumping(false)
+                    }
                 }
-                p.move(MoverType.SELF, p.deltaMovement.add(p.xxa.toDouble(), 0.0, p.zza.toDouble()))
 
                 if (e.shouldAttack) {
                     // p.swing is local
