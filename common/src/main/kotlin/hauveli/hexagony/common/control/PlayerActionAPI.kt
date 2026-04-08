@@ -123,6 +123,8 @@ object PlayerActionAPI {
         fun jump(bool: Boolean) {
             println("Set jump for client: ${bool}")
             e.shouldJump = bool
+            println("e: ${e}")
+            println("New value: ${e.shouldJump}")
         }
 
         fun sprint(bool: Boolean) {
@@ -369,8 +371,11 @@ object PlayerActionAPI {
     }
 
     fun onClientTick() {
+        println("Before player")
         val p = player ?: return
-        val e = PlayerControlData.myEntry
+        println("after player")
+        val e = PlayerControlData.getSelf()
+        println("ejump: ${e.shouldJump}")
         // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
         if (e.shouldMoveForwardBackward != 0f || e.shouldMoveLeftRight != 0f) {
             // p.input.forwardImpulse = e.shouldMoveForwardBackward
@@ -461,6 +466,7 @@ object PlayerActionAPI {
     // todo: store actual player in some sort of field? I don't want to call getPlayer multiple times each tick...
 
     var counter = 0
+    var changed = false
     fun onServerTick(server: MinecraftServer) {
         val data = PlayerControlData.get(server)
         counter++
@@ -527,6 +533,7 @@ object PlayerActionAPI {
                         // Hmm...
                         p.swing(p.usedItemHand) // Momentary
                         e.shouldAttack = false
+                        changed = true
                     } else if (e.shouldAttackPeriod == 0) {
                         p.swing(p.usedItemHand) // Continuous
                     } else if ((p.level().gameTime % e.shouldAttackPeriod) == 0L) {
@@ -540,6 +547,7 @@ object PlayerActionAPI {
                         // Hmm...
                         //mc.options.keyUse.isDown = true // Hmm.... I don't think I can use .isDown because it would conflict...
                         e.shouldUse = false
+                        changed = true
                     } else if (e.shouldUsePeriod == 0) {
                         //p.swing(player!!.usedItemHand) // Continuous
                     } else if ((level!!.gameTime % e.shouldUsePeriod) == 0L) {
@@ -566,6 +574,7 @@ object PlayerActionAPI {
                 if (e.shouldHotbarSlot != -1) {
                     p.inventory.selected = e.shouldHotbarSlot + 1
                     e.shouldHotbarSlot = -1 // reset, no reason to be persistent?
+                    changed = true
                 }
 
                 if (e.shouldSwapHands) {
@@ -575,6 +584,7 @@ object PlayerActionAPI {
                     p.setItemInHand(InteractionHand.OFF_HAND, tempItemStack)
                     e.shouldSwapHands = false
                     //data.setDirty()
+                    changed = true
                 }
 
                 if (e.shouldDrop) {
@@ -582,10 +592,14 @@ object PlayerActionAPI {
                     // p.updateOptions()
                     e.shouldDrop = false
                     //data.setDirty()
+                    changed = true
                 }
             }
         }
-        data.setDirty()
+        if (changed) {
+            data.setDirty()
+            changed = false
+        }
         // Todo: smarter way to mark dirty?
         // data.setDirty()
     }

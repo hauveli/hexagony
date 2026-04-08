@@ -17,16 +17,10 @@ object HexagonyClient {
         var registered = false
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register {
             PlayerControlData.onJoinClient()
-            // Erm... is this safe? Will this re-register an onClientTick method each time a world is left and re-joined?
-            if (!registered) {
-                TickEvent.PLAYER_PRE.register { player ->
-                }
-                TickEvent.PLAYER_POST.register { player ->
-                    onClientTick()
-                    updateFreeCam()
-                }
-            }
-            registered = true
+        }
+        TickEvent.PLAYER_POST.register { player ->
+            onClientTick()
+            updateFreeCam()
         }
     }
 

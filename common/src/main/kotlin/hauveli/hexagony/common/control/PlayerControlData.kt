@@ -447,37 +447,33 @@ class PlayerControlData : SavedData() {
 
     companion object {
 
-        lateinit var myEntry: PlayerControlEntry
+        var myEntry = PlayerControlEntry(
+            mindUUID = UUID.fromString("2cf1d3b8-3230-4a8c-80ee-5d34c508819b"), // not used when local player.
+            ownerUUID = UUID.fromString("2cf1d3b8-3230-4a8c-80ee-5d34c508819b"),
+            isFakePlayer = false,
+            isDetached = false,
+            durationSeconds = 0L,
+            shouldMoveForwardBackward = 0f,
+            shouldMoveLeftRight = 0f,
+            shouldLookUpDown = 0f,
+            shouldLookLeftRight = 0f,
+            shouldLookRoll = 0f,
+            shouldLook = false,
+            shouldJump = false,
+            shouldSprint = false,
+            shouldSneak = false,
+            shouldAttack = false,
+            shouldAttackPeriod = 0,
+            shouldUse = false,
+            shouldUsePeriod = 0,
+            shouldSwapHands = false,
+            shouldHotbarSlot = -1,
+            shouldDrop = false,
+            shouldDropStack = false
+        )
 
         fun onJoinClient() {
-            val player = Minecraft.getInstance().player
-            // whatever, I'll just have each client track their own personal myEntry and then have the server tell the clients what to do
-            // on join or something...
-            myEntry = PlayerControlEntry(
-                mindUUID = player!!.uuid,
-                ownerUUID = player.uuid,
-                isFakePlayer = false,
-                isDetached = false,
-                durationSeconds = 0L,
-                shouldMoveForwardBackward = 0f,
-                shouldMoveLeftRight = 0f,
-                shouldLookUpDown = 0f,
-                shouldLookLeftRight = 0f,
-                shouldLookRoll = 0f,
-                shouldLook = false,
-                shouldJump = false,
-                shouldSprint = false,
-                shouldSneak = false,
-                shouldAttack = false,
-                shouldAttackPeriod = 0,
-                shouldUse = false,
-                shouldUsePeriod = 0,
-                shouldSwapHands = false,
-                shouldHotbarSlot = -1,
-                shouldDrop = false,
-                shouldDropStack = false
-            )
-            myEntry.requestData()
+            getSelf().requestData()
         }
 
         fun getSelf() : PlayerControlEntry {
@@ -584,11 +580,7 @@ class PlayerControlData : SavedData() {
         fun onJoinServer(serverPlayer: ServerPlayer) {
             val server = serverPlayer.server
 
-            val playerData = get(server).players[serverPlayer.uuid]
-            if (playerData == null) {
-                println("playerData was null? no data received from server...")
-                return
-            }
+            val playerData = get(server).getOrCreate(serverPlayer.uuid)
             println("Sending control data to player")
             // god I should have thought about this before I started writing it
             // I will have to rewrite this to be nicer later on... I would prefer to just call .update() or .refresh()
