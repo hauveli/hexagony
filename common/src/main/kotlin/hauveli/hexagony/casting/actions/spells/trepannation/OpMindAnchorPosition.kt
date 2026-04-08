@@ -53,7 +53,7 @@ object OpMindAnchorPosition : ConstMediaAction  {
 
         if (target != null) {
             env.assertEntityInRange(target)
-            val pos = getPosition(target)
+            val pos = getPosition(target as ServerPlayer)
             if (pos != null) {
                 return listOf(Vec3Iota(pos))
             }

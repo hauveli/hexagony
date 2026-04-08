@@ -6,6 +6,7 @@ import at.petrak.hexcasting.api.casting.iota.GarbageIota
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.casting.iota.Vec3Iota
 import hauveli.hexagony.mind_anchor.MindAnchorManager
+import net.minecraft.server.level.ServerPlayer
 
 object OpDetach : ConstMediaAction {
     override val argc = 0
@@ -14,7 +15,7 @@ object OpDetach : ConstMediaAction {
         val target = env.castingEntity
         if (target != null) {
             env.assertEntityInRange(target)
-            val pos = MindAnchorManager.getPosition(target.uuid)
+            val pos = MindAnchorManager.getPosition(target as ServerPlayer)
             if (pos != null) {
                 return listOf(Vec3Iota(pos))
             }

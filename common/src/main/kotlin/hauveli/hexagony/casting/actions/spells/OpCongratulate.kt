@@ -14,6 +14,7 @@ import at.petrak.hexcasting.api.utils.asTranslatedComponent
 import hauveli.hexagony.mind_anchor.MindAnchorManager
 import hauveli.hexagony.mind_anchor.MindAnchorManager.getPosition
 import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.Vec3
@@ -25,7 +26,7 @@ object OpCongratulate : ConstMediaAction  {
     override fun execute(args: List<Iota>, env: CastingEnvironment): List<Iota> {
         val target = args.getEntity(0, argc)
         env.assertEntityInRange(target)
-        val pos = getPosition(target.uuid)
+        val pos = getPosition(target as ServerPlayer)
         if (pos == null) {
             return listOf(GarbageIota())
         } else {
