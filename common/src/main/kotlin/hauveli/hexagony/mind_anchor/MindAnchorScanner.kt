@@ -13,6 +13,10 @@ import java.util.UUID
 
 object MindAnchorScanner {
 
+    enum class MessageTypes {
+        POSITION
+    }
+
     fun scanForMindAnchor(server: MinecraftServer, mindUUID: UUID): Vec3? {
 
         for (level in server.allLevels) {

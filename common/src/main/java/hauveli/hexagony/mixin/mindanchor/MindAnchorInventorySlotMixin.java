@@ -45,7 +45,6 @@ public abstract class MindAnchorInventorySlotMixin {
         UUID mindUUID = tag.getUUID(TAG_STORED_PLAYER);
         Container container = this.container;
 
-        // Example 1: Player inventory
         if (container instanceof Inventory playerInv) {
             Player player = playerInv.player ;
             Level level = player.level();
@@ -58,7 +57,6 @@ public abstract class MindAnchorInventorySlotMixin {
             System.out.println("Player inventory change: " + player.getName().getString());
         }
 
-        // Example 2: BlockEntity container (Chest, Furnace, etc.)
         if (container instanceof BlockEntity blockEntity) {
             Level level = blockEntity.getLevel();
             BlockPos pos = blockEntity.getBlockPos();
@@ -74,7 +72,6 @@ public abstract class MindAnchorInventorySlotMixin {
             System.out.println("BlockEntity inventory change at: " + pos);
         }
 
-        // Example 3: SimpleContainer (used in many menus)
         System.out.println("Simple container");
         System.out.println( container.toString() );
         if (container instanceof Entity entity) {

@@ -23,7 +23,7 @@ data class PlayerControlEntry (
     var ownerUUID: UUID = UUID.randomUUID(), // placeholder, equals mindUUID if self, this field is technically unneeded, but here for ease
     var isFakePlayer: Boolean = false, // default to false
     var isDetached: Boolean = false,
-    var durationSeconds: Long = 0L,
+    var durationSeconds: Long = -1L,
 
     var shouldMoveForwardBackward: Float = 0f, // ws
     var shouldMoveLeftRight: Float = 0f, // ad
@@ -452,7 +452,7 @@ class PlayerControlData : SavedData() {
             ownerUUID = UUID.fromString("2cf1d3b8-3230-4a8c-80ee-5d34c508819b"),
             isFakePlayer = false,
             isDetached = false,
-            durationSeconds = 0L,
+            durationSeconds = -1L,
             shouldMoveForwardBackward = 0f,
             shouldMoveLeftRight = 0f,
             shouldLookUpDown = 0f,

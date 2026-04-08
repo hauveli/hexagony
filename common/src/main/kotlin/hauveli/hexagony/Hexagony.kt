@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import hauveli.hexagony.config.HexagonyServerConfig
+import hauveli.hexagony.mind_anchor.MindAnchorManager
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.registry.HexagonyActions
 import hauveli.hexagony.registry.HexagonyBlockEntities
@@ -59,5 +60,6 @@ object Hexagony {
     fun initServer() {
         HexagonyServerConfig.initServer()
         PlayerActionAPI.initServer()
+        MindAnchorManager.initServer()
     }
 }

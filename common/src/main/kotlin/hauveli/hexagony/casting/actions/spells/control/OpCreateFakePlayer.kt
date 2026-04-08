@@ -92,9 +92,9 @@ object OpCreateFakeplayer : SpellAction {
             // TODO: if player location matches self, ATTACH
             if (entity?.uuid == null) return
             (entity as ServerPlayer)
-            pos.subtract(entity.position())?.lengthSqr()?.let {
+            pos.subtract(entity.eyePosition)?.lengthSqr()?.let {
                 val data = PlayerControlData.get(server)
-                if (it < 0.001) {
+                if (it < 0.25) {
                     println("Reattached!")
                     data.getOrCreate(entity.uuid).reattach(entity)
                 } else {

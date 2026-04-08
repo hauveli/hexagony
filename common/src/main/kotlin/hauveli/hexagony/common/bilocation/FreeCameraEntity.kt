@@ -1,6 +1,7 @@
 package hauveli.hexagony.common.bilocation
 
 import at.petrak.hexcasting.common.lib.HexAttributes
+import hauveli.hexagony.mind_anchor.MindAnchorManager
 import hauveli.hexagony.mind_anchor.MindAnchorManager.getPosition
 import net.minecraft.client.Camera
 import net.minecraft.client.CameraType
@@ -77,7 +78,7 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             val freeCamera = freeCam ?: return
             val player = originalPlayer ?: return
             val diffPlayer = player.position().subtract(freeCamera.position())
-            val anchor = getPosition(player.uuid)
+            val anchor = MindAnchorManager.localPos
             val diffAnchor: Vec3
             if (anchor != null) {
                 diffAnchor = anchor.subtract(freeCamera.position())
@@ -142,7 +143,7 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
 
             // Usually I would like to just overwrite this value but I do not know if doing so calls extra bogus each time...
             if (mc.options.cameraType != CameraType.THIRD_PERSON_BACK)
-                mc.options.setCameraType(CameraType.THIRD_PERSON_BACK)
+                mc.options.cameraType = CameraType.THIRD_PERSON_BACK
 
             var speed = 0.5
 
@@ -204,6 +205,7 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             } else {
                 throw Error("Player existed but had no input field!")
             }
+            client.options.cameraType = CameraType.FIRST_PERSON
 
             // client.options.hideGui = false
             freeCam?.discard()

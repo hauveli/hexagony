@@ -2,6 +2,7 @@ package hauveli.hexagony.common.control
 
 // import at.petrak.hexcasting.ktxt.UseOnContext
 import at.petrak.hexcasting.common.lib.HexParticles
+import dev.architectury.event.events.common.PlayerEvent
 import dev.architectury.event.events.common.TickEvent
 import hauveli.hexagony.common.bilocation.FakeServerPlayer
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
@@ -30,6 +31,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
+import java.util.UUID
 import kotlin.math.min
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -108,7 +110,6 @@ object PlayerActionAPI {
         }
 
         fun attackPeriodic(integer: Int) {
-            println("Wow! ${integer}")
             e.shouldAttackPeriod = integer
         }
 
@@ -121,10 +122,7 @@ object PlayerActionAPI {
         }
 
         fun jump(bool: Boolean) {
-            println("Set jump for client: ${bool}")
             e.shouldJump = bool
-            println("e: ${e}")
-            println("New value: ${e.shouldJump}")
         }
 
         fun sprint(bool: Boolean) {
@@ -136,7 +134,6 @@ object PlayerActionAPI {
         }
 
         fun attack(bool: Boolean) {
-            println("Wow! ${bool}")
             e.shouldAttack = bool
         }
 
@@ -371,11 +368,8 @@ object PlayerActionAPI {
     }
 
     fun onClientTick() {
-        println("Before player")
         val p = player ?: return
-        println("after player")
         val e = PlayerControlData.getSelf()
-        println("ejump: ${e.shouldJump}")
         // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
         if (e.shouldMoveForwardBackward != 0f || e.shouldMoveLeftRight != 0f) {
             // p.input.forwardImpulse = e.shouldMoveForwardBackward
@@ -389,9 +383,7 @@ object PlayerActionAPI {
             p.yRot = e.shouldLookLeftRight
             p.xRot = e.shouldLookUpDown
         }
-        println("e.shouldJump: ${e.shouldJump}, p.onGround(): ${p.onGround()}")
         if (e.shouldJump && p.onGround()) {
-            println("Trying to jump now!!!")
             p.jumpFromGround()
         }
         if (e.shouldSprint && p.canSprint()) {
@@ -465,138 +457,135 @@ object PlayerActionAPI {
     // Todo: get PlayerControlData.get(server) and store is somewhere so it's more convenient and better
     // todo: store actual player in some sort of field? I don't want to call getPlayer multiple times each tick...
 
+    val connectedPlayers: MutableMap<UUID, Pair<ServerPlayer, PlayerControlEntry>> = mutableMapOf()
+
     var counter = 0
     var changed = false
     fun onServerTick(server: MinecraftServer) {
-        val data = PlayerControlData.get(server)
         counter++
         val currentTick = server.tickCount
-        data.players.forEach { (uuid, e) ->
-            val p = server.playerList.getPlayer(uuid)
-            if (counter % 20 == 0) {
-                println("Player: ${p.toString()}")
-                println(e.durationSeconds)
-                println(currentTick)
+        connectedPlayers.forEach { (uuid, pair) ->
+            val p = pair.component1()
+            val e = pair.component2()
+            if (currentTick % 20 == 19) {
+                e.durationSeconds--
             }
-            if (p != null) {
-                if (currentTick % 20 == 19) {
-                    e.durationSeconds--
+            if (e.durationSeconds < 10L) {
+                if (e.durationSeconds == 0L) {
+                    changed = true // Only bother writing when duration has expired?
+                    // TODO: figure out the anchor timing mechanics, then uncomment this
+                    PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
+                } else {
+                    // I'm assuming player.position() is at feet...
+                    p.serverLevel().addParticle(
+                        ParticleTypes.DRAGON_BREATH,
+                        p.position().x, p.position().y + p.bbHeight / 2, p.position().z,
+                        (0.5 - Random.nextDouble()) * 3, (0.5 - Random.nextDouble()) * 3, (0.5 - Random.nextDouble()) * 3
+                    )
                 }
-                if (e.durationSeconds < 10) {
-                    if (e.durationSeconds <= 0) {
-                        // TODO: figure out the anchor timing mechanics, then uncomment this
-                        // PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
-                    } else {
-                        // I'm assuming player.position() is at feet...
-                        p.serverLevel().addParticle(
-                            ParticleTypes.DRAGON_BREATH,
-                            p.position().x, p.position().y + p.bbHeight / 2, p.position().z,
-                            (0.5 - Random.nextDouble()) * 3, (0.5 - Random.nextDouble()) * 3, (0.5 - Random.nextDouble()) * 3
-                        )
-                    }
+            }
+            if (!p.tags.contains("FakePlayer")) return@forEach
+            // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
+            if (e.shouldSprint && p.canSprint()) {
+                p.isSprinting = true
+            } else { p.isSprinting = false }
+            if (e.shouldSneak) {
+                p.isShiftKeyDown = true
+            } else { p.isShiftKeyDown = false }
+            if (e.shouldMoveForwardBackward != 0f) {
+                p.zza = e.shouldMoveForwardBackward
+            }
+            if (e.shouldMoveLeftRight != 0f) {
+                p.xxa = e.shouldMoveLeftRight
+            }
+            if (e.shouldLookUpDown != 0f) {
+                p.yRot = e.shouldLookUpDown
+            }
+            if (e.shouldLookLeftRight != 0f) {
+                p.xRot = e.shouldLookLeftRight
+            }
+            if (e.shouldJump) {
+                if (p.onGround()) {
+                    p.jumpFromGround()
+                } else if (p.isInWater || p.isInLava) {
+                    p.setJumping(true)
+                } else {
+                    p.setJumping(false)
                 }
-                if (!p.tags.contains("FakePlayer")) return@forEach
-                // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
-                if (e.shouldSprint && p.canSprint()) {
-                    p.isSprinting = true
-                } else { p.isSprinting = false }
-                if (e.shouldSneak) {
-                    p.isShiftKeyDown = true
-                } else { p.isShiftKeyDown = false }
-                if (e.shouldMoveForwardBackward != 0f) {
-                    p.zza = e.shouldMoveForwardBackward
-                }
-                if (e.shouldMoveLeftRight != 0f) {
-                    p.xxa = e.shouldMoveLeftRight
-                }
-                if (e.shouldLookUpDown != 0f) {
-                    p.yRot = e.shouldLookUpDown
-                }
-                if (e.shouldLookLeftRight != 0f) {
-                    p.xRot = e.shouldLookLeftRight
-                }
-                if (e.shouldJump) {
-                    if (p.onGround()) {
-                        p.jumpFromGround()
-                    } else if (p.isInWater || p.isInLava) {
-                        p.setJumping(true)
-                    } else {
-                        p.setJumping(false)
-                    }
-                }
+            }
 
-                if (e.shouldAttack) {
-                    // p.swing is local
-                    if (e.shouldAttackPeriod == -1) {
+            if (e.shouldAttack) {
+                // p.swing is local
+                if (e.shouldAttackPeriod == -1) {
 
-                        // TODO: do I really want to do it this way?
-                        // Hmm...
-                        p.swing(p.usedItemHand) // Momentary
-                        e.shouldAttack = false
-                        changed = true
-                    } else if (e.shouldAttackPeriod == 0) {
-                        p.swing(p.usedItemHand) // Continuous
-                    } else if ((p.level().gameTime % e.shouldAttackPeriod) == 0L) {
-                        p.swing(p.usedItemHand) // Periodic
-                    }
-                }
-
-                if (e.shouldUse) {
-                    if (e.shouldUsePeriod == -1) {
-                        // TODO: do I really want to do it this way?
-                        // Hmm...
-                        //mc.options.keyUse.isDown = true // Hmm.... I don't think I can use .isDown because it would conflict...
-                        e.shouldUse = false
-                        changed = true
-                    } else if (e.shouldUsePeriod == 0) {
-                        //p.swing(player!!.usedItemHand) // Continuous
-                    } else if ((level!!.gameTime % e.shouldUsePeriod) == 0L) {
-
-                        // p.lookAngle
-                        /*
-                        val hit = p.gameMode. .hitResult ?: return
-                        if (hit.type != HitResult.Type.BLOCK) return
-                        hit as BlockHitResult
-                        val useContext = UseOnContext(
-                            p,
-                            InteractionHand.MAIN_HAND,
-                            hit
-                        )
-                        p.useItem.useOn(
-                            useContext
-                        )
-                         */
-                        //p.swing(player!!.usedItemHand) // Periodic
-                    }
-                }
-
-
-                if (e.shouldHotbarSlot != -1) {
-                    p.inventory.selected = e.shouldHotbarSlot + 1
-                    e.shouldHotbarSlot = -1 // reset, no reason to be persistent?
+                    // TODO: do I really want to do it this way?
+                    // Hmm...
+                    p.swing(p.usedItemHand) // Momentary
+                    e.shouldAttack = false
                     changed = true
+                } else if (e.shouldAttackPeriod == 0) {
+                    p.swing(p.usedItemHand) // Continuous
+                } else if ((p.level().gameTime % e.shouldAttackPeriod) == 0L) {
+                    p.swing(p.usedItemHand) // Periodic
                 }
+            }
 
-                if (e.shouldSwapHands) {
-                    // PlayerActionPacketAPI.swapHands(p)
-                    val tempItemStack = p.getItemInHand(InteractionHand.MAIN_HAND)
-                    p.setItemInHand(InteractionHand.MAIN_HAND, p.getItemInHand(InteractionHand.OFF_HAND))
-                    p.setItemInHand(InteractionHand.OFF_HAND, tempItemStack)
-                    e.shouldSwapHands = false
-                    //data.setDirty()
+            if (e.shouldUse) {
+                if (e.shouldUsePeriod == -1) {
+                    // TODO: do I really want to do it this way?
+                    // Hmm...
+                    //mc.options.keyUse.isDown = true // Hmm.... I don't think I can use .isDown because it would conflict...
+                    e.shouldUse = false
                     changed = true
-                }
+                } else if (e.shouldUsePeriod == 0) {
+                    //p.swing(player!!.usedItemHand) // Continuous
+                } else if ((level!!.gameTime % e.shouldUsePeriod) == 0L) {
 
-                if (e.shouldDrop) {
-                    p.drop(e.shouldDropStack)
-                    // p.updateOptions()
-                    e.shouldDrop = false
-                    //data.setDirty()
-                    changed = true
+                    // p.lookAngle
+                    /*
+                    val hit = p.gameMode. .hitResult ?: return
+                    if (hit.type != HitResult.Type.BLOCK) return
+                    hit as BlockHitResult
+                    val useContext = UseOnContext(
+                        p,
+                        InteractionHand.MAIN_HAND,
+                        hit
+                    )
+                    p.useItem.useOn(
+                        useContext
+                    )
+                     */
+                    //p.swing(player!!.usedItemHand) // Periodic
                 }
+            }
+
+
+            if (e.shouldHotbarSlot != -1) {
+                p.inventory.selected = e.shouldHotbarSlot + 1
+                e.shouldHotbarSlot = -1 // reset, no reason to be persistent?
+                changed = true
+            }
+
+            if (e.shouldSwapHands) {
+                // PlayerActionPacketAPI.swapHands(p)
+                val tempItemStack = p.getItemInHand(InteractionHand.MAIN_HAND)
+                p.setItemInHand(InteractionHand.MAIN_HAND, p.getItemInHand(InteractionHand.OFF_HAND))
+                p.setItemInHand(InteractionHand.OFF_HAND, tempItemStack)
+                e.shouldSwapHands = false
+                //data.setDirty()
+                changed = true
+            }
+
+            if (e.shouldDrop) {
+                p.drop(e.shouldDropStack)
+                // p.updateOptions()
+                e.shouldDrop = false
+                //data.setDirty()
+                changed = true
             }
         }
         if (changed) {
+            val data = PlayerControlData.get(server)
             data.setDirty()
             changed = false
         }
@@ -608,6 +597,13 @@ object PlayerActionAPI {
         TickEvent.Server.SERVER_POST.register {
                 server ->
             onServerTick(server)
+        }
+        PlayerEvent.PLAYER_JOIN.register { serverPlayer ->
+            val server = serverPlayer.server
+            connectedPlayers[serverPlayer.uuid] = Pair(serverPlayer, PlayerControlData.get(server).getOrCreate(serverPlayer.uuid))
+        }
+        PlayerEvent.PLAYER_QUIT.register { serverPlayer ->
+            connectedPlayers.remove(serverPlayer.uuid)
         }
     }
 }

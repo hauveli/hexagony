@@ -22,7 +22,7 @@
       "type": "hexcasting:pattern",
       "op_id": "hexagony:create",
       "anchor": "hexagony:create",
-      "input": "vec",
+      "input": "vec, int",
       "output": "",
       "text": "hexagony.book.patterns.spells.control_spells.create"
     },
@@ -62,7 +62,7 @@
       "type": "hexcasting:pattern",
       "op_id": "hexagony:move/jump",
       "anchor": "hexagony:move/jump",
-      "input": "player",
+      "input": "player, bool",
       "output": "",
       "text": "hexagony.book.patterns.spells.control_spells.move/jump"
     },

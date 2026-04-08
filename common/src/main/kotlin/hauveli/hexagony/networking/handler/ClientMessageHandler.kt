@@ -6,14 +6,29 @@ import hauveli.hexagony.common.control.PlayerActionAPI
 import hauveli.hexagony.common.control.PlayerActionAPI.onServerTick
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.config.HexagonyServerConfig
+import hauveli.hexagony.mind_anchor.MindAnchorManager
+import hauveli.hexagony.mind_anchor.MindAnchorScanner
 import hauveli.hexagony.networking.msg.*
 import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.world.phys.Vec3
 
 
 fun HexagonyMessageS2C.applyOnClient(ctx: PacketContext) = ctx.queue {
     when (this) {
         is MsgSyncConfigS2C -> {
             HexagonyServerConfig.onSyncConfig(serverConfig)
+        }
+
+        is MsgMindAnchorPositionS2C -> {
+            when (action) {
+                MindAnchorManager.MessageTypes.POSITION -> {
+                    MindAnchorManager.localPos = Vec3(vec.x.toDouble(), vec.y.toDouble(), vec.z.toDouble() )
+                }
+
+                else -> {
+
+                }
+            }
         }
 
         // I'm sure it's possible to do something prettier but I don't predict this part will grow in scope by much
