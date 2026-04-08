@@ -1,8 +1,10 @@
 package hauveli.hexagony
 
 import dev.architectury.event.events.common.LifecycleEvent
+import dev.architectury.event.events.common.PlayerEvent
 import hauveli.hexagony.common.control.PlayerActionAPI
 import hauveli.hexagony.common.control.PlayerControlData
+import hauveli.hexagony.common.control.PlayerControlData.Companion.onJoinServer
 import hauveli.hexagony.common.craft.GraphCraftingRecipes
 import hauveli.hexagony.common.craft.GraphRecipeLoader
 import net.minecraft.resources.ResourceLocation
@@ -49,6 +51,8 @@ object Hexagony {
             // custom weirdo recipe stuff
             GraphCraftingRecipes.init(server.overworld().level)
             GraphRecipeLoader.loadAll() // TODO: only run this once somehow...
+            // player clone and control stuff
+            PlayerControlData.init(server)
         })
     }
 

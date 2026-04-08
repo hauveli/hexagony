@@ -91,13 +91,43 @@ class FakeServerPlayer(
         PlayerControlData.removeEntry(uuid, ser) // This is important, more than actually dying important.
     }
 
-    private fun removeForReal() {
+    fun removeForReal() {
         stopTracking()
         super.disconnect()
         super.discard()
     }
 
     companion object {
+
+        fun respawnFakeClone(server: MinecraftServer, level: ServerLevel, pos: Vec3, uuid: UUID): FakeServerPlayer {
+            val clone = FakeServerPlayer(server, level, uuid)
+
+            val connection = DummyConnection(PacketFlow.SERVERBOUND)
+            val listener = DummyServerGamePacketListenerImpl(server, connection,clone)
+            connection.setListener(listener)
+            server.playerList.placeNewPlayer(
+                connection,
+                clone
+            )
+            // clone.getAttribute(Attributes.)
+
+            // fuck creative mode
+            clone.setGameMode(GameType.SURVIVAL)
+            clone.stopRiding()
+            clone.tags.add("FakePlayer") // I don't know if there's a better way to get whether a ServerPlayer is fake or not
+
+            clone.setPos(pos)
+
+            server.playerList
+                .broadcastAll(ClientboundTeleportEntityPacket( clone )) //instance.dimension);
+            server.playerList.broadcastAll(
+                ClientboundRotateHeadPacket(clone, (clone.yHeadRot * 256 / 360).toInt().toByte()),
+                level.dimension()
+            )
+
+            return clone
+        }
+
         fun spawnFakeClone(original: ServerPlayer, pos: Vec3, uuid: UUID): FakeServerPlayer {
             val server = original.server ?: throw IllegalStateException("Server null")
             val level = original.level() as ServerLevel

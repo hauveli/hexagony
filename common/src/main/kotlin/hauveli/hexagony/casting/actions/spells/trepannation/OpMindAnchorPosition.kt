@@ -46,7 +46,6 @@ object OpMindAnchorPosition : ConstMediaAction  {
             val player = mc.player
             println("Hmm...")
             if (player != null) {
-                player.input.jumping = true
                 println("Erm...?")
             }
         }

@@ -1,6 +1,7 @@
 package hauveli.hexagony.common.bilocation
 
 import at.petrak.hexcasting.common.lib.HexAttributes
+import hauveli.hexagony.mind_anchor.MindAnchorManager.getPosition
 import net.minecraft.client.Camera
 import net.minecraft.client.CameraType
 import net.minecraft.client.ClientRecipeBook
@@ -75,13 +76,34 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
         fun moveTowardsBodyIfNeeded() {
             val freeCamera = freeCam ?: return
             val player = originalPlayer ?: return
-            val diff = player.position().subtract(freeCamera.position())
+            val diffPlayer = player.position().subtract(freeCamera.position())
+            val anchor = getPosition(player.uuid)
+            val diffAnchor: Vec3
+            if (anchor != null) {
+                diffAnchor = anchor.subtract(freeCamera.position())
+            } else {
+                diffAnchor = diffPlayer
+            }
+            // TODO: let it move towards sentinel?
+            // TODO: make it move towards mind anchor?
+            // probably make it move to mind anchor actually...
+            val diffPlayerSqr = diffPlayer.lengthSqr()
+            val diffAnchorSqr = diffAnchor.lengthSqr()
+            val target: Vec3
+            if (diffAnchorSqr <= diffPlayerSqr) {
+                target = diffAnchor
+            } else {
+                target = diffPlayer
+            }
+
             val ambitAttr = player.getAttribute(HexAttributes.AMBIT_RADIUS) ?: return
-            val ambit = ambitAttr.value
-            val ambit2 = ambit * ambit
-            if (diff.lengthSqr() < ambit2) return
-            val mult = (1 - ambit2 / diff.lengthSqr())
-            freeCamera.setDeltaMovement(diff.x * mult, diff.y * mult, diff.z * mult)
+            //val ambitSentAttr = player.getAttribute(HexAttributes.SENTINEL_RADIUS) ?: return
+            val ambit = ambitAttr.value * ambitAttr.value
+            //val sentAmbit = ambitSentAttr.value * ambitSentAttr.value
+            if (target.lengthSqr() < ambit) return // within that ambit
+            //if (diffSqr < sentAmbit) return
+            val mult = (1 - ambit / target.lengthSqr())
+            freeCamera.setDeltaMovement(target.x * mult, target.y * mult, target.z * mult)
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
         }
 

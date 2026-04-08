@@ -1,7 +1,9 @@
 package hauveli.hexagony.networking.handler
 
+import dev.architectury.event.events.common.TickEvent
 import dev.architectury.networking.NetworkManager.PacketContext
 import hauveli.hexagony.common.control.PlayerActionAPI
+import hauveli.hexagony.common.control.PlayerActionAPI.onServerTick
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.config.HexagonyServerConfig
 import hauveli.hexagony.networking.msg.*
@@ -28,6 +30,7 @@ fun HexagonyMessageS2C.applyOnClient(ctx: PacketContext) = ctx.queue {
                     PlayerActionAPI.Client.stop(bool)
                 }
                 PlayerControlData.MessageTypeBoolean.SHOULD_JUMP -> {
+                    println("Calling client.jump!")
                     PlayerActionAPI.Client.jump(bool)
                 }
                 PlayerControlData.MessageTypeBoolean.SHOULD_SPRINT -> {

@@ -1,11 +1,8 @@
 package hauveli.hexagony.common.control
 
-import com.mojang.authlib.GameProfile
-import dev.architectury.event.events.common.LifecycleEvent
-import hauveli.hexagony.common.bilocation.FakeServerPlayer
-import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.spawnFakeClone
-import hauveli.hexagony.common.bilocation.FreeCameraEntity
+import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.respawnFakeClone
 import hauveli.hexagony.networking.HexagonyNetworking
+import hauveli.hexagony.networking.msg.MsgPlayerControlBooleanC2S
 import hauveli.hexagony.networking.msg.MsgPlayerControlBooleanS2C
 import hauveli.hexagony.networking.msg.MsgPlayerControlFloatS2C
 import hauveli.hexagony.networking.msg.MsgPlayerControlIntegerS2C
@@ -15,8 +12,6 @@ import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.level.GameType
 import java.util.UUID
 
 
@@ -27,6 +22,8 @@ data class PlayerControlEntry (
     val mindUUID: UUID, // lol
     var ownerUUID: UUID = UUID.randomUUID(), // placeholder, equals mindUUID if self, this field is technically unneeded, but here for ease
     var isFakePlayer: Boolean = false, // default to false
+    var isDetached: Boolean = false,
+    var durationSeconds: Long = 0L,
 
     var shouldMoveForwardBackward: Float = 0f, // ws
     var shouldMoveLeftRight: Float = 0f, // ad
@@ -50,8 +47,16 @@ data class PlayerControlEntry (
     var shouldDrop: Boolean = false,
     var shouldDropStack: Boolean = false
 ) {
+
     fun stop(serverPlayer: ServerPlayer) {
+        // TODO:
+        // I've considered calling removeEntry() here, but I think a better solution
+        // would be to populate the list of things to run with LifecycleEvent.player_join and remove with player_quit
+        // because the homunculi DIE when the media runs out, this should in general eventually have
+        // the homunculi run out of power and despawn
         if (serverPlayer.tags.contains("FakePlayer")) {
+            isFakePlayer = true
+            isDetached = false
             shouldMoveForwardBackward = 0f
             shouldMoveLeftRight = 0f
             shouldLookUpDown = 0f
@@ -80,9 +85,23 @@ data class PlayerControlEntry (
         }
     }
 
+    fun duration(duration: Long) {
+        durationSeconds = duration
+    }
+
+    fun requestData() {
+        HexagonyNetworking.CHANNEL.sendToServer(
+            MsgPlayerControlBooleanC2S(
+                PlayerControlData.MessageTypeSimple.DATA_REQUEST,
+                true
+            )
+        )
+    }
+
     fun detach(serverPlayer: ServerPlayer) {
         if (serverPlayer.tags.contains("FakePlayer")) {
-            serverPlayer.kill()
+            serverPlayer.hurt(serverPlayer.damageSources().genericKill(),
+                (serverPlayer.maxHealth+serverPlayer.absorptionAmount) * 2)
         } else {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
@@ -104,21 +123,24 @@ data class PlayerControlEntry (
         }
     }
 
-    fun jump(serverPlayer: ServerPlayer) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldJump = true
-        } else {
+    fun jump(serverPlayer: ServerPlayer, jump: Boolean) {
+        println("Set jump: ${jump}")
+        shouldJump = jump
+        if (!serverPlayer.tags.contains("FakePlayer")) {
+            println("Sending jump message to client!")
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
-                MsgPlayerControlBooleanS2C(PlayerControlData.MessageTypeBoolean.SHOULD_JUMP, true)
+                MsgPlayerControlBooleanS2C(
+                    PlayerControlData.MessageTypeBoolean.SHOULD_JUMP,
+                    jump
+                )
             )
         }
     }
 
     fun sprint(serverPlayer: ServerPlayer,sprint: Boolean) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldSprint = sprint
-        } else {
+        shouldSprint = sprint
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlBooleanS2C(
@@ -130,9 +152,8 @@ data class PlayerControlEntry (
     }
 
     fun sneak(serverPlayer: ServerPlayer,sneak: Boolean) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldSneak = sneak
-        } else {
+        shouldSneak = sneak
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlBooleanS2C(
@@ -144,9 +165,8 @@ data class PlayerControlEntry (
     }
 
     fun attackOnce(serverPlayer: ServerPlayer) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldAttack = true
-        } else {
+        shouldAttack = true
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlBooleanS2C(
@@ -159,9 +179,8 @@ data class PlayerControlEntry (
 
     fun attackPeriodic(serverPlayer: ServerPlayer, period: Int) {
         this.attackOnce(serverPlayer)
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldAttackPeriod = period
-        } else {
+        shouldAttackPeriod = period
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlIntegerS2C(
@@ -177,9 +196,8 @@ data class PlayerControlEntry (
     }
 
     fun useOnce(serverPlayer: ServerPlayer) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldUse = true
-        } else {
+        shouldUse = true
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlBooleanS2C(
@@ -192,9 +210,8 @@ data class PlayerControlEntry (
 
     fun usePeriodic(serverPlayer: ServerPlayer, period: Int) {
         this.useOnce(serverPlayer)
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldUsePeriod = period
-        } else {
+        shouldUsePeriod = period
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlIntegerS2C(
@@ -214,9 +231,8 @@ data class PlayerControlEntry (
     // can implement this, but realistically, if shouldUse or shouldAttack are bound, we have hands, and should be allowed to do this
     // only needed if shouldAttack or shouldUse are NOT bound.
     fun hotbar(serverPlayer: ServerPlayer,number: Int) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldHotbarSlot = number
-        } else {
+        shouldHotbarSlot = number
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlIntegerS2C(
@@ -228,9 +244,8 @@ data class PlayerControlEntry (
     }
 
     fun swapHands(serverPlayer: ServerPlayer) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldSwapHands = true
-        } else {
+        shouldSwapHands = true
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlBooleanS2C(
@@ -242,9 +257,8 @@ data class PlayerControlEntry (
     }
 
     fun moveForwardBackward(serverPlayer: ServerPlayer, walking: Float) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldMoveForwardBackward = walking
-        } else {
+        shouldMoveForwardBackward = walking
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlFloatS2C(
@@ -256,9 +270,8 @@ data class PlayerControlEntry (
     }
 
     fun moveLeftRight(serverPlayer: ServerPlayer, walking: Float) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldMoveLeftRight = walking
-        } else {
+        shouldMoveLeftRight = walking
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlFloatS2C(
@@ -270,9 +283,8 @@ data class PlayerControlEntry (
     }
 
     fun lookForced(serverPlayer: ServerPlayer) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldLook = true
-        } else {
+        shouldLook = true
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlBooleanS2C(
@@ -286,10 +298,9 @@ data class PlayerControlEntry (
     // TODO: pitch yaw roll independently
     fun look(serverPlayer: ServerPlayer, pitch: Float, yaw: Float) {
         this.lookForced(serverPlayer)
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldLookUpDown = pitch
-            shouldLookLeftRight = yaw
-        } else {
+        shouldLookUpDown = pitch
+        shouldLookLeftRight = yaw
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlFloatS2C(
@@ -308,9 +319,8 @@ data class PlayerControlEntry (
     }
 
     fun dropStack(serverPlayer: ServerPlayer) {
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldDropStack = true
-        } else {
+        shouldDropStack = true
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlBooleanS2C(
@@ -322,11 +332,10 @@ data class PlayerControlEntry (
     }
 
     fun drop(serverPlayer: ServerPlayer, entireStack: Boolean) {
+        shouldDrop = true
         if (entireStack)
             this.dropStack(serverPlayer) // Todo: actually just call it in the other order...
-        if (serverPlayer.tags.contains("FakePlayer")) {
-            shouldDrop = true
-        } else {
+        if (!serverPlayer.tags.contains("FakePlayer")) {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlBooleanS2C(
@@ -338,16 +347,20 @@ data class PlayerControlEntry (
     }
 
     fun setFake(bool: Boolean) {
-        isFakePlayer = bool
+        isFakePlayer = bool // never matters on client
     }
 
     fun setOwner(uuid: UUID) {
-        ownerUUID = uuid
+        ownerUUID = uuid // never matters on client
     }
 }
 
 class PlayerControlData : SavedData() {
     // TODO: all prefixed with should, I should remove that...
+    enum class MessageTypeSimple {
+        DATA_REQUEST
+    }
+
     enum class MessageTypeBoolean {
         SHOULD_DETACH,
         SHOULD_REATTACH,
@@ -398,6 +411,8 @@ class PlayerControlData : SavedData() {
             e.putUUID("mindUUID", entry.mindUUID)
             e.putUUID("ownerUUID", entry.ownerUUID)
             e.putBoolean("isFakePlayer", entry.isFakePlayer)
+            e.putBoolean("isDetached", entry.isDetached)
+            e.putLong("durationSeconds", entry.durationSeconds)
 
             e.putFloat("shouldMoveForwardBackward", entry.shouldMoveForwardBackward)
             e.putFloat("shouldMoveLeftRight", entry.shouldMoveLeftRight)
@@ -434,7 +449,7 @@ class PlayerControlData : SavedData() {
 
         lateinit var myEntry: PlayerControlEntry
 
-        fun onJoin() {
+        fun onJoinClient() {
             val player = Minecraft.getInstance().player
             // whatever, I'll just have each client track their own personal myEntry and then have the server tell the clients what to do
             // on join or something...
@@ -442,6 +457,8 @@ class PlayerControlData : SavedData() {
                 mindUUID = player!!.uuid,
                 ownerUUID = player.uuid,
                 isFakePlayer = false,
+                isDetached = false,
+                durationSeconds = 0L,
                 shouldMoveForwardBackward = 0f,
                 shouldMoveLeftRight = 0f,
                 shouldLookUpDown = 0f,
@@ -460,6 +477,7 @@ class PlayerControlData : SavedData() {
                 shouldDrop = false,
                 shouldDropStack = false
             )
+            myEntry.requestData()
         }
 
         fun getSelf() : PlayerControlEntry {
@@ -491,6 +509,9 @@ class PlayerControlData : SavedData() {
                 val e = list.getCompound(i)
 
                 val uuid = e.getUUID("mindUUID")
+                val ownerUuid = e.getUUID("ownerUUID")
+                val isFakePlayer = e.getBoolean("isFakePlayer")
+                // Hmmm... I'm not sure how I'd like to handle non-logged in players....
 
                 // todo: is the stored data in bytes? is that why it can't just unpack it in a smart automatic way?
                 val playerEntry =
@@ -498,6 +519,8 @@ class PlayerControlData : SavedData() {
                         uuid,
                         e.getUUID("ownerUUID"),
                         e.getBoolean("isFakePlayer"),
+                        e.getBoolean("isDetached"),
+                        e.getLong("durationSeconds"),
                         e.getFloat("shouldMoveForwardBackward"),
                         e.getFloat("shouldMoveLeftRight"),
                         e.getFloat("shouldLookUpDown"),
@@ -516,33 +539,104 @@ class PlayerControlData : SavedData() {
                         e.getBoolean("shouldDrop"),
                         e.getBoolean("shouldDropStack"),
                     )
-                if (playerEntry.isFakePlayer) {
-                    serverInit(uuid)
-                }
                 data.players[uuid] = playerEntry
             }
 
             return data
         }
 
-        fun serverInit(uuid: UUID) {
+        fun init(server: MinecraftServer) {
             println("Registering event...")
-            LifecycleEvent.SERVER_STARTING.register {
-                server ->
-                val player = ServerPlayer(
-                    server,
-                    server.overworld(),
-                    GameProfile(uuid, "hexagony_report2dev")
-                )
-                val actualPlayer = server.playerList.load(player) ?: return@register
-                println("past player")
-                val pos = actualPlayer.getList("Pos",6)
-                val x = pos.getDouble(0)
-                val y = pos.getDouble(1)
-                val z = pos.getDouble(2)
-                val fake = spawnFakeClone(player, Vec3(x,y,z), player.uuid)
-                // fake.addTag()
-                println("Respawned fake clone: ${fake}")
+            val data = this.get(server)
+            for (pairData in data.players) {
+                val playerDataEntry = pairData.component2()
+                if (playerDataEntry.isFakePlayer) {
+                    println("before place player")
+                    val uuid = pairData.component1()
+                    placeSavedPlayerInWorld(server, uuid)
+                }
+            }
+        }
+
+        fun placeSavedPlayerInWorld(server: MinecraftServer, uuid: UUID) {
+            println("Before profile")
+            val profile = server.profileCache?.get(uuid)?.get() ?: return
+            println("Before tempplayer")
+            val tempPlayer = ServerPlayer(server, server.overworld(), profile)
+            println("Before serverLevel")
+            val level = tempPlayer.serverLevel()
+            val playerData = server.playerList.load(tempPlayer)
+            tempPlayer.disconnect()
+            tempPlayer.discard()
+            println("past player")
+
+            val pos = playerData?.getList("Pos", 6) ?: return
+            val x = pos.getDouble(0)
+            val y = pos.getDouble(1)
+            val z = pos.getDouble(2)
+            val fake = respawnFakeClone(server, level, Vec3(x, y, z), uuid)
+            // fake.addTag()
+            tempPlayer.discard()
+            println("Respawned fake clone: ${fake}")
+        }
+
+        // TODO: this sucks, do something better, only doing this because I want it working (at all) so I can playtest
+        fun onJoinServer(serverPlayer: ServerPlayer) {
+            val server = serverPlayer.server
+
+            val playerData = get(server).players[serverPlayer.uuid]
+            if (playerData == null) {
+                println("playerData was null? no data received from server...")
+                return
+            }
+            println("Sending control data to player")
+            // god I should have thought about this before I started writing it
+            // I will have to rewrite this to be nicer later on... I would prefer to just call .update() or .refresh()
+
+            // duration is tracked by server...
+            // playerData.duration(playerData.durationSeconds)
+            if (playerData.isDetached) {
+                playerData.detach(serverPlayer)
+            }
+
+            if (playerData.shouldUse) {
+                playerData.usePeriodic(serverPlayer, playerData.shouldUsePeriod)
+            }
+            if (playerData.shouldAttack) {
+                playerData.usePeriodic(serverPlayer, playerData.shouldAttackPeriod)
+            }
+
+            if (playerData.shouldJump) {
+                playerData.jump(serverPlayer, playerData.shouldJump)
+            }
+            if (playerData.shouldSprint) {
+                playerData.sprint(serverPlayer, playerData.shouldSprint)
+            }
+            if (playerData.shouldSneak) {
+                playerData.sneak(serverPlayer, playerData.shouldSneak)
+            }
+
+            if (playerData.shouldMoveForwardBackward != 0f) {
+                playerData.moveForwardBackward(serverPlayer, playerData.shouldMoveForwardBackward)
+            }
+            if (playerData.shouldMoveLeftRight != 0f) {
+                playerData.moveLeftRight(serverPlayer, playerData.shouldMoveLeftRight)
+            }
+
+            if (playerData.shouldLook) {
+                playerData.look(serverPlayer, playerData.shouldLookUpDown, playerData.shouldLookLeftRight)
+            }
+
+            if (playerData.shouldDrop) {
+                playerData.drop(serverPlayer, playerData.shouldDropStack)
+            }
+
+            if (playerData.shouldHotbarSlot != -1) {
+                playerData.hotbar(serverPlayer, playerData.shouldHotbarSlot)
+            }
+
+            if (playerData.shouldSwapHands) {
+                playerData.swapHands(serverPlayer)
             }
         }
     }

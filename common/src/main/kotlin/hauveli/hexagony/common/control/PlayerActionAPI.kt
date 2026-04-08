@@ -1,16 +1,23 @@
 package hauveli.hexagony.common.control
 
 // import at.petrak.hexcasting.ktxt.UseOnContext
+import at.petrak.hexcasting.common.lib.HexParticles
 import dev.architectury.event.events.common.TickEvent
+import hauveli.hexagony.common.bilocation.FakeServerPlayer
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
 import net.minecraft.client.Minecraft
+import net.minecraft.client.particle.Particle
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.tags.FluidTags
 import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.damagesource.DamageSources
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.MoverType
@@ -25,6 +32,7 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import kotlin.math.min
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 
 object PlayerActionAPI {
@@ -113,6 +121,7 @@ object PlayerActionAPI {
         }
 
         fun jump(bool: Boolean) {
+            println("Set jump for client: ${bool}")
             e.shouldJump = bool
         }
 
@@ -204,7 +213,7 @@ object PlayerActionAPI {
         var velocity_old = 0.0
     }
 
-    val SPEED_MULT = 0.6
+    val SPEED_MULT = 0.45
 
     private fun customMovement(entity: LivingEntity, input: Vec3) {
         val speed: Float = entity.speed //.getAttributeValue(Attributes.MOVEMENT_SPEED)
@@ -228,13 +237,14 @@ object PlayerActionAPI {
         val viscosityMult = if (entity.isInWater || entity.isInLava) 0.3 else 1.0
         val groundAccel = if (entity.onGround()) {
             SPEED_MULT * (entity.level().getBlockState(entity.blockPosition().below()).block.friction * 0.91)
+        } else if (entity.isSprinting) {
+            0.075
         } else {
-            0.15
+            0.045 // decelerate a lot in the air if not sprintjumping
         }
 
         // Maximum length of rotated must be 4 or 5 ish? 3 works well enough for the feel of it
         val finalMult = min(sneakMult * sprintMult * groundAccel * viscosityMult, 3.0)
-        println(finalMult)
         entity.addDeltaMovement(rotated.multiply(finalMult,1.0,finalMult))
     }
 
@@ -374,12 +384,15 @@ object PlayerActionAPI {
             p.yRot = e.shouldLookLeftRight
             p.xRot = e.shouldLookUpDown
         }
+        println("e.shouldJump: ${e.shouldJump}, p.onGround(): ${p.onGround()}")
         if (e.shouldJump && p.onGround()) {
-            player?.jumpFromGround()
+            println("Trying to jump now!!!")
+            p.jumpFromGround()
         }
         if (e.shouldSprint && p.canSprint()) {
-            if (!p.isSprinting)
+            if (!p.isSprinting) {
                 p.isSprinting = true
+            }
         }
         if (e.shouldSneak) {
             // p.isCrouching
@@ -444,14 +457,38 @@ object PlayerActionAPI {
 
     // Most of this, don't have to do every tick...
 
+    // Todo: get PlayerControlData.get(server) and store is somewhere so it's more convenient and better
+    // todo: store actual player in some sort of field? I don't want to call getPlayer multiple times each tick...
+
     var counter = 0
     fun onServerTick(server: MinecraftServer) {
         val data = PlayerControlData.get(server)
         counter++
+        val currentTick = server.tickCount
         data.players.forEach { (uuid, e) ->
             val p = server.playerList.getPlayer(uuid)
-            if (counter % 20 == 0) println("Player: ${p.toString()}")
+            if (counter % 20 == 0) {
+                println("Player: ${p.toString()}")
+                println(e.durationSeconds)
+                println(currentTick)
+            }
             if (p != null) {
+                if (currentTick % 20 == 19) {
+                    e.durationSeconds--
+                }
+                if (e.durationSeconds < 10) {
+                    if (e.durationSeconds <= 0) {
+                        // TODO: figure out the anchor timing mechanics, then uncomment this
+                        // PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
+                    } else {
+                        // I'm assuming player.position() is at feet...
+                        p.serverLevel().addParticle(
+                            ParticleTypes.DRAGON_BREATH,
+                            p.position().x, p.position().y + p.bbHeight / 2, p.position().z,
+                            (0.5 - Random.nextDouble()) * 3, (0.5 - Random.nextDouble()) * 3, (0.5 - Random.nextDouble()) * 3
+                        )
+                    }
+                }
                 if (!p.tags.contains("FakePlayer")) return@forEach
                 // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
                 if (e.shouldSprint && p.canSprint()) {

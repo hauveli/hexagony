@@ -19,7 +19,7 @@ object OpWalkAMileInTheseLouisVuittons : SpellAction {
         get() = 2
 
     override fun executeWithUserdata(
-        args: kotlin.collections.List<Iota>,
+        args: List<Iota>,
         env: CastingEnvironment,
         tags: CompoundTag
     ): SpellAction.Result {
@@ -41,7 +41,7 @@ object OpWalkAMileInTheseLouisVuittons : SpellAction {
 
         val walking = args.getInt(1, argc)
         return SpellAction.Result(
-            OpWalkAMileInTheseLouisVuittons.Spell(target, walking),
+            Spell(target, walking),
             MediaConstants.DUST_UNIT / 10,
             listOf(burst(target.position().add(0.0, target.getEyeHeight() / 2.0, 0.0), 1.0, 10)),
             1
@@ -57,7 +57,7 @@ object OpWalkAMileInTheseLouisVuittons : SpellAction {
     }
 
     override fun execute(
-        args: kotlin.collections.List<Iota>,
+        args: List<Iota>,
         castingEnvironment: CastingEnvironment
     ): SpellAction.Result {
         throw IllegalStateException()

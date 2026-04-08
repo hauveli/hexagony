@@ -5,6 +5,7 @@ import at.petrak.hexcasting.api.casting.RenderedSpell
 import at.petrak.hexcasting.api.casting.castables.SpellAction
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
+import at.petrak.hexcasting.api.casting.getInt
 import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
@@ -16,13 +17,14 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 import java.util.UUID
+import kotlin.math.pow
 
 object OpCreateFakeplayer : SpellAction {
     override val argc: Int
-        get() = 1 // number of arguments should be 1 if the input is EntityIota
+        get() = 2 // number of arguments should be 1 if the input is EntityIota
 
     override fun executeWithUserdata(
-        args: kotlin.collections.List<Iota>,
+        args: List<Iota>,
         env: CastingEnvironment,
         tags: CompoundTag
     ): SpellAction.Result {
@@ -43,6 +45,7 @@ object OpCreateFakeplayer : SpellAction {
         }
          */
 
+        val duration = args.getInt(1, argc)
         // val username: String = FakeplayerUtils.getFakeName(FakeplayerUtils.getUsernameString(caster as ServerPlayer?))
         val server = env.getWorld().getServer()
         /*
@@ -53,12 +56,13 @@ object OpCreateFakeplayer : SpellAction {
         }
          */
 
-
         return SpellAction.Result(
-            OpCreateFakeplayer.Spell(pos, caster),
-            MediaConstants.CRYSTAL_UNIT,
+            Spell(pos, caster, duration.toLong()),
+            (MediaConstants.CRYSTAL_UNIT +
+                    MediaConstants.DUST_UNIT * (1 + duration / 3600).toDouble().pow(2.0) // power 2, can not be negative
+                    ).toLong(),
             listOf(burst(pos, 1.0, 10)),
-            1
+            2
         )
     }
 
@@ -71,13 +75,13 @@ object OpCreateFakeplayer : SpellAction {
     }
 
     override fun execute(
-        args: kotlin.collections.List<Iota>,
+        args: List<Iota>,
         castingEnvironment: CastingEnvironment
     ): SpellAction.Result {
         throw IllegalStateException()
     }
 
-    private class Spell(private val pos: Vec3, private val entity: Entity?) : RenderedSpell {
+    private class Spell(private val pos: Vec3, private val entity: Entity?, val duration: Long) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
 
             val server = env.getWorld().getServer()
@@ -100,6 +104,7 @@ object OpCreateFakeplayer : SpellAction {
                     fakePlayerEntry.setFake(true)
                     fakePlayerEntry.setOwner(entity.uuid)
                     fakePlayer.addTag(entity.uuid.toString()) // hmm.... Might not be needed if persistent?
+                    fakePlayerEntry.duration(duration)
                     data.setDirty()
                 }
             }
