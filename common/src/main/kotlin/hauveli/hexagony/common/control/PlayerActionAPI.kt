@@ -6,6 +6,7 @@ import dev.architectury.event.events.common.PlayerEvent
 import dev.architectury.event.events.common.TickEvent
 import hauveli.hexagony.common.bilocation.FakeServerPlayer
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
+import hauveli.hexagony.mind_anchor.MindAnchorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.Particle
 import net.minecraft.client.player.LocalPlayer
@@ -469,6 +470,12 @@ object PlayerActionAPI {
             val e = pair.component2()
             if (currentTick % 20 == 19) {
                 e.durationSeconds--
+                if (e.isDetached) {
+                    // update position at least once a second...?
+                    MindAnchorManager.getPosition(p)?.let {
+                        MindAnchorManager.forwardToPlayer(p, it)
+                    }
+                }
             }
             if (e.durationSeconds < 10L) {
                 if (e.durationSeconds == 0L) {
