@@ -105,17 +105,30 @@ object OpCreateFakeplayer : SpellAction {
     }
 
     fun swapHomunculusAndPlayer(realPlayer: ServerPlayer, homunculus: ServerPlayer) {
-        val targetPos = homunculus.position()
+        val targetLevel = homunculus.serverLevel()
+        val targetX = homunculus.position().x
+        val targetY = homunculus.position().y
+        val targetZ = homunculus.position().z
         val targetLook = homunculus.lookAngle
         val targetXRot = homunculus.xRot
         val targetYRot = homunculus.yRot
-        homunculus.setPos(realPlayer.position())
-        homunculus.xRot = realPlayer.xRot
-        homunculus.yRot = realPlayer.yRot
+        homunculus.teleportTo(
+            realPlayer.serverLevel(),
+            realPlayer.position().x,
+            realPlayer.position().y,
+            realPlayer.position().z,
+            realPlayer.xRot,
+            realPlayer.yRot
+        )
 
-        realPlayer.setPos(targetPos)
-        realPlayer.xRot = targetXRot
-        realPlayer.yRot = targetYRot
+        realPlayer.teleportTo(
+            targetLevel,
+            targetX,
+            targetY,
+            targetZ,
+            targetXRot,
+            targetYRot
+        )
     }
 
     private class Spell(private val pos: Vec3, private val entity: Entity?, val duration: Long) : RenderedSpell {
