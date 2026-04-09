@@ -17,6 +17,17 @@
 
   hexagony: {
     book: {
+      "craft": {
+        "1": "Deceptively tricky. This spell has nearly driven me mad trying to figure it out. It behaves stupidly simple yet preparing the conditions for the spell to work can become a chore. I placed my materials for a chain, one iron ingot in the center and two iron nuggets at opposite sides. And it worked, no matter the ordering in my list.",
+        "2": "Knowing that their relative positions in the real world matter, I tried to make a pickaxe. Same as before, and with caution to ensure the raw materials were positioned as any good crafty miner might, roughly in the shape of a pickaxe. This time, I got an axe...",
+        "3": "Finally! By precisely measuring out several holes and throwing my materials into them, I was able to construct a pickaxe, equal to that of any smith!",
+        "4": "Looking at the fruits of my casting, I'm reminded of an old arcane painting without direction, yet with structure... But why was there a cleric impetus $(br)and an empty impetus?"
+      },
+      "bilocation": {
+        page: {
+          "1": "I've done it. I can, even with the anchor holding me back at times, separate my mind from my body and navigate the world freely... And something is wrong, the ground seems... hollow."
+        }
+      },
       "mind_anchor": {
         page: {
           "1": "I finally understand now blablabla lorem ipsum dolor sit amet and baddabing baddaboom I have no body and I must exist"
@@ -31,6 +42,10 @@
       },
       patterns: {
         spells: {
+          bilocation_spells: {
+            "create/trepanned": "The only way I can return to the prison that is a mortal body. I must own the body at the given coordinates for the transfer to succeed. Unlike the cost associated with Create Creature, costs just one charged Amethyst.",
+            "destroy/trepanned" :  "I can shatter the prison holding my mind and free myself of my mortal shell, for as long as my anchor has media. The cost is one shard."
+          },
           mind_anchor_spells: {
             "": "Mind Anchor Spells",
             "mind_anchor/pos": "Get the current position of your mind anchor. Returns garbage if not found.",
@@ -40,9 +55,8 @@
           control_spells: {
             "": "Control Spells",
             "move/stopall" : "An important signal! Stops actions being performed by the creature, continuous and otherwise. Conveniently, an exception to the cost rule facing this page; It's free to cast.",
-            "create": "Bids the creature to the given location, for as many seconds as the integer I provide. Costs a charged amethyst, plus units of Amethyst Dust equal to the square of the duration in hours, starting from 1. These creatures are woefully short-lived...",
-            "destroy" :  "Banishes the creature, making it disappear until I call it back. One Shard.",
-            "destroy/trepanned" :  "I can shatter the barrier to my mind and free myself of my mortal shell, for as long as my anchor has media. Unlike the cost associated with Create Creature, the cost is constant.",
+            "create": "Bids the creature to the given location, for as many seconds as the integer I provide. Costs a charged amethyst, plus units of Amethyst Dust equal to the square of the duration in hours, starting from 1.",
+            "destroy" :  "Banishes the creature, making it disappear until I call it back. One Shard. These creatures are woefully short-lived as is...",
             "move/walk" : "Instructs the creature to walk along its facing. A 1 beckons it forth, and a -1 backward. Interestingly, a 0 causes it to stop, as if I had halted it.",
             "move/strafe" :  "As previous, but along strafing. A 1, then, beckons it to the left, and a -1 to the right.",
             "move/look" : "Instructs the creature to look in a direction. The vector can be of any length. Seems to work on myself in the eyes of Nature, even though I don't feel or see the change.",
@@ -53,7 +67,7 @@
             "move/attack" :  "Given 0, uses it continuously, such as eating or channeling, or in the case of Attack, mining. Given -1, uses or attacks once and stops.",
             "move/hotbar" : "Takes a number from 1 to 9 inclusive, and instructs to select that slot in its toolbar. Works on myself, but may interrupt things like drawing patterns.",
             "move/swap_hands" :  "Instructs the creature to hand its mainhand item into its offhand, and vice versa. As previous, in its function to myself.",
-            "move/drop" : "Instructs the creature to drop the item or stack of items it holds in its main hand. Can even yank an item from my own hand, as I'm so familiar with."
+            "move/drop" : "Instructs the creature to drop the item if given False or stack of items it holds in its main hand if given True. Can even yank an item from my own hand, as I'm so familiar with."
           }
         },
         great_spells: {
@@ -61,6 +75,13 @@
             "": "Dummy Great Spells",
             "congratulate/great": "Same as $(l:patterns/spells/dummy_spells#hexagony:congratulate)$(action)Congratulate/$, but as a great spell.",
           },
+          control_great_spells: {
+            "": "",
+          },
+          craft_great_spells: {
+            "": "Crafting Great Spells",
+            "craft": "I can barely wrap my head around this one... It seems to draw a tree, starting at the center-most item in the list, it then draws lines to the nearest item, or items if they are equidistant..."
+          }
         },
       },
     },
@@ -69,11 +90,15 @@
   hexcasting: {
     action: {
       "hexagony:": {
-        "mind_anchor/pos": "Locate Mind Anchor",
+        "craft": "Craft Item",
+        "mind_anchor/pos": "Mind Anchor Location",
+        "mind_anchor/state": "Mind Anchor State",
+        "mind_anchor/signal": "Mind Anchor Signal Strength",
+        "mind_anchor/media": "Mind Anchor Media",
         "congratulate/great": "Great Congrats!",
-        "create": "Summon Creature",
-        "destroy": "Banish Creature",
-        "move/stopall": "Halt Creature",
+        "create": "Summon Homunculus",
+        "destroy": "Banish Homunculus",
+        "move/stopall": "Halt Homunculus",
         "move/walk": "Bid: Walking",
         "move/strafe": "Bid: Strafing",
         "move/look": "Bid: Looking",

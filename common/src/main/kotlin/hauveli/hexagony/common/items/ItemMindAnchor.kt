@@ -52,12 +52,13 @@ class ItemMindAnchor(block: Block?, properties: Properties) : BlockItem (block a
         val tag = stack.tag
         if (server != null &&
             tag != null &&
-            tag.hasCompound("BlockEntityTag")) {
+            tag.hasCompound("BlockEntityTag")) { // thank god this is a method in ItemMindAnchor so I only have to check this
             val compound = tag.getCompound("BlockEntityTag")
             MindAnchorManager.trackItemStack(
                 server,
                 compound.getUUID(TAG_STORED_PLAYER),
-                entity
+                entity,
+                stack
             )
         }
     }

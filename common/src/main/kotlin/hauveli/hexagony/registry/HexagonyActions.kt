@@ -13,6 +13,7 @@ import hauveli.hexagony.casting.actions.spells.trepannation.OpMindAnchorPowered
 import hauveli.hexagony.casting.actions.spells.trepannation.OpMindAnchorSignalStrength
 import hauveli.hexagony.casting.actions.spells.control.OpJumpButWithYourFeet
 import hauveli.hexagony.casting.actions.spells.craft.OpCraft
+import hauveli.hexagony.casting.actions.spells.trepannation.OpMindAnchorMedia
 
 
 object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
@@ -59,6 +60,9 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     val MIND_ANCHOR_POWER = make("mind_anchor/state", HexDir.WEST, "qaqqaeeq", OpMindAnchorPowered)
 
     val MIND_ANCHOR_SIGNAL = make("mind_anchor/signal", HexDir.WEST, "qaqqaee", OpMindAnchorSignalStrength)
+
+    // todo: actually make the media spell
+    val MIND_ANCHOR_MEDIA = make("mind_anchor/media", HexDir.WEST, "qaqqae", OpMindAnchorMedia)
 
     val GREAT_CONGRATULATE = make("congratulate/great", HexDir.EAST, "qwwqqqwwqwded", OpCongratulate)
 

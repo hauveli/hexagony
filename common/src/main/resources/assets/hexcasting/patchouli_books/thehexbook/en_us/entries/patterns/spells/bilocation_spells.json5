@@ -1,12 +1,12 @@
 {
-  name: "hexagony.book.patterns.spells.astral_projection_spells",
+  name: "hexagony.book.patterns.spells.bilocation_spells",
   category: "hexcasting:patterns/spells",
   icon: "minecraft:leather_boots",
   advancement: "hexagony:graft_succeeded",
   pages: [
     {
       type: "patchouli:text",
-      text: "hexagony.book.astral_projection.page.1",
+      text: "hexagony.book.bilocation.page.1",
     },
     {
       type: "hexcasting:pattern",

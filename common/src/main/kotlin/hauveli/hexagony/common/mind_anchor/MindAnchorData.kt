@@ -28,7 +28,7 @@ class MindAnchorRuntime {
     var itemEntity: ItemEntity? = null
         private set
 
-    var itemStack: Entity? = null
+    var itemStack: ItemStack? = null
         private set
 
     var entity: Entity? = null
@@ -44,20 +44,17 @@ class MindAnchorRuntime {
         itemEntity = entity
     }
 
-    fun trackItemStack(entity: Entity) {
+    fun trackItemStackAndEntity(item: ItemStack, ent: Entity) {
         clear()
-        itemStack = entity
-    }
-
-    fun trackEntity(entity: Entity) {
-        clear()
-        itemStack = entity
+        itemStack = item
+        entity = ent
     }
 
     fun clear() {
         blockEntity = null
         itemEntity = null
         itemStack = null
+        entity = null
     }
 }
 
@@ -66,7 +63,8 @@ data class MindAnchorEntry(
     var type: AnchorType,
     var activeUUID: UUID?,
     var dimension: ResourceKey<Level>,
-    var pos: BlockPos
+    var pos: BlockPos,
+    var media: Long
 )
 
 enum class AnchorType {
@@ -119,7 +117,8 @@ class MindAnchorData : SavedData() {
                 AnchorType.ITEM_STACK,
                 null,
                 Level.OVERWORLD,
-                BlockPos.ZERO
+                BlockPos.ZERO,
+                0L
             )
         }
     }
@@ -138,6 +137,8 @@ class MindAnchorData : SavedData() {
             e.putInt("X", entry.pos.x)
             e.putInt("Y", entry.pos.y)
             e.putInt("Z", entry.pos.z)
+
+            e.putLong("Media", entry.media)
 
             list.add(e)
         }
@@ -181,8 +182,10 @@ class MindAnchorData : SavedData() {
                     e.getInt("Z")
                 )
 
+                val media = e.getLong("Media")
+
                 data.anchors[uuid] =
-                    MindAnchorEntry(uuid, type, activeUUID, dim, pos)
+                    MindAnchorEntry(uuid, type, activeUUID, dim, pos, media)
             }
 
             return data

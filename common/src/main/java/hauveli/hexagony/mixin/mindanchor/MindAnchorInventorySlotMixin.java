@@ -53,7 +53,8 @@ public abstract class MindAnchorInventorySlotMixin {
             MindAnchorManager.INSTANCE.trackItemStack(
                     server,
                     mindUUID,
-                    player);
+                    player,
+                    stack);
             System.out.println("Player inventory change: " + player.getName().getString());
         }
 
@@ -81,7 +82,8 @@ public abstract class MindAnchorInventorySlotMixin {
             MindAnchorManager.INSTANCE.trackItemStack(
                     server,
                     mindUUID,
-                    entity);
+                    entity,
+                    stack);
             System.out.println("Simple container size: ");
         }
         System.out.println("Slot index: " + index);

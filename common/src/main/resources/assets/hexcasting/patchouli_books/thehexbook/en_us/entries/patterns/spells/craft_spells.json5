@@ -1,0 +1,20 @@
+{
+  name: "hexagony.book.patterns.spells.craft_spells",
+  category: "hexcasting:patterns/spells",
+  icon: "minecraft:crafting_table",
+  advancement: "hexcasting:enlightenment",
+  pages: [
+    {
+      type: "patchouli:text",
+      text: "hexagony.book.craft.page.1",
+    },
+    {
+      type: "hexcasting:pattern",
+      op_id: "hexagony:craft",
+      anchor: "hexagony:craft",
+      input: "List",
+      output: "",
+      text: "hexagony.book.patterns.spells.craft_spells.craft",
+    },
+  ],
+}

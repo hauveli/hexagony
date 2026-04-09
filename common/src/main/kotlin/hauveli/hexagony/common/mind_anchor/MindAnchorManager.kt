@@ -4,6 +4,7 @@ import at.petrak.hexcasting.api.casting.iota.GarbageIota
 import at.petrak.hexcasting.api.casting.iota.Vec3Iota
 import dev.architectury.event.events.common.LifecycleEvent
 import dev.architectury.event.events.common.PlayerEvent
+import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
 import hauveli.hexagony.common.blocks.BlockFullMindAnchor
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.networking.HexagonyNetworking
@@ -29,6 +30,8 @@ object MindAnchorManager {
         POSITION
     }
 
+    private val MAX_CAPACITY = 9_000_000_000_000_000_000L
+
     var localPos: Vec3? = null
 
     private val runtime = ConcurrentHashMap<UUID, MindAnchorRuntime>()
@@ -48,6 +51,10 @@ object MindAnchorManager {
         entry.activeUUID = null
         entry.dimension = blockEntity.level!!.dimension()
         entry.pos = blockEntity.blockPos
+
+        // get media here, hmm...
+        val be = blockEntity as BlockEntityFullMindAnchor
+        entry.media = (MAX_CAPACITY - be.remainingMediaCapacity()).coerceAtLeast(0L)
 
         runtime(mindUUID).trackBlock(blockEntity)
 
@@ -71,6 +78,13 @@ object MindAnchorManager {
 
         runtime(mindUUID).trackItemEntity(entity)
 
+        // hmmm...
+        val com = entity.item.tag?.getCompound("BlockEntityTag")
+        val media = com?.getLong("media")
+        if (media != null) {
+            entry.media = media
+        }
+
         data.setDirty()
 
         forwardToUuid(entry.mindUUID, server, entity.position())
@@ -79,7 +93,8 @@ object MindAnchorManager {
     fun trackItemStack(
         server: MinecraftServer,
         mindUUID: UUID,
-        holder: Entity
+        holder: Entity,
+        itemStack: ItemStack
     ) {
         val data = MindAnchorData.get(server)
         val entry = data.getOrCreate(mindUUID)
@@ -89,15 +104,19 @@ object MindAnchorManager {
         entry.dimension = holder.level().dimension()
         entry.pos = holder.blockPosition()
 
-        runtime(mindUUID).trackItemStack(holder)
+        // oof... can't do both... hmm...
+        runtime(mindUUID).trackItemStackAndEntity(itemStack, holder)
+
+        // Hmm... could just steal media from the person holding it hehe...
+        val com = itemStack.tag?.getCompound("BlockEntityTag")
+        val media = com?.getLong("media")
+        if (media != null) {
+            entry.media = media
+        }
 
         data.setDirty()
-        forwardToUuid(entry.mindUUID, server, holder.position())
-    }
 
-    // todo, do something smart with this instead of accessing runtime[uuid]
-    fun getRuntime(uuid: UUID): MindAnchorRuntime? {
-        return runtime[uuid]
+        forwardToUuid(entry.mindUUID, server, holder.position())
     }
 
     fun forwardToUuid(uuid: UUID, server: MinecraftServer, vec: Vec3) {
@@ -132,7 +151,7 @@ object MindAnchorManager {
         val rt = runtime[serverPlayer.uuid]
         val be = rt?.blockEntity
         val ie = rt?.itemEntity
-        val it = rt?.itemStack
+        val it = rt?.entity // because itemStack has no position
         val pos: Vec3?
         if (be != null) {
             pos = be.blockPos.center
@@ -144,6 +163,56 @@ object MindAnchorManager {
             pos = null
         }
         return pos // can be null...
+    }
+
+    fun getMedia(serverPlayer: ServerPlayer): Long? {
+        val rt = runtime[serverPlayer.uuid]
+        val be = rt?.blockEntity
+        val ie = rt?.itemEntity
+        val it = rt?.itemStack // because itemStack has no position
+
+        val media: Long?
+        if (be != null) {
+            (be as BlockEntityFullMindAnchor)
+            // maybe I should get it via tag....
+            media = (MAX_CAPACITY - be.remainingMediaCapacity()).coerceAtLeast(0L)
+
+        } else if (ie != null) {
+            val ieCom = it?.tag?.getCompound("BlockEntityTag")
+            media = ieCom?.getLong("media")
+
+        } else if (it != null) {
+            val itCom = it.tag?.getCompound("BlockEntityTag")
+            media = itCom?.getLong("media")
+        } else {
+            media = null
+        }
+        return media // can be null...
+    }
+
+    fun subtractMedia(serverPlayer: ServerPlayer, toSubtract: Long) {
+        val rt = runtime[serverPlayer.uuid]
+        val be = rt?.blockEntity
+        val ie = rt?.itemEntity
+        val it = rt?.itemStack // because itemStack has no position
+
+        if (be != null) {
+            (be as BlockEntityFullMindAnchor)
+            val media = be.updateTag.getLong("media")
+            be.updateTag.putLong("media", (media - toSubtract).coerceAtLeast(0))
+
+        } else if (ie != null) {
+            val ieCom = it?.tag?.getCompound("BlockEntityTag")
+            val media = ieCom?.getLong("media")
+            if (media != null)
+                ieCom.putLong("media", (media - toSubtract).coerceAtLeast(0))
+
+        } else if (it != null) {
+            val itCom = it.tag?.getCompound("BlockEntityTag")
+            val media = itCom?.getLong("media")
+            if (media != null)
+                itCom.putLong("media", (media - toSubtract).coerceAtLeast(0))
+        }
     }
 
     fun getPowered(uuid: UUID): Boolean? {
