@@ -15,4 +15,6 @@ public interface SetInterpolationDurationDisplayInvoker {
     void setLerpDelay(int interpolationDuration);
     @Invoker("setTransformation")
     void setTrans(Transformation transformation);
+    @Invoker("setBillboardConstraints")
+    void setBillboard(Display.BillboardConstraints constraints);
 }

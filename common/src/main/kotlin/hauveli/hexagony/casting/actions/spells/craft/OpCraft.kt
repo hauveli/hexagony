@@ -26,6 +26,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.crafting.Recipe
@@ -40,14 +41,21 @@ object DisplayItemHelper {
     fun setDisplayItem(display: ItemDisplay, itemStack: ItemStack) {
         (display as SetItemStackItemDisplayInvoker).setStack(itemStack)
     }
+
     fun setInterpolationDuration(display: ItemDisplay, ticks: Int) {
         (display as SetInterpolationDurationDisplayInvoker).setLerpDur(ticks)
     }
+
     fun setInterpolationDelay(display: ItemDisplay, ticks: Int) {
         (display as SetInterpolationDurationDisplayInvoker).setLerpDelay(ticks)
     }
+
     fun setTransformation(display: ItemDisplay, trans: Transformation) {
         (display as SetInterpolationDurationDisplayInvoker).setTrans(trans)
+    }
+
+    fun setBillboardConstraints(display: ItemDisplay, constraints: Display.BillboardConstraints) {
+        (display as SetInterpolationDurationDisplayInvoker).setBillboard(constraints)
     }
 }
 
@@ -105,10 +113,12 @@ object OpCraft : SpellAction  {
         ent.setPos(position)
         ent.isInvisible = false
         DisplayItemHelper.setDisplayItem(ent, stack)
+        DisplayItemHelper.setBillboardConstraints(ent, Display.BillboardConstraints.FIXED)
+        val scale = if (stack.item is BlockItem) 0.25f else 0.5f
         val transformation = Transformation(
             Vector3f(),
             Quaternionf(),
-            Vector3f(0.25f,0.25f,0.25f),
+            Vector3f(scale,scale,scale),
             Quaternionf(),
         )
         DisplayItemHelper.setInterpolationDelay(ent, 2)
@@ -144,9 +154,9 @@ object OpCraft : SpellAction  {
                 itemEntity.item
             )
             val transformation = Transformation(
-                worldGraph.pos.subtract(itemEntity.position()).scale(0.99).toVector3f(),
+                worldGraph.pos.subtract(dummy.position()).scale(0.99).toVector3f(),
                 Quaternionf(),
-                Vector3f(0.1f,0.1f,0.1f),
+                Vector3f(1f,1f,1f),
                 Quaternionf(),
             )
             // I couldnt figure out another way...
