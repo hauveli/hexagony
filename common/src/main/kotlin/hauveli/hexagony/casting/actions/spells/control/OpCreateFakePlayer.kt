@@ -13,6 +13,7 @@ import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.spawnFakeCl
 import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
@@ -81,6 +82,42 @@ object OpCreateFakeplayer : SpellAction {
         throw IllegalStateException()
     }
 
+    private val GREATEST_DISTANCE_TO_SWAPPEE_SQUARED = 1.0
+
+    fun lookForBodyAtPosition(server: MinecraftServer, caster: ServerPlayer, pos: Vec3): ServerPlayer? {
+        // check all players
+        var minimum = GREATEST_DISTANCE_TO_SWAPPEE_SQUARED // I should use a better number than this and better approach but whatever
+        var nearestPlayer: ServerPlayer? = null
+        for (player in server.playerList.players) {
+            pos.subtract(player.eyePosition)?.lengthSqr()?.let {
+                if (it < minimum) {
+                    minimum = it
+                    if (player.uuid == caster.uuid) {
+                        return player
+                    } else if (player.tags.contains(caster.uuid.toString())) {
+                        // check if caster is allowed to swap before selecting
+                        nearestPlayer = player
+                    }
+                }
+            }
+        }
+        return nearestPlayer
+    }
+
+    fun swapHomunculusAndPlayer(realPlayer: ServerPlayer, homunculus: ServerPlayer) {
+        val targetPos = homunculus.position()
+        val targetLook = homunculus.lookAngle
+        val targetXRot = homunculus.xRot
+        val targetYRot = homunculus.yRot
+        homunculus.setPos(realPlayer.position())
+        homunculus.xRot = realPlayer.xRot
+        homunculus.yRot = realPlayer.yRot
+
+        realPlayer.setPos(targetPos)
+        realPlayer.xRot = targetXRot
+        realPlayer.yRot = targetYRot
+    }
+
     private class Spell(private val pos: Vec3, private val entity: Entity?, val duration: Long) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
 
@@ -91,22 +128,25 @@ object OpCreateFakeplayer : SpellAction {
             // TODO: attach player camera to player, and make keybinds work as expected
             // TODO: if player location matches self, ATTACH
             if (entity?.uuid == null) return
-            (entity as ServerPlayer)
-            pos.subtract(entity.eyePosition)?.lengthSqr()?.let {
-                val data = PlayerControlData.get(server)
-                if (it < 0.25) {
-                    println("Reattached!")
-                    data.getOrCreate(entity.uuid).reattach(entity)
-                } else {
-                    println("Spawned fake!")
-                    val fakePlayer = spawnFakeClone(entity, pos, UUID.randomUUID())
-                    val fakePlayerEntry = data.getOrCreate(fakePlayer.uuid)
-                    fakePlayerEntry.setFake(true)
-                    fakePlayerEntry.setOwner(entity.uuid)
-                    fakePlayer.addTag(entity.uuid.toString()) // hmm.... Might not be needed if persistent?
-                    fakePlayerEntry.duration(duration)
-                    data.setDirty()
+            // (entity as ServerPlayer)
+            (caster as ServerPlayer)
+            val potentialSwappee = lookForBodyAtPosition(server, caster, pos)
+            val data = PlayerControlData.get(server)
+            if (potentialSwappee != null) {
+                println("Reattached!")
+                if (potentialSwappee != caster) { // if this was self it wouldnt even do anything, do I want to check anyway?
+                    swapHomunculusAndPlayer(caster, potentialSwappee)
                 }
+                data.getOrCreate(caster.uuid).reattach(caster)
+            } else {
+                println("Spawned fake!")
+                val fakePlayer = spawnFakeClone(caster, pos, UUID.randomUUID())
+                val fakePlayerEntry = data.getOrCreate(fakePlayer.uuid)
+                fakePlayerEntry.setFake(true)
+                fakePlayerEntry.setOwner(caster.uuid)
+                fakePlayer.addTag(caster.uuid.toString()) // hmm.... Might not be needed if persistent?
+                fakePlayerEntry.duration(duration)
+                data.setDirty()
             }
             //PlayerControlData.get(server).getOrCreate(entity.uuid).sprint(doesSprint)
         }
