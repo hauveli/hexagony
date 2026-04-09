@@ -102,6 +102,7 @@ data class PlayerControlEntry (
         if (serverPlayer.tags.contains("FakePlayer")) {
             serverPlayer.hurt(serverPlayer.damageSources().genericKill(),
                 (serverPlayer.maxHealth+serverPlayer.absorptionAmount) * 2)
+            serverPlayer.hurtMarked = true
         } else {
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,

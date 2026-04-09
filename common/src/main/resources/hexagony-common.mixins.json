@@ -16,6 +16,8 @@
     "bilocation.BilocationAntiTurnEntityMixin",
     "bilocation.BilocationSelectedSlotInventoryMixin",
     "control.KnockbackServerPlayerMixin",
+    "craft.SetInterpolationDurationDisplayInvoker",
+    "craft.SetItemStackItemDisplayInvoker",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "mindanchor.AddFreshEntityServerLevelMixin",
     "mindanchor.MindAnchorInventorySlotMixin",

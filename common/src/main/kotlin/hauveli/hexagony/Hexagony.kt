@@ -7,6 +7,7 @@ import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.common.control.PlayerControlData.Companion.onJoinServer
 import hauveli.hexagony.common.craft.GraphCraftingRecipes
 import hauveli.hexagony.common.craft.GraphRecipeLoader
+import hauveli.hexagony.common.misc.TickScheduler
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -55,6 +56,7 @@ object Hexagony {
             // player clone and control stuff
             PlayerControlData.init(server)
         })
+        TickScheduler.init()
     }
 
     fun initServer() {
