@@ -106,11 +106,12 @@ object OpCraft : SpellAction  {
         ent.isInvisible = false
         DisplayItemHelper.setDisplayItem(ent, stack)
         val transformation = Transformation(
-            Vector3f(0f,0f,0f),
+            Vector3f(),
             Quaternionf(),
             Vector3f(0.25f,0.25f,0.25f),
             Quaternionf(),
         )
+        DisplayItemHelper.setInterpolationDelay(ent, 2)
         DisplayItemHelper.setTransformation(ent, transformation)
         level.addFreshEntity(ent)
         return ent
@@ -118,7 +119,6 @@ object OpCraft : SpellAction  {
 
     fun theatrics(itemEntities: List<ItemEntity>, recipe: Recipe<*>) {
         val worldGraph = GraphCrafting.buildGraph(itemEntities) // this is a bit redundant, but whatever....
-
 
         val level = itemEntities[0].level() ?: return
         val toCreate = ItemEntity(
@@ -134,14 +134,9 @@ object OpCraft : SpellAction  {
         val startDelay = 2
         var delay = 10L
         val totalDuration = startDelay + delay * ( sortedByDistance.count() + 1 ) // plus one so minimum lerpDur is greater than 0
-        println(totalDuration)
-
-        toCreate.setPickUpDelay(totalDuration.toInt() + 10) // 10 is delay of naturally dropped items
-        toCreate.isInvisible = true
-        toCreate.level().addFreshEntity(toCreate)
 
         for (itemEntity in sortedByDistance) {
-            itemEntity.setPickUpDelay(totalDuration.toInt() * 10)
+            itemEntity.setPickUpDelay(totalDuration.toInt())
             val dummy = spawnItemDisplay(
                 itemEntity.level(),
                 itemEntity.position(),
@@ -152,21 +147,22 @@ object OpCraft : SpellAction  {
             TickScheduler.schedule(
                 delay,
                 {
-                    DisplayItemHelper.setInterpolationDuration(dummy, (totalDuration).toInt())
+                    val thisDelay = (totalDuration).toInt()
                     DisplayItemHelper.setInterpolationDelay(dummy, startDelay)
+                    DisplayItemHelper.setInterpolationDuration(dummy, totalDuration.toInt())
                     val transformation = Transformation(
-                        toCreate.position().subtract(dummy.position()).scale(0.975).toVector3f(),
+                        worldGraph.pos.subtract(itemEntity.position()).scale(0.99).toVector3f(),
                         Quaternionf(),
-                        Vector3f(0.25f,0.25f,0.25f),
+                        Vector3f(0.1f,0.1f,0.1f),
                         Quaternionf(),
                     )
                     DisplayItemHelper.setTransformation(dummy, transformation)
 
                     // schedule removal inside the scheduler so it happens after it has moved
                     TickScheduler.schedule(
-                        totalDuration + startDelay,
+                        thisDelay.toLong(),
                         {
-                            burst(toCreate.position().add(
+                            burst(worldGraph.pos.add(
                                 0.5-Random.nextDouble(), 0.5-Random.nextDouble(), 0.5-Random.nextDouble()),
                                 1.0, 10).sprayParticles(
                                 level as ServerLevel,
@@ -175,12 +171,12 @@ object OpCraft : SpellAction  {
                             dummy.kill()
                             dummy.remove(Entity.RemovalReason.DISCARDED)
                             dummy.discard()
+                            itemEntity.item.count--
                         }
                     )
                 }
             )
             // Subtract after scheduling...
-            itemEntity.item.count--
             //dummy.lerpMotion(worldGraph.pos.x, worldGraph.pos.y, worldGraph.pos.z)
             delay += 10L
         }
@@ -188,7 +184,8 @@ object OpCraft : SpellAction  {
         TickScheduler.schedule(
             totalDuration,
             {
-                toCreate.isInvisible = false
+                toCreate.setPickUpDelay(10) // 10 is delay of naturally dropped items
+                toCreate.level().addFreshEntity(toCreate)
             }
         )
 
