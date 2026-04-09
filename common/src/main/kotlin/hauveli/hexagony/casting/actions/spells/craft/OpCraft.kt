@@ -137,10 +137,22 @@ object OpCraft : SpellAction  {
 
         for (itemEntity in sortedByDistance) {
             itemEntity.setPickUpDelay(totalDuration.toInt())
+            itemEntity.isInvisible = true
             val dummy = spawnItemDisplay(
                 itemEntity.level(),
                 itemEntity.position(),
                 itemEntity.item
+            )
+            val transformation = Transformation(
+                worldGraph.pos.subtract(itemEntity.position()).scale(0.99).toVector3f(),
+                Quaternionf(),
+                Vector3f(0.1f,0.1f,0.1f),
+                Quaternionf(),
+            )
+            // I couldnt figure out another way...
+            TickScheduler.schedule(
+                1,
+                {itemEntity.item.count--}
             )
             // dummy.deltaMovement = worldGraph.pos.subtract(dummy.position()).scale(0.0275)
             //dummy.lerpTo(worldGraph.pos.x, worldGraph.pos.y, worldGraph.pos.z, 0f, 0f, 2000, true)
@@ -150,12 +162,6 @@ object OpCraft : SpellAction  {
                     val thisDelay = (totalDuration).toInt()
                     DisplayItemHelper.setInterpolationDelay(dummy, startDelay)
                     DisplayItemHelper.setInterpolationDuration(dummy, totalDuration.toInt())
-                    val transformation = Transformation(
-                        worldGraph.pos.subtract(itemEntity.position()).scale(0.99).toVector3f(),
-                        Quaternionf(),
-                        Vector3f(0.1f,0.1f,0.1f),
-                        Quaternionf(),
-                    )
                     DisplayItemHelper.setTransformation(dummy, transformation)
 
                     // schedule removal inside the scheduler so it happens after it has moved
@@ -171,7 +177,6 @@ object OpCraft : SpellAction  {
                             dummy.kill()
                             dummy.remove(Entity.RemovalReason.DISCARDED)
                             dummy.discard()
-                            itemEntity.item.count--
                         }
                     )
                 }
@@ -182,7 +187,7 @@ object OpCraft : SpellAction  {
         }
         // reveal the item
         TickScheduler.schedule(
-            totalDuration,
+            totalDuration + delay,
             {
                 toCreate.setPickUpDelay(10) // 10 is delay of naturally dropped items
                 toCreate.level().addFreshEntity(toCreate)
