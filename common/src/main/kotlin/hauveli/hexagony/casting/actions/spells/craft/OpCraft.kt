@@ -12,8 +12,10 @@ import at.petrak.hexcasting.api.misc.MediaConstants
 import at.petrak.hexcasting.api.pigment.FrozenPigment
 import com.mojang.math.Transformation
 import hauveli.hexagony.common.craft.GraphCrafting
+import hauveli.hexagony.common.craft.GraphCrafting.sprayAndPray
 import hauveli.hexagony.common.craft.GraphCrafting.subtract
 import hauveli.hexagony.common.craft.GraphCrafting.visualize
+import hauveli.hexagony.common.craft.GraphCrafting.visualizeFailure
 import hauveli.hexagony.common.craft.GraphCraftingRecipes.matchRecipe
 import hauveli.hexagony.common.misc.TickScheduler
 import hauveli.hexagony.mixin.craft.SetInterpolationDurationDisplayInvoker
@@ -165,6 +167,15 @@ object OpCraft : SpellAction  {
                 Vector3f(0.01f,0.01f,0.01f), // make it size 0?
                 Quaternionf(),
             )
+
+            // TODO: Miyu said thusly in hexcord
+            /*
+                Just make it spawn a particle effect
+                That is what particle effects were made for
+                You can make a custom particle that renders as an item stack and then make it fly or do whatever you want, and particles automatically die as needed
+                Even the item pickup animation ( basically the same as what you are doing ) is a particle effect
+             */
+
             // itemEntity.item.count--
             // Hexes are instant
             // I couldnt figure out another way...
@@ -246,10 +257,10 @@ object OpCraft : SpellAction  {
             val worldGraph = match.second
             if (recipe != null) {
                 println(recipe.id)
-                visualize(worldGraph)
+                sprayAndPray(worldGraph)
                 theatrics(itemEntities, recipe, worldGraph)
             } else {
-                visualize(worldGraph)
+                sprayAndPray(worldGraph)
             }
 
         }

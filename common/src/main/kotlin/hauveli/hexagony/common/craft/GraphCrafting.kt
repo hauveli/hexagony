@@ -21,6 +21,7 @@ object GraphCrafting {
         val entity: ItemEntity,
         val pos: Vec3,
         val stack: ItemStack,
+        // todo: change to MutableSet, I think
         val neighbors: MutableList<ItemNode> = mutableListOf(),
         val nodeList: MutableList<ItemNode> = mutableListOf(),
         val partitions: MutableList<Set<ItemNode>> = mutableListOf(),
@@ -66,7 +67,9 @@ object GraphCrafting {
         }
     }
 
+    // this results in the partition graph, which is good and also bad...
     fun connectNearest(nodes: List<ItemNode>) {
+        var threshold = 0.5 // tolerance in blocks for allowing
         for (node in nodes) {
 
             var minDist = Double.MAX_VALUE
@@ -78,21 +81,22 @@ object GraphCrafting {
                 val dist = node.pos.distanceToSqr(other.pos)
 
                 // when it finds the best option any equidistant points will be kept
+                // TODO: why are equidistant points not being respected? is my understanding of basic trigonometry wrong?
                 when {
                     dist + EPSILON < minDist -> {
                         minDist = dist
-                        nearest.clear()
+                        nearest.clear() // this SHOULD only remove nodes that are further away...
                         nearest.add(other)
                     }
 
-                    abs(dist - minDist) < EPSILON -> {
+                    abs(dist - minDist) < EPSILON + threshold -> {
                         nearest.add(other)
                     }
                 }
             }
 
-            for (n in nearest) {
-                connectBidirectional(node, n)
+            for (neighbor in nearest) {
+                connectBidirectional(node, neighbor)
             }
         }
     }
@@ -107,6 +111,7 @@ object GraphCrafting {
             if (node in visited) continue
 
             val component = mutableSetOf<ItemNode>()
+            // when this has finished exploring, if each node is connected, then they should all be included in visited
             explore(node, visited, component)
             rootNode.partitions.add(component)
         }
@@ -157,6 +162,31 @@ object GraphCrafting {
         }
     }
 
+    fun sprayAndPray(node: ItemNode) {
+        val level = node.entity.level() as ServerLevel
+        for (node in node.nodeList) {
+            for (neighbor in node.neighbors) {
+                // Actually? just blast it, if I draw a line between every possible neighbor, it won't miss any
+                // It should also respect partitioning because it partitions by neighborhood
+                drawLine(level, node.pos, neighbor.pos, ParticleTypes.END_ROD)
+            }
+        }
+    }
+
+    fun visualizeFailure(rootNode: ItemNode) {
+        val partitions = rootNode.partitions
+        val level = rootNode.entity.level() as ServerLevel
+
+        drawBall(level, rootNode.pos, 0.25)
+        for (partition in partitions) {
+            // Ok, I think the issue was here?
+            val arbitraryOrigin = partition.first()
+            for (node in arbitraryOrigin.neighbors) {
+                drawLine(level, arbitraryOrigin.pos, node.pos, ParticleTypes.END_ROD)
+            }
+        }
+    }
+
     fun visualize(rootNode: ItemNode) {
         val partitions = rootNode.partitions
         val matching = rootNode.matchingPartitions
@@ -197,7 +227,6 @@ object GraphCrafting {
     fun drawLine(level: ServerLevel, start: Vec3, end: Vec3, particleType: ParticleOptions) {
         val steps = (start.distanceTo(end) * 5).roundToInt()
 
-        println("drawing lines!")
         for (i in 0..steps) {
             val t = i.toDouble() / steps.toDouble()
 
