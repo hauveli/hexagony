@@ -127,8 +127,7 @@ object OpCraft : SpellAction  {
         return ent
     }
 
-    fun theatrics(itemEntities: List<ItemEntity>, recipe: Recipe<*>) {
-        val worldGraph = GraphCrafting.buildGraph(itemEntities) // this is a bit redundant, but whatever....
+    fun theatrics(itemEntities: List<ItemEntity>, recipe: Recipe<*>, worldGraph: GraphCrafting.ItemNode) {
 
         val level = itemEntities[0].level() ?: return
         val toCreate = ItemEntity(
@@ -214,12 +213,13 @@ object OpCraft : SpellAction  {
             }
             println(itemEntities)
 
+            val worldGraph = GraphCrafting.buildGraph(itemEntities, true) // this is a bit redundant, but whatever....
             // Now you have List<ItemEntity>
             val recipe = matchRecipe(itemEntities) ?: return
 
             println(recipe.id)
 
-            theatrics(itemEntities, recipe)
+            theatrics(itemEntities, recipe, worldGraph)
 
         }
 

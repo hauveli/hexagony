@@ -1,9 +1,13 @@
 package hauveli.hexagony.common.craft
 
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import kotlin.math.pow
+import kotlin.math.roundToInt
+import kotlin.random.Random
 
 object GraphCrafting {
 
@@ -45,16 +49,20 @@ object GraphCrafting {
     // tolerance for equidistant nodes, ugh I didn't consider this at first
     private const val EPSILON = 1e-4
 
-    fun connectBidirectional(a: ItemNode, b: ItemNode) {
+    fun connectBidirectional(a: ItemNode, b: ItemNode, visualize: Boolean) {
         if (!a.neighbors.contains(b)) {
             a.neighbors.add(b)
         }
         if (!b.neighbors.contains(a)) {
             b.neighbors.add(a)
         }
+        if (visualize) {
+            val level = a.entity.level() as ServerLevel
+            drawLine(level, a.pos, b.pos)
+        }
     }
 
-    fun connectNearest(nodes: List<ItemNode>) {
+    fun connectNearest(nodes: List<ItemNode>, visualize: Boolean) {
         for (node in nodes) {
 
             var minDist = Double.MAX_VALUE
@@ -80,13 +88,13 @@ object GraphCrafting {
             }
 
             for (n in nearest) {
-                connectBidirectional(node, n)
+                connectBidirectional(node, n, visualize)
             }
         }
     }
 
     // Builds the graph from a list of itemEntities, then returns the
-    fun buildGraph(items: List<ItemEntity>): ItemNode {
+    fun buildGraph(items: List<ItemEntity>, visualize: Boolean = false): ItemNode {
         // make unconnected graph of all Itementities as node
         val nodes = items.map { ItemNode(it, it.position(), it.item.copy()) }.toMutableList()
 
@@ -94,14 +102,57 @@ object GraphCrafting {
         val centerEntity = findCenter(items) ?: return nodes[0] // should only be possible if empty? might be better to do !!
         val centerNode = nodes.first { it.entity == centerEntity }
 
-        connectNearest(nodes)
+        connectNearest(nodes, visualize)
 
         centerNode.nodeList.addAll(nodes)
+
+        println("visualize: ${visualize}")
+        if (visualize)
+            drawBall(
+                centerNode.entity.level() as ServerLevel,
+                centerNode.pos,
+                0.25
+            )
 
         println(centerNode.neighbors.size)
         println(centerNode.stack.displayName.toString())
 
         return centerNode
+    }
+
+    fun drawBall(level: ServerLevel, origin: Vec3, radius: Double) {
+        val density = 25
+        for (i in 0..density) {
+            val randomDirection = Vec3.directionFromRotation(Random.nextFloat(), Random.nextFloat()).scale(radius)
+            level.sendParticles(
+                ParticleTypes.SOUL_FIRE_FLAME,
+                origin.x, origin.y, origin.z,
+                3,   // count
+                randomDirection.x, randomDirection.y, randomDirection.z,
+                0.1  // speed
+            );
+        }
+    }
+
+    fun drawLine(level: ServerLevel, start: Vec3, end: Vec3) {
+        val steps = (start.distanceTo(end) * 5).roundToInt()
+
+        println("drawing lines!")
+        for (i in 0..steps) {
+            val t = i.toDouble() / steps.toDouble()
+
+            val x = start.x + (end.x - start.x) * t
+            val y = start.y + (end.y - start.y) * t
+            val z = start.z + (end.z - start.z) * t
+
+            level.sendParticles(
+                ParticleTypes.END_ROD,
+                x, y, z,
+                1,   // count
+                (0.5-Random.nextDouble())*0.1, (0.5-Random.nextDouble())*0.1, (0.5-Random.nextDouble())*0.1,
+                0.0  // speed
+            );
+        }
     }
 
     /*
