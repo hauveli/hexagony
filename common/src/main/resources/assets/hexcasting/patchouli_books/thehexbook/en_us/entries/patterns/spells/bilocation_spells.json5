@@ -10,11 +10,19 @@
     },
     {
       type: "hexcasting:pattern",
-      op_id: "hexcasting:brainsweep",
-      anchor: "hexcasting:brainsweep",
+      op_id: "hexagony:create",
+      anchor: "hexagony:create",
       input: "",
       output: "",
-      text: "hexagony.placeholder.freecam.stuff.goes.here",
+      text: "hexagony.patterns.spells.bilocation_spells.create/trepanned",
     },
+    {
+      type: "hexcasting:pattern",
+      op_id: "hexagony:destroy",
+      anchor: "hexagony:destroy",
+      input: "",
+      output: "",
+      text: "hexagony.patterns.spells.bilocation_spells.destroy/trepanned",
+    }
   ],
 }

@@ -64,10 +64,12 @@
   hexagony: {
     book: {
       "craft": {
-        "1": "Deceptively tricky. This spell has nearly driven me mad trying to figure it out. It behaves stupidly simple yet preparing the conditions for the spell to work can become a chore. I placed my materials for a chain, one iron ingot in the center and two iron nuggets at opposite sides. And it worked, no matter the ordering in my list.",
-        "2": "Knowing that their relative positions in the real world matter, I tried to make a pickaxe. Same as before, and with caution to ensure the raw materials were positioned as any good crafty miner might, roughly in the shape of a pickaxe. This time, I got an axe...",
-        "3": "Finally! By precisely measuring out several holes and throwing my materials into them, I was able to construct a pickaxe, equal to that of any smith!",
-        "4": "Looking at the fruits of my casting, I'm reminded of an old arcane painting without direction, yet with structure... But why was there a cleric impetus $(br)and an empty impetus?"
+        page: {
+          "1": "Deceptively tricky. This spell has nearly driven me mad trying to figure it out. It behaves stupidly simple yet preparing the conditions for the spell to work can become a chore. I placed my materials for a chain, one iron ingot in the center and two iron nuggets at opposite sides. And it worked, no matter the ordering in my list.",
+          "2": "Knowing that their relative positions in the real world matter, I tried to make a pickaxe. Same as before, and with caution to ensure the raw materials were positioned as any good crafty miner might, roughly in the shape of a pickaxe. This time, I got an axe...",
+          "3": "Finally! By precisely measuring out several holes and throwing my materials into them, I was able to construct a pickaxe, equal to that of any smith!",
+          "4": "Looking at the fruits of my casting, I'm reminded of an old arcane painting without direction, yet with structure... But why was there a cleric impetus $(br)and an empty impetus?",
+        }
       },
       "bilocation": {
         page: {
@@ -88,7 +90,12 @@
       },
       patterns: {
         spells: {
+          craft_spells: {
+            "": "Crafting Spells",
+            "craft": "Craft a list of items on the ground..."
+          },
           bilocation_spells: {
+            "": "Bilocation Spells",
             "create/trepanned": "The only way I can return to the prison that is a mortal body. I must own the body at the given coordinates for the transfer to succeed. Unlike the cost associated with Create Creature, costs just one charged Amethyst.",
             "destroy/trepanned" :  "I can shatter the prison holding my mind and free myself of my mortal shell, for as long as my anchor has media. The cost is one shard."
           },
