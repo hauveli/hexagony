@@ -11,6 +11,38 @@
     "try_banish_self": {
       "title": "I Don't Want to Live on this Planet Anymore",
       "desc": "As a real player, try to cast Banish Creature on yourself."
+    },
+    "detached": {
+      "title": "I hope you planned a-head!",
+      "desc": "Free your own mind from your body."
+    },
+    "reattached": {
+      "title": "An OBE",
+      "desc": "Return your mind to your body."
+    },
+    "swapped": {
+      "title": "Holiday",
+      "desc": "Swap bodies with a Homunculus."
+    },
+    "trapped": {
+      "title": "An unfun experience",
+      "desc": "Trap your mind in your body."
+    },
+    "crafted": {
+      "title": "Graphting",
+      "desc": "Crafted an item using a graph-crafting spell."
+    },
+    "out_of_mana": {
+      "title": "Short-sighted",
+      "desc": "Expelled your mind from your body, without a plan to get it back."
+    },
+    "body_dead_mind_alive": {
+      "title": "Not the afterlife",
+      "desc": "Die without dying."
+    },
+    "mind_alive_body_revived": {
+      "title": "Life insurance",
+      "desc": "Commandeer a homunculus while your body is dead."
     }
   },
   "block.hexagony": {

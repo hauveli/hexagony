@@ -48,8 +48,11 @@ object OpDestroyFakeplayer : SpellAction {
             // easter egg joke advancement! I love modding.
             // I could not figure out how to keep the original namespace (movesthemind) when adding an advancement
             grantAdvancement(player, "try_banish_self")
-            if (!isTrepanned(player))
+            if (!isTrepanned(player)) {
                 throw(MishapOthersName(caster))
+            } else {
+                grantAdvancement(player, "detached")
+            }
         }
 
         return SpellAction.Result(
@@ -82,6 +85,7 @@ object OpDestroyFakeplayer : SpellAction {
             // server.getCommands().performPrefixedCommand(sourceStack, "player " + FakeplayerUtils.getUsernameString(player) + " kill")
             // TODO: Deatch player
             target.sendSystemMessage(Component.nullToEmpty("Totally Detached the player!!!"))
+            // TODO: make the advancement have a success variant? Might not be needed though...
             PlayerControlData.get(server).getOrCreate(target.uuid).detach(target)
             // PlayerControlData.get(server).getOrCreate(target.uuid).drop(true)
         }

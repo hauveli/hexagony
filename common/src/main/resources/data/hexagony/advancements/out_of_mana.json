@@ -1,0 +1,27 @@
+{
+  "parent": "hexcasting:graft_succeeded",
+  "criteria": {
+    "out_of_mana": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  },
+  "display": {
+    "announce_to_chat": true,
+    "bold": true,
+    "color": "light_purple",
+    "description": {
+      "translate": "advancement.hexagony.out_of_mana.desc"
+    },
+    "frame": "task",
+    "icon": {
+      "item": "hexcasting:battery"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancement.hexagony.out_of_mana.title"
+    }
+  }
+}

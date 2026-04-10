@@ -1,0 +1,28 @@
+{
+  "parent": "hexcasting:root",
+  "criteria": {
+    "crafted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  },
+  "display": {
+    "announce_to_chat": true,
+    "bold": true,
+    "color": "light_purple",
+    "description": {
+      "translate": "advancement.hexagony.crafted.desc"
+    },
+    "frame": "task",
+    "icon": {
+      "item": "minecraft:player_head",
+      "nbt": "{SkullOwner:{Id:[I;-4742729,1869039148,-1622017286,75116978],Properties:{textures:[{Value:\"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjdjZmJjOWI2MWJjYjJiZTQ0YzYxMTlkNjZlODI5NTVkM2Y2Y2ExMzNkY2QwZWMxMTExYTA1OWIzMTFiNWVhMyJ9fX0=\"}]}}}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancement.hexagony.crafted.title"
+    }
+  }
+}
