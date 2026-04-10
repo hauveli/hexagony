@@ -77,7 +77,7 @@
       <ul class="nav navbar-nav navbar-right">
             <li>
     <a
-      href="https://github.com/hauveli/hexagony/tree/d4f5f03307442d1ce73fb573fe4f51b666954174"
+      href="https://github.com/hauveli/hexagony/tree/af2e1c108c86364ff5e25e565a5727b20f8275c5"
         target="_blank"
       class="navbar-link"
       role="button"
@@ -146,6 +146,27 @@
       class="item-texture  texture pixelated"
     > Spells</a></summary>
       <ul>
+          <li><a href="#patterns/spells/bilocation_spells" class="toc-elem "><img
+      title="Leather Boots"
+      alt="Leather Boots"
+      src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/a14c64362abe4a12c2dfd87f8d1673af9d1b09f4/data/1.20.2/items/leather_boots.png"
+      loading="lazy"
+      class="item-texture  texture pixelated"
+    > Bilocation Spells</a></li>
+          <li><a href="#patterns/spells/control_spells" class="toc-elem "><img
+      title="Player Head"
+      alt="Player Head"
+      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAElBMVEV5YVJqUkRbRThJNyxCMSc1KSLA3kmkAAAAd0lEQVR42gVAMRKEIAxcHa93gtcLgf4IoVfRB0DG/3/lBjENtqd7UNzn+5Uvej4XftqGU+jntCSM7A7X9ALL1jkHRbVIJc6M8grLuiQwl1v8mkAW6jV1QRUXzF0C8w9pYsOYOqnUCjpXd7cq+PgltmA7nJEOzccfetIW7VmI180AAAAASUVORK5CYII="
+      loading="lazy"
+      class="item-texture  texture pixelated"
+    > Control Spells</a></li>
+          <li><a href="#patterns/spells/craft_spells" class="toc-elem spoilered"><img
+      title="Crafting Table"
+      alt="Crafting Table"
+      src="https://hexdoc-dev.github.io/hexdoc-minecraft/v/1.20.1/1.0.dev1/assets/minecraft/textures/block/crafting_table.png"
+      loading="lazy"
+      class="item-texture  texture "
+    > Crafting Spells</a></li>
           <li><a href="#patterns/spells/mind_anchor_spells" class="toc-elem "><img
       title="Occupied Mind Anchor"
       alt="Occupied Mind Anchor"
@@ -153,13 +174,6 @@
       loading="lazy"
       class="item-texture  texture "
     > Mind Anchor Spells</a></li>
-          <li><a href="#patterns/spells/astral_projection_spells" class="toc-elem "><img
-      title="Leather Boots"
-      alt="Leather Boots"
-      src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/a14c64362abe4a12c2dfd87f8d1673af9d1b09f4/data/1.20.2/items/leather_boots.png"
-      loading="lazy"
-      class="item-texture  texture pixelated"
-    > hexagony.book.patterns.spells.astral_projection_spells</a></li>
       </ul>
     </details>
     <details class="toc-category">
@@ -200,6 +214,1020 @@
     title="Permalink"
   ><i class="bi bi-link-45deg"></i></a></h2>
     <p>Patterns and actions that perform a magical effect on the world.</p>
+<div id="patterns/spells/bilocation_spells" class="entry">
+    <h3 class="entry-title page-header">
+    <img
+      title="Leather Boots"
+      alt="Leather Boots"
+      src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/a14c64362abe4a12c2dfd87f8d1673af9d1b09f4/data/1.20.2/items/leather_boots.png"
+      loading="lazy"
+      class="item-texture  texture pixelated"
+    >Bilocation Spells<a
+    href="#table-of-contents"
+    class="permalink small"
+    title="Jump to top"
+  ><i class="bi bi-box-arrow-up"></i></a><a
+    href="#patterns/spells/bilocation_spells"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h3>
+    <p>I&#39;ve done it. I can, even with the anchor holding me back at times, separate my mind from my body and navigate the world freely... And something is wrong, the ground seems... hollow.</p>
+<br />
+  <div id="patterns/spells/bilocation_spells@hexagony:create" class="">
+<h4 class="pattern-title">Summon Homunculus<a
+    href="#patterns/spells/bilocation_spells@hexagony:create"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeaqqwwawwqq"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeaqqwwawwqq</canvas>
+  </details>
+      <p>The only way I can return to the prison that is a mortal body. I must own the body at the given coordinates for the transfer to succeed. Unlike the cost associated with Create Creature, costs just one charged Amethyst.</p>
+  </div>
+<br />
+  <div id="patterns/spells/bilocation_spells@hexagony:destroy" class="">
+<h4 class="pattern-title">Banish Homunculus<a
+    href="#patterns/spells/bilocation_spells@hexagony:destroy"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeaqqwadawqq"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeaqqwadawqq</canvas>
+  </details>
+      <p>I can shatter the prison holding my mind and free myself of my mortal shell, for as long as my anchor has media. The cost is one shard.</p>
+  </div>
+<br />
+</div>
+<div id="patterns/spells/control_spells" class="entry">
+    <h3 class="entry-title page-header">
+    <img
+      title="Player Head"
+      alt="Player Head"
+      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAElBMVEV5YVJqUkRbRThJNyxCMSc1KSLA3kmkAAAAd0lEQVR42gVAMRKEIAxcHa93gtcLgf4IoVfRB0DG/3/lBjENtqd7UNzn+5Uvej4XftqGU+jntCSM7A7X9ALL1jkHRbVIJc6M8grLuiQwl1v8mkAW6jV1QRUXzF0C8w9pYsOYOqnUCjpXd7cq+PgltmA7nJEOzccfetIW7VmI180AAAAASUVORK5CYII="
+      loading="lazy"
+      class="item-texture  texture pixelated"
+    >Control Spells<a
+    href="#table-of-contents"
+    class="permalink small"
+    title="Jump to top"
+  ><i class="bi bi-box-arrow-up"></i></a><a
+    href="#patterns/spells/control_spells"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h3>
+    <p>Yippee sample text example bla bla bla</p>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/stopall" class="">
+<h4 class="pattern-title">Halt Homunculus (player →)<a
+    href="#patterns/spells/control_spells@hexagony:move/stopall"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeaqqwqqwqq"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeaqqwqqwqq</canvas>
+  </details>
+      <p>An important signal! Stops actions being performed by the creature, continuous and otherwise. Conveniently, an exception to the cost rule facing this page; It&#39;s free to cast.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:create" class="">
+<h4 class="pattern-title">Summon Homunculus (vec, int →)<a
+    href="#patterns/spells/control_spells@hexagony:create"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeaqqwwawwqq"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeaqqwwawwqq</canvas>
+  </details>
+      <p>Bids the creature to the given location, for as many seconds as the integer I provide. Costs a charged amethyst, plus units of Amethyst Dust equal to the square of the duration in hours, starting from 1.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:destroy" class="">
+<h4 class="pattern-title">Banish Homunculus (player →)<a
+    href="#patterns/spells/control_spells@hexagony:destroy"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeaqqwadawqq"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeaqqwadawqq</canvas>
+  </details>
+      <p>Banishes the creature, making it disappear until I call it back. One Shard. These creatures are woefully short-lived as is...</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/walk" class="">
+<h4 class="pattern-title">Bid: Walking (player, num →)<a
+    href="#patterns/spells/control_spells@hexagony:move/walk"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeqd"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeqd</canvas>
+  </details>
+      <p>Instructs the creature to walk along its facing. A 1 beckons it forth, and a -1 backward. Interestingly, a 0 causes it to stop, as if I had halted it.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/strafe" class="">
+<h4 class="pattern-title">Bid: Strafing (player, num →)<a
+    href="#patterns/spells/control_spells@hexagony:move/strafe"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edewa"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edewa</canvas>
+  </details>
+      <p>As previous, but along strafing. A 1, then, beckons it to the left, and a -1 to the right.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/look" class="">
+<h4 class="pattern-title">Bid: Looking (player, vec →)<a
+    href="#patterns/spells/control_spells@hexagony:move/look"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeaqwa"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeaqwa</canvas>
+  </details>
+      <p>Instructs the creature to look in a direction. The vector can be of any length. Seems to work on myself in the eyes of Nature, even though I don&#39;t feel or see the change.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/jump" class="">
+<h4 class="pattern-title">Bid: Jump (player, bool →)<a
+    href="#patterns/spells/control_spells@hexagony:move/jump"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeqda"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeqda</canvas>
+  </details>
+      <p>Takes a boolean and tells the creature to start or stop hopping.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/sneak" class="">
+<h4 class="pattern-title">Bid: Sneak (player, bool →)<a
+    href="#patterns/spells/control_spells@hexagony:move/sneak"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeade"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeade</canvas>
+  </details>
+      <p>As previous, but with sneaking. Also seems to work on myself, until my synapses kick in a moment after. Maybe it could be of use with other bids?</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/sprint" class="">
+<h4 class="pattern-title">Bid: Sprint (player, bool →)<a
+    href="#patterns/spells/control_spells@hexagony:move/sprint"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeaqad"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeaqad</canvas>
+  </details>
+      <p>As previous, but with sprinting. Even when stationary, the creature produces sprinting particles to denote its intention.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/use" class="">
+<h4 class="pattern-title">Bid: Use (player, num →)<a
+    href="#patterns/spells/control_spells@hexagony:move/use"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeaqwaaq"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeaqwaaq</canvas>
+  </details>
+      <p>Now, an interesting pair of instructions. Begin to use or attack with the held item at an interval, in twentieths of a second. <br />Both work on myself, though the former strangely.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/attack" class="">
+<h4 class="pattern-title">Bid: Attack (player, num →)<a
+    href="#patterns/spells/control_spells@hexagony:move/attack"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeaqedde"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeaqedde</canvas>
+  </details>
+      <p>Given 0, uses it continuously, such as eating or channeling, or in the case of Attack, mining. Given -1, uses or attacks once and stops.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/hotbar" class="">
+<h4 class="pattern-title">Bid: Select Toolbar (player, num →)<a
+    href="#patterns/spells/control_spells@hexagony:move/hotbar"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeawq"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeawq</canvas>
+  </details>
+      <p>Takes a number from 1 to 9 inclusive, and instructs to select that slot in its toolbar. Works on myself, but may interrupt things like drawing patterns.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/swap_hands" class="">
+<h4 class="pattern-title">Bid: Swap Hands (player →)<a
+    href="#patterns/spells/control_spells@hexagony:move/swap_hands"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeawqa"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeawqa</canvas>
+  </details>
+      <p>Instructs the creature to hand its mainhand item into its offhand, and vice versa. As previous, in its function to myself.</p>
+  </div>
+<br />
+  <div id="patterns/spells/control_spells@hexagony:move/drop" class="">
+<h4 class="pattern-title">Bid: Drop Item (player, bool →)<a
+    href="#patterns/spells/control_spells@hexagony:move/drop"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="edeaqe"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: edeaqe</canvas>
+  </details>
+      <p>Instructs the creature to drop the item if given False or stack of items it holds in its main hand if given True. Can even yank an item from my own hand, as I&#39;m so familiar with.</p>
+  </div>
+<br />
+</div>
+<div id="patterns/spells/craft_spells" class="entry">
+    <div class="spoilered">
+      <h3 class="entry-title page-header">
+    <img
+      title="Crafting Table"
+      alt="Crafting Table"
+      src="https://hexdoc-dev.github.io/hexdoc-minecraft/v/1.20.1/1.0.dev1/assets/minecraft/textures/block/crafting_table.png"
+      loading="lazy"
+      class="item-texture  texture "
+    >Crafting Spells<a
+    href="#table-of-contents"
+    class="permalink small"
+    title="Jump to top"
+  ><i class="bi bi-box-arrow-up"></i></a><a
+    href="#patterns/spells/craft_spells"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h3>
+    <p>Deceptively tricky. This spell has nearly driven me mad trying to figure it out. It behaves stupidly simple yet preparing the conditions for the spell to work can become a chore. I placed my materials for a chain, one iron ingot in the center and two iron nuggets at opposite sides. And it worked, no matter the ordering in my list.</p>
+<br />
+  <div id="patterns/spells/craft_spells@hexagony:craft" class="">
+<h4 class="pattern-title">Craft Item (list →)<a
+    href="#patterns/spells/craft_spells@hexagony:craft"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="daqedeqadedaqedeqad"
+        data-start="north_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: daqedeqadedaqedeqad</canvas>
+  </details>
+      <p>Craft a list of items on the ground...</p>
+  </div>
+<br />
+    </div>
+</div>
 <div id="patterns/spells/mind_anchor_spells" class="entry">
     <h3 class="entry-title page-header">
     <img
@@ -385,82 +1413,6 @@
       >Your browser does not support visualizing patterns. Pattern code: qaqqaee</canvas>
   </details>
       <p>Get the current redstone signal strength of your mind anchor. Returns garbage if not found.</p>
-  </div>
-<br />
-</div>
-<div id="patterns/spells/astral_projection_spells" class="entry">
-    <h3 class="entry-title page-header">
-    <img
-      title="Leather Boots"
-      alt="Leather Boots"
-      src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/a14c64362abe4a12c2dfd87f8d1673af9d1b09f4/data/1.20.2/items/leather_boots.png"
-      loading="lazy"
-      class="item-texture  texture pixelated"
-    >hexagony.book.patterns.spells.astral_projection_spells<a
-    href="#table-of-contents"
-    class="permalink small"
-    title="Jump to top"
-  ><i class="bi bi-box-arrow-up"></i></a><a
-    href="#patterns/spells/astral_projection_spells"
-    class="permalink small"
-    title="Permalink"
-  ><i class="bi bi-link-45deg"></i></a></h3>
-    <p>hexagony.book.astral_projection.page.1</p>
-<br />
-  <div id="patterns/spells/astral_projection_spells@hexagony:move/jump" class="">
-<h4 class="pattern-title">hexcasting.action.book.hexagony:move/jump (entity →)<a
-    href="#patterns/spells/astral_projection_spells@hexagony:move/jump"
-    class="permalink small"
-    title="Permalink"
-  ><i class="bi bi-link-45deg"></i></a></h4>
-  <details class="details-collapsible">
-    <summary class="collapse-details collapse-spell"></summary>
-    <div class="dropdown spell-settings-dropdown">
-      <span
-        href=""
-        class="dropdown-toggle spell-settings-toggle"
-        data-toggle="dropdown"
-        role="button"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
-        <i class="bi bi-gear-fill"></i>
-      </span>
-      <ul class="dropdown-menu">
-        <li class="dropdown-submenu">
-          <a
-            href=""
-            class="dropdown-toggle"
-            data-toggle="dropdown"
-            role="button"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >Renders</a>
-          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
-        </li>
-        <li class="dropdown-submenu">
-          <a
-            href=""
-            class="dropdown-toggle"
-            data-toggle="dropdown"
-            role="button"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >Palettes</a>
-          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
-        </li>
-      </ul>
-    </div>
-      <canvas
-        class="spell-viz"
-        width="216"
-        height="216"
-        data-string="edeqda"
-        data-start="north_west"
-        data-per-world="False"
-      >Your browser does not support visualizing patterns. Pattern code: edeqda</canvas>
-  </details>
-      <p>hexagony.book.patterns.spells.astral_projection_spells.move/jump</p>
   </div>
 <br />
 </div>
