@@ -1,27 +1,21 @@
 package hauveli.hexagony.mind_anchor
 
-import at.petrak.hexcasting.api.casting.iota.GarbageIota
-import at.petrak.hexcasting.api.casting.iota.Vec3Iota
-import dev.architectury.event.events.common.LifecycleEvent
 import dev.architectury.event.events.common.PlayerEvent
+import hauveli.hexagony.Hexagony
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
 import hauveli.hexagony.common.blocks.BlockFullMindAnchor
-import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.networking.msg.MsgMindAnchorPositionS2C
-import hauveli.hexagony.networking.msg.MsgPlayerControlIntegerS2C
-import net.minecraft.core.BlockPos
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
-import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
-import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.phys.Vec3
-import org.joml.Vector3f
-import java.util.UUID
+import org.spongepowered.asm.mixin.Unique
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 object MindAnchorManager {

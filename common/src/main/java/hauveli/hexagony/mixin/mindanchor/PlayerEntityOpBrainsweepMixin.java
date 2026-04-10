@@ -12,6 +12,7 @@ import at.petrak.hexcasting.common.casting.actions.spells.great.OpBrainsweep;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
 import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor;
+import hauveli.hexagony.common.misc.AdvancementProvider;
 import hauveli.hexagony.mind_anchor.MindAnchorManager;
 import hauveli.hexagony.registry.HexagonyBlocks;
 import hauveli.hexagony.registry.HexagonyDamageTypes;
@@ -46,6 +47,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.Objects;
 
 
 import at.petrak.hexcasting.api.casting.OperatorUtils;
@@ -135,7 +137,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             // Peek at my unenlightened mixin and take the mishap context and error message code from there?
 
             // Mind has already been used
-            if (hexagony$isGrafted(serverPlayer)) {
+            if (AdvancementProvider.isTrepanned(serverPlayer)) {
                 ServerLevel serverLevel = (ServerLevel) serverPlayer.level();
                 Villager villager = new Villager(
                         EntityType.VILLAGER,
@@ -185,7 +187,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
 
             // Only grant attempt if the caster survived in the first place
             if (simulatedMediaNeeded <= 0) {
-                grantAdvancement(serverPlayer, "graft_attempted");
+                grantAdvancement(serverPlayer, AdvancementProvider.INSTANCE.getTREPIDATION());
             }
 
             // Kill or don't kill player, it doesn't matter.
@@ -202,7 +204,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
             hexagony$theatrics(castingEnvironment, sacrifice, pos);
 
             graftPlayer(serverPlayer, state, pos);
-            grantAdvancement(serverPlayer, "graft_succeeded");
+            grantAdvancement(serverPlayer, AdvancementProvider.INSTANCE.getTREPANNED());
             // I don't think we can ever end up here without going into the if statement with ServerPlayer...
         }
     }
@@ -264,16 +266,6 @@ public abstract class PlayerEntityOpBrainsweepMixin {
     @Unique
     public boolean hexagony$isTargetingSelf(LivingEntity sacrifice, CastingEnvironment castingEnvironment) {
         return sacrifice.equals(castingEnvironment.getCastingEntity());
-    }
-
-    @Unique
-    public boolean hexagony$isGrafted(ServerPlayer serverPlayer) {
-        var adv = serverPlayer.getServer().getAdvancements().getAdvancement(
-                new ResourceLocation(Hexagony.MODID, "graft_succeeded"));
-        if (adv == null)
-            return false;
-
-        return serverPlayer.getAdvancements().getOrStartProgress(adv).isDone();
     }
 
     @Unique

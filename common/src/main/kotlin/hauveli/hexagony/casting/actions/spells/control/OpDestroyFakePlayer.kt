@@ -7,9 +7,13 @@ import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
 import at.petrak.hexcasting.api.casting.getPlayer
 import at.petrak.hexcasting.api.casting.iota.Iota
+import at.petrak.hexcasting.api.casting.mishaps.MishapBadCaster
+import at.petrak.hexcasting.api.casting.mishaps.MishapEntityTooFarAway
+import at.petrak.hexcasting.api.casting.mishaps.MishapOthersName
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.common.control.PlayerActionAPI
 import hauveli.hexagony.common.control.PlayerControlData
+import hauveli.hexagony.common.misc.AdvancementProvider.grantAdvancement
+import hauveli.hexagony.common.misc.AdvancementProvider.isTrepanned
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
@@ -20,58 +24,53 @@ object OpDestroyFakeplayer : SpellAction {
         get() = 1
 
     override fun executeWithUserdata(
-        args: kotlin.collections.List<Iota>,
+        args: List<Iota>,
         env: CastingEnvironment,
-        tags: CompoundTag
+        userData: CompoundTag
     ): SpellAction.Result {
         val player = args.getPlayer(0, argc)
         if (!env.isEntityInRange(player)) {
-            // JavaMishapThrower.throwMishap(MishapEntityTooFarAway(player))
+            throw MishapEntityTooFarAway(player)
         }
-        val caster: Entity? = env.getCastingEntity()
+        val caster: Entity? = env.castingEntity
+        // Can't cast from box?
         if (caster !is ServerPlayer) {
-            // JavaMishapThrower.throwMishap(MishapBadCaster())
+            throw MishapBadCaster()
         }
-        /*
-        if (!FakeplayerUtils.canBid(caster as ServerPlayer?, player)) JavaMishapThrower.throwMishap(
-            MishapOthersName(
-                player
-            )
-        )
-        */
-        // TODO: make the advancement have a success variant? Might not be needed though...
-        /*
-        if (caster!!.getStringUUID() == player.getStringUUID() && caster.javaClass == ServerPlayer::class.java) {
-            // easter egg joke advancement! I love modding.
-            val server = env.getWorld().getServer()
-            val sourceStack = server.createCommandSourceStack().withSuppressedOutput()
-            server.getCommands().performPrefixedCommand(
-                sourceStack,
-                "advancement grant " + FakeplayerUtils.getUsernameString(caster as ServerPlayer) + " only minecraft:movesthemind/try_banish_self"
-            )
 
-            JavaMishapThrower.throwMishap(MishapOthersName(caster))
+        // can't cast on non-consenting players (you can if you add the tag yourself, though!) I don't know what would happen...
+        // if target is not self, and target does not consent, abort
+        if (player != caster && !player.tags.contains(caster.uuid.toString())) {
+            throw MishapOthersName(player)
         }
-        */
+        // TODO: make the advancement have a success variant? Might not be needed though...
+
+        if (caster.getStringUUID() == player.getStringUUID() && caster.javaClass == ServerPlayer::class.java) {
+            // easter egg joke advancement! I love modding.
+            grantAdvancement(player, "movesthemind:try_banish_self")
+            if (!isTrepanned(player))
+                throw(MishapOthersName(caster))
+        }
+
         return SpellAction.Result(
             Spell(player),
             MediaConstants.DUST_UNIT * 5,
-            listOf(burst(player.position().add(0.0, player.getEyeHeight() / 2.0, 0.0), 1.0, 10)),
+            listOf(burst(player.position().add(0.0, player.eyeHeight / 2.0, 0.0), 1.0, 10)),
             1
         )
     }
 
-    override fun hasCastingSound(castingEnvironment: CastingEnvironment): Boolean {
+    override fun hasCastingSound(ctx: CastingEnvironment): Boolean {
         return true
     }
 
-    override fun awardsCastingStat(castingEnvironment: CastingEnvironment): Boolean {
+    override fun awardsCastingStat(ctx: CastingEnvironment): Boolean {
         return true
     }
 
     override fun execute(
-        args: kotlin.collections.List<Iota>,
-        castingEnvironment: CastingEnvironment
+        args: List<Iota>,
+        env: CastingEnvironment
     ): SpellAction.Result {
         throw IllegalStateException()
     }
@@ -89,9 +88,9 @@ object OpDestroyFakeplayer : SpellAction {
 
         }
 
-        override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {
+        override fun cast(env: CastingEnvironment, image: CastingImage): CastingImage? {
             cast(env)
-            return castingImage
+            return image
         }
     }
 

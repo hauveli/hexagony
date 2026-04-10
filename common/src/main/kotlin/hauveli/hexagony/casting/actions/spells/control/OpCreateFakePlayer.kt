@@ -11,6 +11,7 @@ import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
 import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.spawnFakeClone
 import hauveli.hexagony.common.control.PlayerControlData
+import hauveli.hexagony.common.misc.AdvancementProvider.isTrepanned
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
@@ -145,7 +146,7 @@ object OpCreateFakeplayer : SpellAction {
             (caster as ServerPlayer)
             val potentialSwappee = lookForBodyAtPosition(server, caster, pos)
             val data = PlayerControlData.get(server)
-            if (potentialSwappee != null) {
+            if (potentialSwappee != null && isTrepanned(caster)) {
                 println("Reattached!")
                 if (potentialSwappee != caster) { // if this was self it wouldnt even do anything, do I want to check anyway?
                     swapHomunculusAndPlayer(caster, potentialSwappee)
