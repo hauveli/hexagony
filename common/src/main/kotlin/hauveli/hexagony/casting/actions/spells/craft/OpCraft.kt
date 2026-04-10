@@ -88,7 +88,7 @@ object OpCraft : SpellAction  {
         return SpellAction.Result(
             Spell(entityList.toList()),
             MediaConstants.DUST_UNIT / 10,
-            listOf(burst(target.position().add(0.0, target.getEyeHeight() / 2.0, 0.0), 1.0, 10)),
+            listOf(burst(target.position().add(0.0, target.eyeHeight / 2.0, 0.0), 1.0, 10)),
             1
         )
     }
@@ -102,7 +102,7 @@ object OpCraft : SpellAction  {
     }
 
     override fun execute(
-        args: kotlin.collections.List<Iota>,
+        args: List<Iota>,
         castingEnvironment: CastingEnvironment
     ): SpellAction.Result {
         throw IllegalStateException()
@@ -144,7 +144,7 @@ object OpCraft : SpellAction  {
             worldGraph.pos.z,
             recipe.getResultItem(level.registryAccess())
         )
-        val ingredientList = recipe.ingredients
+        subtract(worldGraph)
 
         val sortedByDistance = itemEntities.sortedBy { it.distanceToSqr(worldGraph.entity) }
 
@@ -152,7 +152,9 @@ object OpCraft : SpellAction  {
         var delay = 0L
         val totalDuration = startDelay + delay * ( sortedByDistance.count() + 1 ) // plus one so minimum lerpDur is greater than 0
 
+        /*
         for (itemEntity in sortedByDistance) {
+            /*
             val dummy = spawnItemDisplay(
                 itemEntity.level(),
                 itemEntity.position(),
@@ -168,6 +170,8 @@ object OpCraft : SpellAction  {
                 Quaternionf(),
             )
 
+             */
+
             // TODO: Miyu said thusly in hexcord
             /*
                 Just make it spawn a particle effect
@@ -179,18 +183,21 @@ object OpCraft : SpellAction  {
             // itemEntity.item.count--
             // Hexes are instant
             // I couldnt figure out another way...
+            /*
             TickScheduler.schedule(
                 1,
                 {
                     // crawl the rootNode to avoid deleting other items
                     // pros: kind of cool
                     // cons: ??
-                    subtract(worldGraph)
+                    //subtract(worldGraph)
                 }
             )
+            */
 
             // dummy.deltaMovement = worldGraph.pos.subtract(dummy.position()).scale(0.0275)
             //dummy.lerpTo(worldGraph.pos.x, worldGraph.pos.y, worldGraph.pos.z, 0f, 0f, 2000, true)
+            /*
             TickScheduler.schedule(
                 delay,
                 {
@@ -215,10 +222,12 @@ object OpCraft : SpellAction  {
                     )
                 }
             )
+             */
             // Subtract after scheduling...
             //dummy.lerpMotion(worldGraph.pos.x, worldGraph.pos.y, worldGraph.pos.z)
             delay += 1L
         }
+         */
         level.playSound(
             null, // all nearby players?
             worldGraph.entity.blockPosition(),

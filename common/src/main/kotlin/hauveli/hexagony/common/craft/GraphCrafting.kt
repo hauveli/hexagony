@@ -83,7 +83,7 @@ object GraphCrafting {
                 // when it finds the best option any equidistant points will be kept
                 // TODO: why are equidistant points not being respected? is my understanding of basic trigonometry wrong?
                 when {
-                    dist + EPSILON < minDist -> {
+                    dist + EPSILON + threshold < minDist -> {
                         minDist = dist
                         nearest.clear() // this SHOULD only remove nodes that are further away...
                         nearest.add(other)
@@ -164,6 +164,7 @@ object GraphCrafting {
 
     fun sprayAndPray(node: ItemNode) {
         val level = node.entity.level() as ServerLevel
+        drawBall(level, node.pos, 0.5)
         for (node in node.nodeList) {
             for (neighbor in node.neighbors) {
                 // Actually? just blast it, if I draw a line between every possible neighbor, it won't miss any
@@ -177,7 +178,7 @@ object GraphCrafting {
         val partitions = rootNode.partitions
         val level = rootNode.entity.level() as ServerLevel
 
-        drawBall(level, rootNode.pos, 0.25)
+        //drawBall(level, rootNode.pos, 0.25)
         for (partition in partitions) {
             // Ok, I think the issue was here?
             val arbitraryOrigin = partition.first()
@@ -192,7 +193,6 @@ object GraphCrafting {
         val matching = rootNode.matchingPartitions
         val level = rootNode.entity.level() as ServerLevel
 
-        drawBall(level, rootNode.pos, 0.25)
         var matched = false
         for (partition in partitions) {
             matched = false
@@ -211,7 +211,7 @@ object GraphCrafting {
     }
 
     fun drawBall(level: ServerLevel, origin: Vec3, radius: Double) {
-        val density = 25
+        val density = (10 * radius).toInt()
         for (i in 0..density) {
             val randomDirection = Vec3.directionFromRotation(Random.nextFloat(), Random.nextFloat()).scale(radius)
             level.sendParticles(
@@ -220,12 +220,12 @@ object GraphCrafting {
                 3,   // count
                 randomDirection.x, randomDirection.y, randomDirection.z,
                 0.1  // speed
-            );
+            )
         }
     }
 
     fun drawLine(level: ServerLevel, start: Vec3, end: Vec3, particleType: ParticleOptions) {
-        val steps = (start.distanceTo(end) * 5).roundToInt()
+        val steps = (start.distanceTo(end) * 3).roundToInt()
 
         for (i in 0..steps) {
             val t = i.toDouble() / steps.toDouble()
