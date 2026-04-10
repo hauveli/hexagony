@@ -21,30 +21,30 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     { HexActions.REGISTRY },
 ) {
     // cool!!!!!
-    val CRAFT = make( "craft", HexDir.NORTH_WEST,"daqedeqadedaqedeqad", OpCraft)
+    val CRAFT = make("craft", HexDir.NORTH_WEST,"daqedeqadedaqedeqad", OpCraft)
 
     // I've kept the names from moves the mind because it doesn't affect the code and is maybe respectful
 
     // With a mind anchor, create attaches player to their body
-    val CREATE = make( "create", HexDir.NORTH_WEST,"edeaqqwwawwqq", OpCreateFakeplayer)
+    val CREATE = make("create", HexDir.NORTH_WEST,"edeaqqwwawwqq", OpCreateFakeplayer)
 
     // With a mind anchor, destroy detaches player from their body (astral projection)
     // While astral projecting, the body can still be controlled independently.
     // However, targeting the playerEntity will teleport and affect their astral body, NOT their physical body.
-    val DESTROY = make( "destroy", HexDir.NORTH_WEST,"edeaqqwadawqq", OpDestroyFakeplayer)
+    val DESTROY = make("destroy", HexDir.NORTH_WEST,"edeaqqwadawqq", OpDestroyFakeplayer)
 
-    val STOP_ALL = make( "move/stopall", HexDir.NORTH_WEST,"edeaqqwqqwqq", OpStopAll)
+    val STOP_ALL = make("move/stopall", HexDir.NORTH_WEST,"edeaqqwqqwqq", OpStopAll)
 
-    val LOOK = make( "move/look", HexDir.NORTH_WEST,"edeaqwa", OpMadeYouLook)
+    val LOOK = make("move/look", HexDir.NORTH_WEST,"edeaqwa", OpMadeYouLook)
 
     val WALK = make("move/walk", HexDir.NORTH_WEST, "edeqd", OpWalkAMileInTheseLouisVuittons)
 
-    val STRAFE = make( "move/strafe", HexDir.NORTH_WEST,"edewa", OpStrafeInAforementionedLouisVuittons)
+    val STRAFE = make("move/strafe", HexDir.NORTH_WEST,"edewa", OpStrafeInAforementionedLouisVuittons)
 
     val JUMP = make("move/jump", HexDir.NORTH_WEST, "edeqda", OpJumpButWithYourFeet)
 
     val SNEAK = make("move/sneak", HexDir.NORTH_WEST, "edeade", OpSetSneak)
-    val SPRINT = make( "move/sprint", HexDir.NORTH_WEST,"edeaqad", OpSetSprint)
+    val SPRINT = make("move/sprint", HexDir.NORTH_WEST,"edeaqad", OpSetSprint)
 
     val USE = make( "move/use", HexDir.NORTH_WEST,"edeaqwaaq", OpUseItem)
     val ATTACK = make("move/attack", HexDir.NORTH_WEST, "edeaqedde", OpAttack)
