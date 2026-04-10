@@ -43,7 +43,6 @@ object OpDestroyFakeplayer : SpellAction {
         if (player != caster && !player.tags.contains(caster.uuid.toString())) {
             throw MishapOthersName(player)
         }
-        // TODO: make the advancement have a success variant? Might not be needed though...
 
         if (caster.getStringUUID() == player.getStringUUID() && caster.javaClass == ServerPlayer::class.java) {
             // easter egg joke advancement! I love modding.
