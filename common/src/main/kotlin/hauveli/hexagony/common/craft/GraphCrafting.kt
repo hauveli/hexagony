@@ -56,7 +56,7 @@ object GraphCrafting {
 
 
     // tolerance for equidistant nodes, ugh I didn't consider this at first
-    private const val EPSILON = 1e-4
+    private const val EPSILON = 1e-4 + 0.25
 
     fun connectBidirectional(a: ItemNode, b: ItemNode) {
         if (!a.neighbors.contains(b)) {
@@ -69,7 +69,6 @@ object GraphCrafting {
 
     // this results in the partition graph, which is good and also bad...
     fun connectNearest(nodes: List<ItemNode>) {
-        var threshold = 0.5 // tolerance in blocks for allowing
         for (node in nodes) {
 
             var minDist = Double.MAX_VALUE
@@ -83,13 +82,13 @@ object GraphCrafting {
                 // when it finds the best option any equidistant points will be kept
                 // TODO: why are equidistant points not being respected? is my understanding of basic trigonometry wrong?
                 when {
-                    dist + EPSILON + threshold < minDist -> {
+                    dist + EPSILON < minDist -> {
                         minDist = dist
                         nearest.clear() // this SHOULD only remove nodes that are further away...
                         nearest.add(other)
                     }
 
-                    abs(dist - minDist) < EPSILON + threshold -> {
+                    abs(dist - minDist) < EPSILON -> {
                         nearest.add(other)
                     }
                 }
