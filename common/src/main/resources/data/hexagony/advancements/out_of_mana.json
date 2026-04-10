@@ -1,5 +1,5 @@
 {
-  "parent": "hexcasting:graft_succeeded",
+  "parent": "hexagony:graft_succeeded",
   "criteria": {
     "out_of_mana": {
       "trigger": "minecraft:impossible"
@@ -16,6 +16,7 @@
       "translate": "advancement.hexagony.out_of_mana.desc"
     },
     "frame": "task",
+    "hidden": true,
     "icon": {
       "item": "hexcasting:battery"
     },

@@ -1,5 +1,5 @@
 {
-  "parent": "hexcasting:enlightenment",
+  "parent": "hexagony:crafted",
   "criteria": {
     "graft_attempted": {
       "trigger": "minecraft:impossible"

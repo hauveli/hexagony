@@ -1,5 +1,5 @@
 {
-  "parent": "hexcasting:graft_succeeded",
+  "parent": "hexagony:graft_succeeded",
   "criteria": {
     "mind_alive_body_revived": {
       "trigger": "minecraft:impossible"
