@@ -46,7 +46,7 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     val SNEAK = make("move/sneak", HexDir.NORTH_WEST, "edeade", OpSetSneak)
     val SPRINT = make("move/sprint", HexDir.NORTH_WEST,"edeaqad", OpSetSprint)
 
-    val USE = make( "move/use", HexDir.NORTH_WEST,"edeaqwaaq", OpUseItem)
+    val USE = make("move/use", HexDir.NORTH_WEST,"edeaqwaaq", OpUseItem)
     val ATTACK = make("move/attack", HexDir.NORTH_WEST, "edeaqedde", OpAttack)
 
     val HOTBAR = make("move/hotbar", HexDir.NORTH_WEST, "edeawq", OpSelectHotbar)
