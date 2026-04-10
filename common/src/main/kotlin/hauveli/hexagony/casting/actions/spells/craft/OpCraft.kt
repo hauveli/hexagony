@@ -12,10 +12,13 @@ import at.petrak.hexcasting.api.misc.MediaConstants
 import at.petrak.hexcasting.api.pigment.FrozenPigment
 import com.mojang.math.Transformation
 import hauveli.hexagony.common.craft.GraphCrafting
+import hauveli.hexagony.common.craft.GraphCrafting.subtract
+import hauveli.hexagony.common.craft.GraphCrafting.visualize
 import hauveli.hexagony.common.craft.GraphCraftingRecipes.matchRecipe
 import hauveli.hexagony.common.misc.TickScheduler
 import hauveli.hexagony.mixin.craft.SetInterpolationDurationDisplayInvoker
 import hauveli.hexagony.mixin.craft.SetItemStackItemDisplayInvoker
+import net.minecraft.core.RegistryAccess
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
@@ -31,6 +34,7 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
@@ -130,15 +134,15 @@ object OpCraft : SpellAction  {
     }
 
     fun theatrics(itemEntities: List<ItemEntity>, recipe: Recipe<*>, worldGraph: GraphCrafting.ItemNode) {
-
         val level = itemEntities[0].level() ?: return
         val toCreate = ItemEntity(
             level,
             worldGraph.pos.x,
             worldGraph.pos.y,
             worldGraph.pos.z,
-            ItemStack(BuiltInRegistries.ITEM.get(recipe.id))
+            recipe.getResultItem(level.registryAccess())
         )
+        val ingredientList = recipe.ingredients
 
         val sortedByDistance = itemEntities.sortedBy { it.distanceToSqr(worldGraph.entity) }
 
@@ -166,7 +170,12 @@ object OpCraft : SpellAction  {
             // I couldnt figure out another way...
             TickScheduler.schedule(
                 1,
-                {itemEntity.item.count--}
+                {
+                    // crawl the rootNode to avoid deleting other items
+                    // pros: kind of cool
+                    // cons: ??
+                    subtract(worldGraph)
+                }
             )
 
             // dummy.deltaMovement = worldGraph.pos.subtract(dummy.position()).scale(0.0275)
@@ -231,13 +240,17 @@ object OpCraft : SpellAction  {
             }
             println(itemEntities)
 
-            val worldGraph = GraphCrafting.buildGraph(itemEntities, true) // this is a bit redundant, but whatever....
             // Now you have List<ItemEntity>
-            val recipe = matchRecipe(itemEntities) ?: return
-
-            println(recipe.id)
-
-            theatrics(itemEntities, recipe, worldGraph)
+            val match = matchRecipe(itemEntities)
+            val recipe = match.first
+            val worldGraph = match.second
+            if (recipe != null) {
+                println(recipe.id)
+                visualize(worldGraph)
+                theatrics(itemEntities, recipe, worldGraph)
+            } else {
+                visualize(worldGraph)
+            }
 
         }
 

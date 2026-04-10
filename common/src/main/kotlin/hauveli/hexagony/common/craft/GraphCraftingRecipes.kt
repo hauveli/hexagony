@@ -39,7 +39,8 @@ object GraphCraftingRecipes {
         val validIngredients: Array<ItemStack>,
         val pos: Vec3,
         val neighbors: MutableList<ItemNodeVanilla> = mutableListOf(),
-        val nodeList: MutableList<ItemNodeVanilla> = mutableListOf()
+        val nodeList: MutableList<ItemNodeVanilla> = mutableListOf(),
+        val partitions: MutableList<Set<ItemNodeVanilla>> = mutableListOf()
     )
 
     fun distanceSquared(a: Vec3, b: Vec3): Double {
@@ -145,6 +146,8 @@ object GraphCraftingRecipes {
 
         centerNode.nodeList.addAll(nodes)
 
+        makePartitions(centerNode)
+
         return centerNode
     }
 
@@ -180,21 +183,103 @@ object GraphCraftingRecipes {
         return true
     }
 
+    private fun atLeastMatchesRecipe(worldItemNode: ItemNode, recipeItemNode: ItemNodeVanilla): Boolean {
+        val consumedMatches = mutableListOf<Set<ItemNode>>()
+        for (recipePartition in recipeItemNode.partitions) {
+            // continue comes back here, note to self in future
+            for (worldPartition in worldItemNode.partitions) {
+                if (partitionsEqual(worldPartition, recipePartition)) {
+                    if (!consumedMatches.contains(worldPartition)) {
+                        consumedMatches.add(worldPartition)
+                        continue // next worldPartition right away
+                    }
+                }
+            }
+        }
+        if (consumedMatches.count() == recipeItemNode.partitions.count()) {
+            worldItemNode.matchingPartitions.addAll(consumedMatches)
+            return true
+        }
+        return false
+    }
+
+    private fun partitionsEqual(itemNodePartition: Set<ItemNode>, recipeNodePartition: Set<ItemNodeVanilla>): Boolean {
+        if (itemNodePartition.size < recipeNodePartition.size) return false // abort if recipe is larger
+
+        val unmatched: MutableList<ItemNodeVanilla> = ArrayList(recipeNodePartition)
+
+        for (nodeA in itemNodePartition) {
+            var matched = false
+
+            val iterator: MutableIterator<ItemNodeVanilla> = unmatched.iterator()
+            while (iterator.hasNext()) {
+                val nodeB: ItemNodeVanilla = iterator.next()
+
+                if (nodesAreEqual(nodeA, nodeB)) {
+                    iterator.remove()
+                    matched = true
+                    break
+                }
+            }
+
+            if (!matched) return false
+        }
+
+        return true
+    }
+
+    // TODO: here, get the partition
+    // Note: the important point is that for each partition in the RECIPE, there is at least one matching set of partitions
+    // in the world....
+    private fun makePartitions(rootNode: ItemNodeVanilla) {
+        val visited = mutableSetOf<ItemNodeVanilla>()
+
+        for (node in rootNode.nodeList) {
+            if (node in visited) continue
+
+            val component = mutableSetOf<ItemNodeVanilla>()
+            explore(node, visited, component)
+            rootNode.partitions.add(component)
+        }
+    }
+
+    // recursively explore directly connected graphs
+    private fun explore(
+        node: ItemNodeVanilla,
+        visited: MutableSet<ItemNodeVanilla>,
+        component: MutableSet<ItemNodeVanilla>
+    ) {
+        if (!visited.add(node)) return
+
+        component.add(node)
+
+        for (neighbor in node.neighbors) {
+            explore(neighbor, visited, component)
+        }
+    }
+
     fun matchGraphs(
         worldRoot: ItemNode,
         recipeRoot: ItemNodeVanilla
     ): Boolean {
 
         val equal = neighborhoodIsEqual(worldRoot, recipeRoot)
+        if (equal) {
+            val partitionsEqualToo = atLeastMatchesRecipe(worldRoot, recipeRoot)
+            return partitionsEqualToo
+        }
+        println("returning false I guess")
 
-        return equal
+        return false
     }
 
-    fun matchRecipe(entities: List<ItemEntity>): Recipe<*>? {
+    fun matchRecipe(entities: List<ItemEntity>): Pair<Recipe<*>?,ItemNode> {
         val worldGraph = GraphCrafting.buildGraph(entities)
         for (recipe in recipes) {
-            if ( matchGraphs(worldGraph, recipe.second) ) return recipe.first
+            if ( matchGraphs(worldGraph, recipe.second) ) {
+                return Pair(recipe.first, worldGraph)
+            }
         }
-        return null
+        return Pair(null, worldGraph)
     }
 }

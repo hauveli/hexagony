@@ -1,13 +1,19 @@
 package hauveli.hexagony.common.craft
 
+import at.petrak.hexcasting.common.lib.HexParticles
+import hauveli.hexagony.common.craft.GraphCraftingRecipes.nodesAreEqual
+import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
+import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.random.Random
+
 
 object GraphCrafting {
 
@@ -16,7 +22,9 @@ object GraphCrafting {
         val pos: Vec3,
         val stack: ItemStack,
         val neighbors: MutableList<ItemNode> = mutableListOf(),
-        val nodeList: MutableList<ItemNode> = mutableListOf()
+        val nodeList: MutableList<ItemNode> = mutableListOf(),
+        val partitions: MutableList<Set<ItemNode>> = mutableListOf(),
+        val matchingPartitions: MutableList<Set<ItemNode>> = mutableListOf(),
     )
 
     fun distanceSquared(a: Vec3, b: Vec3): Double {
@@ -49,20 +57,16 @@ object GraphCrafting {
     // tolerance for equidistant nodes, ugh I didn't consider this at first
     private const val EPSILON = 1e-4
 
-    fun connectBidirectional(a: ItemNode, b: ItemNode, visualize: Boolean) {
+    fun connectBidirectional(a: ItemNode, b: ItemNode) {
         if (!a.neighbors.contains(b)) {
             a.neighbors.add(b)
         }
         if (!b.neighbors.contains(a)) {
             b.neighbors.add(a)
         }
-        if (visualize) {
-            val level = a.entity.level() as ServerLevel
-            drawLine(level, a.pos, b.pos)
-        }
     }
 
-    fun connectNearest(nodes: List<ItemNode>, visualize: Boolean) {
+    fun connectNearest(nodes: List<ItemNode>) {
         for (node in nodes) {
 
             var minDist = Double.MAX_VALUE
@@ -81,20 +85,51 @@ object GraphCrafting {
                         nearest.add(other)
                     }
 
-                    kotlin.math.abs(dist - minDist) < EPSILON -> {
+                    abs(dist - minDist) < EPSILON -> {
                         nearest.add(other)
                     }
                 }
             }
 
             for (n in nearest) {
-                connectBidirectional(node, n, visualize)
+                connectBidirectional(node, n)
             }
         }
     }
 
-    // Builds the graph from a list of itemEntities, then returns the
-    fun buildGraph(items: List<ItemEntity>, visualize: Boolean = false): ItemNode {
+    // TODO: here, get the partition
+    // Note: the important point is that for each partition in the RECIPE, there is at least one matching set of partitions
+    // in the world....
+    private fun makePartitions(rootNode: ItemNode) {
+        val visited = mutableSetOf<ItemNode>()
+
+        for (node in rootNode.nodeList) {
+            if (node in visited) continue
+
+            val component = mutableSetOf<ItemNode>()
+            explore(node, visited, component)
+            rootNode.partitions.add(component)
+        }
+    }
+
+    // recursively explore directly connected graphs
+    private fun explore(
+        node: ItemNode,
+        visited: MutableSet<ItemNode>,
+        component: MutableSet<ItemNode>
+    ) {
+        if (!visited.add(node)) return
+
+        component.add(node)
+
+        for (neighbor in node.neighbors) {
+            explore(neighbor, visited, component)
+        }
+    }
+
+    // Builds the graph from a list of itemEntities, then returns the root...
+    // TODO: I have to somehow deal with the partitioned graphs...
+    fun buildGraph(items: List<ItemEntity>): ItemNode {
         // make unconnected graph of all Itementities as node
         val nodes = items.map { ItemNode(it, it.position(), it.item.copy()) }.toMutableList()
 
@@ -102,22 +137,47 @@ object GraphCrafting {
         val centerEntity = findCenter(items) ?: return nodes[0] // should only be possible if empty? might be better to do !!
         val centerNode = nodes.first { it.entity == centerEntity }
 
-        connectNearest(nodes, visualize)
+        connectNearest(nodes)
 
         centerNode.nodeList.addAll(nodes)
 
-        println("visualize: ${visualize}")
-        if (visualize)
-            drawBall(
-                centerNode.entity.level() as ServerLevel,
-                centerNode.pos,
-                0.25
-            )
+        makePartitions(centerNode)
 
         println(centerNode.neighbors.size)
         println(centerNode.stack.displayName.toString())
 
         return centerNode
+    }
+
+    fun subtract(worldItemNode: ItemNode) {
+        for (matchingPartition in worldItemNode.matchingPartitions) {
+            for (node in matchingPartition) {
+                node.entity.item.count--
+            }
+        }
+    }
+
+    fun visualize(rootNode: ItemNode) {
+        val partitions = rootNode.partitions
+        val matching = rootNode.matchingPartitions
+        val level = rootNode.entity.level() as ServerLevel
+
+        drawBall(level, rootNode.pos, 0.25)
+        var matched = false
+        for (partition in partitions) {
+            matched = false
+            if (matching.contains(partition)) {
+                matched = true
+            }
+            val arbitraryOrigin = partition.first().pos
+            for (node in partition) {
+                if (matched) {
+                    drawLine(level, arbitraryOrigin, node.pos, ParticleTypes.FLAME)
+                } else {
+                    drawLine(level, arbitraryOrigin, node.pos, ParticleTypes.END_ROD)
+                }
+            }
+        }
     }
 
     fun drawBall(level: ServerLevel, origin: Vec3, radius: Double) {
@@ -134,7 +194,7 @@ object GraphCrafting {
         }
     }
 
-    fun drawLine(level: ServerLevel, start: Vec3, end: Vec3) {
+    fun drawLine(level: ServerLevel, start: Vec3, end: Vec3, particleType: ParticleOptions) {
         val steps = (start.distanceTo(end) * 5).roundToInt()
 
         println("drawing lines!")
@@ -146,7 +206,7 @@ object GraphCrafting {
             val z = start.z + (end.z - start.z) * t
 
             level.sendParticles(
-                ParticleTypes.END_ROD,
+                particleType,
                 x, y, z,
                 1,   // count
                 (0.5-Random.nextDouble())*0.1, (0.5-Random.nextDouble())*0.1, (0.5-Random.nextDouble())*0.1,
