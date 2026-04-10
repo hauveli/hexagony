@@ -1,4 +1,18 @@
 {
+  "advancement.hexagony": {
+    "graft_attempted": {
+      "title": "Trepidation",
+      "desc": "Attempt to flay own mind..."
+    },
+    "graft_succeeded": {
+      "title": "Trepanned",
+      "desc": "... and succeed."
+    },
+    "try_banish_self": {
+      "title": "I Don't Want to Live on this Planet Anymore",
+      "desc": "As a real player, try to cast Banish Creature on yourself."
+    }
+  },
   "block.hexagony": {
     mind_anchor: {
       empty: "Empty Mind Anchor",

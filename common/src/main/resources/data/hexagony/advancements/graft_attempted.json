@@ -12,7 +12,9 @@
     "announce_to_chat": true,
     "bold": true,
     "color": "dark_purple",
-    "description": "Attempt to flay own mind...",
+    "description": {
+      "translate": "advancement.hexagony.graft_attempted.desc"
+    },
     "frame": "goal",
     "hidden": true,
     "icon": {
@@ -20,6 +22,8 @@
 	  "nbt": "{CustomModelData:270439}"
     },
     "show_toast": true,
-    "title": "Trepidation"
+    "title": {
+      "translate": "advancement.hexagony.graft_attempted.title"
+    }
   }
 }

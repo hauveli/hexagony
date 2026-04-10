@@ -1,12 +1,14 @@
 {
   "parent": "hexcasting:root",
   "criteria": {
-    "dummy": {"trigger": "minecraft:impossible"}
+    "dummy": {
+      "trigger": "minecraft:impossible"
+    }
   },
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancement.movesthemind:try_banish_self.desc"
+      "translate": "advancement.hexagony.try_banish_self.desc"
     },
     "frame": "task",
     "hidden": true,
@@ -15,9 +17,7 @@
     },
     "show_toast": true,
     "title": {
-      "translate": "advancement.movesthemind:try_banish_self"
+      "translate": "advancement.hexagony.try_banish_self.title"
     }
-  },
-  "requirements": [],
-  "sends_telemetry_event": true
+  }
 }

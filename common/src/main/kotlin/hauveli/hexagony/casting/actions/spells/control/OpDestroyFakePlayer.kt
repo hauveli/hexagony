@@ -47,7 +47,8 @@ object OpDestroyFakeplayer : SpellAction {
 
         if (caster.getStringUUID() == player.getStringUUID() && caster.javaClass == ServerPlayer::class.java) {
             // easter egg joke advancement! I love modding.
-            grantAdvancement(player, "movesthemind:try_banish_self")
+            // I could not figure out how to keep the original namespace (movesthemind) when adding an advancement
+            grantAdvancement(player, "try_banish_self")
             if (!isTrepanned(player))
                 throw(MishapOthersName(caster))
         }
@@ -75,17 +76,15 @@ object OpDestroyFakeplayer : SpellAction {
         throw IllegalStateException()
     }
 
-    private class Spell(private val target: ServerPlayer?) : RenderedSpell {
+    private class Spell(private val target: ServerPlayer) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
             val server = env.getWorld().server
             // val sourceStack = server.createCommandSourceStack()
             // server.getCommands().performPrefixedCommand(sourceStack, "player " + FakeplayerUtils.getUsernameString(player) + " kill")
             // TODO: Deatch player
-            target?.sendSystemMessage(Component.nullToEmpty("Totally Detached the player!!!"))
-            if (target?.uuid == null) return
+            target.sendSystemMessage(Component.nullToEmpty("Totally Detached the player!!!"))
             PlayerControlData.get(server).getOrCreate(target.uuid).detach(target)
             // PlayerControlData.get(server).getOrCreate(target.uuid).drop(true)
-
         }
 
         override fun cast(env: CastingEnvironment, image: CastingImage): CastingImage? {

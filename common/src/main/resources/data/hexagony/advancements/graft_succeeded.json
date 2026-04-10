@@ -12,7 +12,9 @@
     "announce_to_chat": false,
     "bold": true,
     "color": "light_purple",
-    "description": "... and succeed.",
+    "description": {
+      "translate": "advancement.hexagony.graft_succeeded.desc"
+    },
     "frame": "challenge",
     "hidden": true,
     "icon": {
@@ -20,6 +22,8 @@
       "nbt": "{CustomModelData:270441}"
     },
     "show_toast": true,
-    "title": "Trepanned"
+    "title": {
+      "translate": "advancement.hexagony.graft_succeeded.title"
+    }
   }
 }
