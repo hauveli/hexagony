@@ -20,6 +20,8 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Display.ItemDisplay
 import net.minecraft.world.entity.Entity
@@ -141,43 +143,46 @@ object OpCraft : SpellAction  {
         val sortedByDistance = itemEntities.sortedBy { it.distanceToSqr(worldGraph.entity) }
 
         val startDelay = 2
-        var delay = 10L
+        var delay = 0L
         val totalDuration = startDelay + delay * ( sortedByDistance.count() + 1 ) // plus one so minimum lerpDur is greater than 0
 
         for (itemEntity in sortedByDistance) {
-            itemEntity.setPickUpDelay(totalDuration.toInt())
-            itemEntity.isInvisible = true
             val dummy = spawnItemDisplay(
                 itemEntity.level(),
                 itemEntity.position(),
                 itemEntity.item
             )
+            val destination = dummy.position().subtract(worldGraph.pos).scale(0.99)
             val transformation = Transformation(
-                worldGraph.pos.subtract(dummy.position()).scale(0.99).toVector3f(),
+                // worldGraph.pos.subtract(dummy.position()).scale(0.99).toVector3f(),
+                destination.toVector3f(),
                 Quaternionf(),
-                Vector3f(1f,1f,1f),
+                //Vector3f(1f,1f,1f),
+                Vector3f(0.01f,0.01f,0.01f), // make it size 0?
                 Quaternionf(),
             )
+            // itemEntity.item.count--
+            // Hexes are instant
             // I couldnt figure out another way...
             TickScheduler.schedule(
                 1,
                 {itemEntity.item.count--}
             )
+
             // dummy.deltaMovement = worldGraph.pos.subtract(dummy.position()).scale(0.0275)
             //dummy.lerpTo(worldGraph.pos.x, worldGraph.pos.y, worldGraph.pos.z, 0f, 0f, 2000, true)
             TickScheduler.schedule(
                 delay,
                 {
-                    val thisDelay = (totalDuration).toInt()
-                    DisplayItemHelper.setInterpolationDelay(dummy, startDelay)
-                    DisplayItemHelper.setInterpolationDuration(dummy, totalDuration.toInt())
+                    DisplayItemHelper.setInterpolationDelay(dummy, 1)
+                    DisplayItemHelper.setInterpolationDuration(dummy, 10)
                     DisplayItemHelper.setTransformation(dummy, transformation)
 
                     // schedule removal inside the scheduler so it happens after it has moved
                     TickScheduler.schedule(
-                        thisDelay.toLong(),
+                        11,
                         {
-                            burst(worldGraph.pos.add(
+                            burst(destination.add(
                                 0.5-Random.nextDouble(), 0.5-Random.nextDouble(), 0.5-Random.nextDouble()),
                                 1.0, 10).sprayParticles(
                                 level as ServerLevel,
@@ -192,8 +197,20 @@ object OpCraft : SpellAction  {
             )
             // Subtract after scheduling...
             //dummy.lerpMotion(worldGraph.pos.x, worldGraph.pos.y, worldGraph.pos.z)
-            delay += 10L
+            delay += 1L
         }
+        level.playSound(
+            null, // all nearby players?
+            worldGraph.entity.blockPosition(),
+            SoundEvents.AMETHYST_BLOCK_CHIME,
+            SoundSource.BLOCKS,
+            1.0f,
+            1.0f
+        )
+        toCreate.setPickUpDelay(10) // 10 is delay of naturally dropped items
+        toCreate.level().addFreshEntity(toCreate)
+        // Hexes are instant
+        /*
         // reveal the item
         TickScheduler.schedule(
             totalDuration + delay,
@@ -202,6 +219,7 @@ object OpCraft : SpellAction  {
                 toCreate.level().addFreshEntity(toCreate)
             }
         )
+         */
 
     }
 
