@@ -2,7 +2,9 @@
   name: "hexagony.book.patterns.spells.craft_spells",
   category: "hexcasting:patterns/spells",
   icon: "minecraft:crafting_table",
+  "sortnum": 0,
   advancement: "hexcasting:enlightenment",
+  "read_by_default": false,
   pages: [
     {
       type: "patchouli:text",
@@ -14,7 +16,7 @@
       anchor: "hexagony:craft",
       input: "list",
       output: "",
-      text: "hexagony.book.patterns.spells.craft_spells.craft",
+      text: "hexagony.book.patterns.spells.craft_spells.craft"
     },
   ],
 }

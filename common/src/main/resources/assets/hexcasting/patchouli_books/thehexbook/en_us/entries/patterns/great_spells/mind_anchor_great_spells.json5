@@ -2,7 +2,9 @@
   name: "hexagony.book.patterns.great_spells.mind_anchor_great_spells",
   category: "hexcasting:patterns/great_spells",
   icon: "minecraft:heart_of_the_sea{CustomModelData:270441}",
+  "sortnum": 0,
   advancement: "hexagony:graft_succeeded",
+  "read_by_default": false,
   pages: [
     {
       type: "hexcasting:pattern",

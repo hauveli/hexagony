@@ -2,7 +2,9 @@
   name: "hexagony.book.patterns.spells.bilocation_spells",
   category: "hexcasting:patterns/spells",
   icon: "minecraft:leather_boots",
+  "sortnum": 0,
   advancement: "hexagony:graft_succeeded",
+  "read_by_default": false,
   pages: [
     {
       type: "patchouli:text",
