@@ -14,7 +14,7 @@
       anchor: "hexagony:create",
       input: "",
       output: "",
-      text: "hexagony.patterns.spells.bilocation_spells.create/trepanned",
+      text: "hexagony.book.patterns.spells.bilocation_spells.create/trepanned",
     },
     {
       type: "hexcasting:pattern",
@@ -22,7 +22,7 @@
       anchor: "hexagony:destroy",
       input: "",
       output: "",
-      text: "hexagony.patterns.spells.bilocation_spells.destroy/trepanned",
+      text: "hexagony.book.patterns.spells.bilocation_spells.destroy/trepanned",
     }
   ],
 }
