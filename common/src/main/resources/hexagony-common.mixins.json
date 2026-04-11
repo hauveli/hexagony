@@ -7,13 +7,13 @@
     "bilocation.BilocationAntiSneakLocalPlayerMixin",
     "bilocation.BilocationDisableIngameGuiMixin",
     "bilocation.BilocationNoInputMinecraftMixin",
+    "bilocation.BilocationAntiTurnEntityMixin",
     "bilocation.BilocationSetPositionCameraMixin"
   ],
   "server": [
   ],
   "mixins": [
     "MixinDatagenMain",
-    "bilocation.BilocationAntiTurnEntityMixin",
     "bilocation.BilocationSelectedSlotInventoryMixin",
     "control.KnockbackServerPlayerMixin",
     "craft.SetInterpolationDurationDisplayInvoker",
