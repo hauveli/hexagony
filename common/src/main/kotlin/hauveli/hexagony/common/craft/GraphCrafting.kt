@@ -155,8 +155,9 @@ object GraphCrafting {
 
     fun subtract(worldItemNode: ItemNode) {
         for (matchingPartition in worldItemNode.matchingPartitions) {
+            println("Subtracting!")
             for (node in matchingPartition) {
-                node.entity.item.count--
+                node.entity.item.shrink(1)
             }
         }
     }
