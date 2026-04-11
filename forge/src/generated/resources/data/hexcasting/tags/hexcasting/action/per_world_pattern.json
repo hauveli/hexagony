@@ -1,5 +1,7 @@
 {
   "values": [
-    "hexagony:congratulate/great"
+    "hexagony:congratulate/great",
+    "hexagony:craft",
+    "hexagony:create"
   ]
 }
