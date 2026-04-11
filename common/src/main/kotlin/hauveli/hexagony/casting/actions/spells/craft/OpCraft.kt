@@ -18,6 +18,9 @@ import hauveli.hexagony.common.craft.GraphCrafting.subtract
 import hauveli.hexagony.common.craft.GraphCrafting.visualize
 import hauveli.hexagony.common.craft.GraphCrafting.visualizeFailure
 import hauveli.hexagony.common.craft.GraphCraftingRecipes.matchRecipe
+import hauveli.hexagony.common.misc.AdvancementProvider.GRAPHTING
+import hauveli.hexagony.common.misc.AdvancementProvider.grantAdvancement
+import hauveli.hexagony.common.misc.AdvancementProvider.hasAdvancement
 import hauveli.hexagony.common.misc.TickScheduler
 import hauveli.hexagony.mixin.craft.SetInterpolationDurationDisplayInvoker
 import hauveli.hexagony.mixin.craft.SetItemStackItemDisplayInvoker
@@ -267,6 +270,9 @@ object OpCraft : SpellAction  {
             val recipe = match.first
             val worldGraph = match.second
             if (recipe != null) {
+                // it checks anyway so whatever
+                grantAdvancement(env.castingEntity as ServerPlayer,GRAPHTING)
+
                 println(recipe.id)
                 sprayAndPray(worldGraph)
                 theatrics(itemEntities, recipe, worldGraph)
