@@ -6,6 +6,7 @@ import at.petrak.hexcasting.api.casting.castables.SpellAction
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
 import at.petrak.hexcasting.api.casting.getList
+import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
@@ -68,7 +69,7 @@ object DisplayItemHelper {
 }
 
 object OpCraft : SpellAction  {
-    override val argc = 1
+    override val argc = 2
 
     override fun executeWithUserdata(
         args: List<Iota>,
@@ -76,6 +77,7 @@ object OpCraft : SpellAction  {
         tags: CompoundTag
     ): SpellAction.Result {
         val entityList = args.getList(0, argc)
+        val orientation = args.getVec3(1, argc)
         //if (!env.isEntityInRange(entityList)) {
             //  JavaMishapThrower.throwMishap(MishapEntityTooFarAway(target))
         //}
@@ -86,7 +88,7 @@ object OpCraft : SpellAction  {
         // TODO: get center of one of the items
         val target = env.castingEntity!!
         return SpellAction.Result(
-            Spell(entityList.toList()),
+            Spell(entityList.toList(), orientation),
             MediaConstants.DUST_UNIT / 10,
             listOf(burst(target.position().add(0.0, target.eyeHeight / 2.0, 0.0), 1.0, 10)),
             1
@@ -252,7 +254,7 @@ object OpCraft : SpellAction  {
 
     }
 
-    private class Spell(private val entityList: List<Iota>) : RenderedSpell {
+    private class Spell(private val entityList: List<Iota>, private val orientation: Vec3) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
             val itemEntities = entityList.mapNotNull { iota ->
                 val entity = (iota as? EntityIota)?.entity
@@ -261,7 +263,7 @@ object OpCraft : SpellAction  {
             println(itemEntities)
 
             // Now you have List<ItemEntity>
-            val match = matchRecipe(itemEntities, Vec3(0,1,0))
+            val match = matchRecipe(itemEntities, orientation)
             val recipe = match.first
             val worldGraph = match.second
             if (recipe != null) {

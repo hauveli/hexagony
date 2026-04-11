@@ -41,8 +41,12 @@ object GraphCraftingRecipes {
         val neighbors: MutableList<ItemNodeVanilla> = mutableListOf(),
         val nodeList: MutableList<ItemNodeVanilla> = mutableListOf(),
         val partitions: MutableList<Set<ItemNodeVanilla>> = mutableListOf(),
-        val orientation: Vec3
+        var orientation: Vec3 = Vec3.ZERO
     )
+
+    fun differenceInOrientation(desiredOrientation: Vec3, recipeOrientation: Vec3): Double {
+        return distanceSquared(desiredOrientation.normalize(), recipeOrientation.normalize())
+    }
 
     fun calculateOrientation(rootNode: ItemNodeVanilla) {
         /*
@@ -71,7 +75,7 @@ object GraphCraftingRecipes {
         for (node in rootNode.nodeList) {
             summedPositions = summedPositions.add(node.pos.subtract(rootNode.pos))
         }
-
+        rootNode.orientation = summedPositions
     }
 
     fun distanceSquared(a: Vec3, b: Vec3): Double {
@@ -160,7 +164,7 @@ object GraphCraftingRecipes {
                 if (recipe.id.path.equals("iron_block")) println(ingredient.items.toString())
                 // all valid ingredients
                 val matchStack = ingredient.items
-                val pos = Vec3(x.toDouble(), 0.0, y.toDouble())
+                val pos = Vec3(x.toDouble(), y.toDouble(), 0.0) // I'm unsure if I prefer x 0 y or x y 0
                 nodes.add(ItemNodeVanilla(matchStack, pos))
             }
         }
@@ -178,6 +182,8 @@ object GraphCraftingRecipes {
         centerNode.nodeList.addAll(nodes)
 
         makePartitions(centerNode)
+
+        calculateOrientation(centerNode)
 
         return centerNode
     }
@@ -306,11 +312,17 @@ object GraphCraftingRecipes {
 
     fun matchRecipe(entities: List<ItemEntity>, orientation: Vec3): Pair<Recipe<*>?,ItemNode> {
         val worldGraph = GraphCrafting.buildGraph(entities)
+        var minimumDistance = Double.MAX_VALUE
+        var bestMatch: Recipe<*>? = null
         for (recipe in recipes) {
             if ( matchGraphs(worldGraph, recipe.second) ) {
-                return Pair(recipe.first, worldGraph)
+                val dist = differenceInOrientation(orientation, recipe.second.orientation)
+                if (dist + EPSILON < minimumDistance) {
+                    minimumDistance = dist
+                    bestMatch = recipe.first
+                }
             }
         }
-        return Pair(null, worldGraph)
+        return Pair(bestMatch, worldGraph)
     }
 }
