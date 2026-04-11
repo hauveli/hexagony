@@ -1,6 +1,7 @@
 package hauveli.hexagony.common.craft
 
 import hauveli.hexagony.common.craft.GraphCrafting.ItemNode
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.item.ItemEntity
@@ -24,10 +25,9 @@ object GraphCraftingRecipes {
     fun init(level: ServerLevel) {
         val manager = level.recipeManager
         val list = mutableListOf<Pair<Recipe<*>, ItemNodeVanilla>>()
-        val craftingRecipes = manager.getAllRecipesFor(RecipeType.CRAFTING)
 
-        craftingRecipes.forEach { recipe ->
-            if (recipe is CraftingRecipe) {
+        manager.recipes.forEach { recipe ->
+            if (recipe is CraftingRecipe) { // TODO: some way to mark a recipe? idk, it should be registerable via datapack if I fix the json reading...
                 val centerNode = fromCraftingRecipe(recipe)
                 if (centerNode != null) {
                     list.add(Pair(recipe, centerNode))
@@ -163,7 +163,6 @@ object GraphCraftingRecipes {
                 index++
                 // skip empty
                 if (ingredient.test(ItemStack.EMPTY)) continue
-                if (recipe.id.path.equals("iron_block")) println(ingredient.items.toString())
                 // all valid ingredients
                 val matchStack = ingredient.items
                 val pos = Vec3(x.toDouble(), y.toDouble(), 0.0) // I'm unsure if I prefer x 0 y or x y 0
