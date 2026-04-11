@@ -261,7 +261,7 @@ object OpCraft : SpellAction  {
             println(itemEntities)
 
             // Now you have List<ItemEntity>
-            val match = matchRecipe(itemEntities)
+            val match = matchRecipe(itemEntities, Vec3(0,1,0))
             val recipe = match.first
             val worldGraph = match.second
             if (recipe != null) {

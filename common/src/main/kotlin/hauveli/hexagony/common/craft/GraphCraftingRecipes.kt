@@ -37,11 +37,42 @@ object GraphCraftingRecipes {
 
     class ItemNodeVanilla(
         val validIngredients: Array<ItemStack>,
-        val pos: Vec3,
+        val pos: Vec3, // huh...? actually yeah beacuse it's useful to keep for checking stuff so why not
         val neighbors: MutableList<ItemNodeVanilla> = mutableListOf(),
         val nodeList: MutableList<ItemNodeVanilla> = mutableListOf(),
-        val partitions: MutableList<Set<ItemNodeVanilla>> = mutableListOf()
+        val partitions: MutableList<Set<ItemNodeVanilla>> = mutableListOf(),
+        val orientation: Vec3
     )
+
+    fun calculateOrientation(rootNode: ItemNodeVanilla) {
+        /*
+            I think this should work for determining orientation?
+            committing now because tummy ache
+
+            Ex:   -> (1,0,0) + (1,0,1) + (1,0,2) = (3,0,3)
+                  -> (0,0,0) + (0,0,1) + (0,0,2) = (0,0,3)
+            _ X _
+            _ X _
+            _ X _
+
+            Ex:   -> (0,0,2) + (1,0,1) + (2,0,0) = (3,0,3)
+                  -> (0,0,0) + (1,0,-1) + (2,0,-2) = (3,0,-3)
+            _ _ X
+            _ X _
+            X _ _
+
+            Ex:   -> (0,0,1) + (1,0,1) + (2,0,1) = (3,0,3)
+                  -> (0,0,0) + (1,0,0) + (2,0,0) = (3,0,0)
+            _ _ _
+            X X X
+            _ _ _
+         */
+        var summedPositions = Vec3.ZERO
+        for (node in rootNode.nodeList) {
+            summedPositions = summedPositions.add(node.pos.subtract(rootNode.pos))
+        }
+
+    }
 
     fun distanceSquared(a: Vec3, b: Vec3): Double {
         // if the game ever adds more dimensions, this is where I'd want to change it...
@@ -273,7 +304,7 @@ object GraphCraftingRecipes {
         return false
     }
 
-    fun matchRecipe(entities: List<ItemEntity>): Pair<Recipe<*>?,ItemNode> {
+    fun matchRecipe(entities: List<ItemEntity>, orientation: Vec3): Pair<Recipe<*>?,ItemNode> {
         val worldGraph = GraphCrafting.buildGraph(entities)
         for (recipe in recipes) {
             if ( matchGraphs(worldGraph, recipe.second) ) {
