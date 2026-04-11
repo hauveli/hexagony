@@ -1,6 +1,5 @@
 {
   "required": true,
-  "refmap": "hexagony-common.refmap.json",
   "package": "hauveli.hexagony.mixin",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
