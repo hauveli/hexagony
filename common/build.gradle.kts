@@ -8,12 +8,16 @@ architectury {
 }
 /*
 loom {
-    // Name of your refmap file
     mixin {
         defaultRefmapName.set ("mixins.hexagony.refmap.json")
     }
 }
 */
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(kotlin("reflect"))
