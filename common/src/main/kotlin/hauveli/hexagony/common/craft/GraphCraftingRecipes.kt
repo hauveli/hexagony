@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.crafting.CraftingRecipe
 import net.minecraft.world.item.crafting.Recipe
+import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
@@ -19,12 +20,13 @@ import kotlin.math.pow
 object GraphCraftingRecipes {
     // recipes here is what matters, and init
     lateinit var recipes: MutableList<Pair<Recipe<*>, ItemNodeVanilla>>
-
+    // I'm hoping this will always load AFTER all other mods haha...
     fun init(level: ServerLevel) {
         val manager = level.recipeManager
         val list = mutableListOf<Pair<Recipe<*>, ItemNodeVanilla>>()
+        val craftingRecipes = manager.getAllRecipesFor(RecipeType.CRAFTING)
 
-        manager.recipes.forEach { recipe ->
+        craftingRecipes.forEach { recipe ->
             if (recipe is CraftingRecipe) {
                 val centerNode = fromCraftingRecipe(recipe)
                 if (centerNode != null) {
