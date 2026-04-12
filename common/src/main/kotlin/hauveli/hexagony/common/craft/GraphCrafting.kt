@@ -154,17 +154,30 @@ object GraphCrafting {
     }
 
     fun subtract(worldItemNode: ItemNode) {
+        val checkedNodes = mutableSetOf<ItemNode>()
+        val level = worldItemNode.entity.level()
         for (matchingPartition in worldItemNode.matchingPartitions) {
             println("Subtracting!")
             for (node in matchingPartition) {
-                val stack = node.entity.item
-                stack.shrink(1)
-
-                // what the fuck? why is this not called in .shrink()?
-                if (stack.isEmpty) {
+                if (!checkedNodes.contains(node)) {
+                    checkedNodes.add(node)
+                    // TOdo: I guess respawn the items at their positions?
+                    val pos = node.entity.position()
+                    val stack = node.entity.item;
+                    stack.shrink(1)
                     node.entity.discard()
-                } else {
-                    node.entity.item = stack
+                    if (!stack.isEmpty) {
+                        node.entity.item = stack;
+                        level.addFreshEntity(
+                            ItemEntity(
+                                level,
+                                pos.x,
+                                pos.y,
+                                pos.z,
+                                stack
+                            )
+                        )
+                    }
                 }
             }
         }
