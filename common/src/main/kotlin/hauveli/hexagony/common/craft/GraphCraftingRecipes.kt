@@ -1,16 +1,15 @@
 package hauveli.hexagony.common.craft
 
 import hauveli.hexagony.common.craft.GraphCrafting.ItemNode
+import hauveli.hexagony.registry.HexagonyRecipeTypes
 import net.minecraft.world.item.ItemStack
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.Container
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.TransientCraftingContainer
 import net.minecraft.world.item.crafting.CraftingRecipe
 import net.minecraft.world.item.crafting.Recipe
-import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.phys.Vec3
@@ -24,10 +23,22 @@ import kotlin.math.pow
  */
 object GraphCraftingRecipes {
     // recipes here is what matters, and init
+    lateinit var graphRecipes: MutableList<Pair<Recipe<*>, ItemNodeVanilla>>
     lateinit var shapedRecipes: MutableList<Pair<Recipe<*>, ItemNodeVanilla>>
     lateinit var shapelessRecipes: MutableList<Pair<Recipe<*>, ItemNodeVanilla>>
 
-    private fun getAllShapedRecipesAtRuntime(level: ServerLevel) {
+    fun getGraphRecipesAtRuntime(level: ServerLevel) {
+        val recipes = level.recipeManager.getAllRecipesFor(HexagonyRecipeTypes.GRAPH_TYPE.value)
+        val list = mutableListOf<Pair<Recipe<*>, ItemNodeVanilla>>()
+        // recipe component 1
+        // itemNodeVanilla component 2
+        for (recipe in recipes) {
+            list.add(Pair(recipe, recipe.centerNode))
+        }
+        graphRecipes =  list
+    }
+
+    private fun getShapedRecipesAtRuntime(level: ServerLevel) {
         val manager = level.recipeManager
         val list = mutableListOf<Pair<Recipe<*>, ItemNodeVanilla>>()
 
@@ -42,7 +53,7 @@ object GraphCraftingRecipes {
         shapedRecipes =  list
     }
 
-    private fun getAllShapelessRecipesAtRuntime(level: ServerLevel) {
+    private fun getShapelessRecipesAtRuntime(level: ServerLevel) {
         val manager = level.recipeManager
         val list = mutableListOf<Pair<Recipe<*>, ItemNodeVanilla>>()
 
@@ -59,8 +70,10 @@ object GraphCraftingRecipes {
 
     // I'm hoping this will always load AFTER all other mods haha...
     fun init(level: ServerLevel) {
-        getAllShapedRecipesAtRuntime(level)
-        getAllShapelessRecipesAtRuntime(level)
+        if (level.isClientSide) return
+        getShapedRecipesAtRuntime(level)
+        getShapelessRecipesAtRuntime(level)
+        getGraphRecipesAtRuntime(level)
     }
 
     class ItemNodeVanilla(
@@ -423,6 +436,16 @@ object GraphCraftingRecipes {
 
         for (recipe in shapedRecipes) {
             // print(recipe.first.id)
+            if ( matchGraphs(worldGraph, recipe.second) ) {
+                val dist = differenceInOrientation(orientation, recipe.second.orientation)
+                if (dist + EPSILON < minimumDistance) {
+                    minimumDistance = dist
+                    bestMatch = recipe.first
+                }
+            }
+        }
+
+        for (recipe in graphRecipes) {
             if ( matchGraphs(worldGraph, recipe.second) ) {
                 val dist = differenceInOrientation(orientation, recipe.second.orientation)
                 if (dist + EPSILON < minimumDistance) {

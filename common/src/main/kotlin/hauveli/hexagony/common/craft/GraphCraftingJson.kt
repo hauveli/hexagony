@@ -48,7 +48,7 @@ object GraphCraftingJson {
         .setLenient()
         .create()
 
-    fun parse(json: String): Root {
+    fun parse(json: JsonObject): Root {
         return gson.fromJson(json, Root::class.java)
     }
 
@@ -76,9 +76,9 @@ object GraphCraftingJson {
         )
     }
 
-    fun buildFromJson(file: String): Pair<ItemNodeVanilla, ResourceLocation> {
+    fun buildFromJson(json: JsonObject): Pair<ItemNodeVanilla, ResourceLocation> {
 
-        val jsonRoot = parse(file)
+        val jsonRoot = parse(json)
 
         val partitions = jsonRoot.partitions
         val resultId = ResourceLocation(jsonRoot.result.item)

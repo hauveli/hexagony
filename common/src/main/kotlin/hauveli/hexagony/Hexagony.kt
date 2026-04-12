@@ -6,7 +6,6 @@ import hauveli.hexagony.common.control.PlayerActionAPI
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.common.control.PlayerControlData.Companion.onJoinServer
 import hauveli.hexagony.common.craft.GraphCraftingRecipes
-import hauveli.hexagony.common.craft.GraphRecipeLoader
 import hauveli.hexagony.common.misc.TickScheduler
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
@@ -17,7 +16,10 @@ import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.registry.HexagonyActions
 import hauveli.hexagony.registry.HexagonyBlockEntities
 import hauveli.hexagony.registry.HexagonyBlocks
+import hauveli.hexagony.registry.HexagonyDamageTypes
 import hauveli.hexagony.registry.HexagonyItems
+import hauveli.hexagony.registry.HexagonyRecipeSerializers
+import hauveli.hexagony.registry.HexagonyRecipeTypes
 import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener
 
@@ -43,7 +45,10 @@ object Hexagony {
             HexagonyActions,
             HexagonyBlocks,
             HexagonyItems,
-            HexagonyBlockEntities // Blocks must be registered first in order to access block.value!!!
+            // HexagonyDamageTypes,
+            HexagonyBlockEntities, // Blocks must be registered first in order to access block.value!!!
+            HexagonyRecipeSerializers,
+            HexagonyRecipeTypes
         )
         // It works and I'm lazy?
         HexagonyNetworking.init()
@@ -52,7 +57,7 @@ object Hexagony {
             server ->
             // custom weirdo recipe stuff
             GraphCraftingRecipes.init(server.overworld().level)
-            GraphRecipeLoader.loadAll() // TODO: only run this once somehow...
+            // GraphRecipeLoader.loadAll() // TODO: only run this once somehow...
             // player clone and control stuff
             PlayerControlData.init(server)
         })

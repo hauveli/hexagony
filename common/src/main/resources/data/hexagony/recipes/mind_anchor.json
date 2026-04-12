@@ -1,4 +1,5 @@
 {
+  "type": "hexagony:graph_crafting",
   "partitions": {
     "somePartitionName": {
       "1": {
