@@ -22,6 +22,9 @@ object GraphRecipeLoader {
             "/data/${Hexagony.MODID}/$folder/mind_anchor.json"
         )
 
+        // todo: support for shapeless recipes?
+        // not even sure if that would be needed, it should be possible
+        // to register a big shapeless recipe and have it work so I think I won't do that...
         for (path in files) {
             try {
                 val input = javaClass.getResourceAsStream(path)
@@ -30,7 +33,8 @@ object GraphRecipeLoader {
                 val graphJson = Gson().fromJson(json, GraphJson::class.java)
                 val (centerNode, resultId) = GraphCraftingJson.buildFromJson(graphJson)
                 val recipe = GraphRecipe(resultId, centerNode, resultId)
-                GraphCraftingRecipes.recipes.add(Pair(recipe, centerNode))
+                // technically, this should probably be its own recipe type, as it is shaped, but not 2D.
+                GraphCraftingRecipes.shapedRecipes.add(Pair(recipe, centerNode))
                 println("Loaded graph recipe: $path")
 
             } catch (e: Exception) {

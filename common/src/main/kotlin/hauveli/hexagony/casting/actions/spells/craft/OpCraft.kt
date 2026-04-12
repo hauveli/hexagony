@@ -149,7 +149,7 @@ object OpCraft : SpellAction  {
             worldGraph.pos.z,
             recipe.getResultItem(level.registryAccess())
         )
-        subtract(worldGraph)
+        subtract(worldGraph, recipe)
 
         val sortedByDistance = itemEntities.sortedBy { it.distanceToSqr(worldGraph.entity) }
 

@@ -50,7 +50,8 @@ object GraphCraftingJson {
             val node = ItemNodeVanilla(
                 validIngredients = arrayOf(stack),
                 pos = Vec3.ZERO, // Replace with real positioning if needed
-                nodeList = nodeList
+                nodeList = nodeList,
+                shaped = true
             )
 
             builtNodes[id] = node

@@ -1,14 +1,18 @@
 package hauveli.hexagony.common.craft
 
 import hauveli.hexagony.common.craft.GraphCrafting.ItemNode
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.Container
 import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.TransientCraftingContainer
 import net.minecraft.world.item.crafting.CraftingRecipe
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.item.crafting.ShapedRecipe
+import net.minecraft.world.item.crafting.ShapelessRecipe
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 import kotlin.math.pow
@@ -20,21 +24,43 @@ import kotlin.math.pow
  */
 object GraphCraftingRecipes {
     // recipes here is what matters, and init
-    lateinit var recipes: MutableList<Pair<Recipe<*>, ItemNodeVanilla>>
-    // I'm hoping this will always load AFTER all other mods haha...
-    fun init(level: ServerLevel) {
+    lateinit var shapedRecipes: MutableList<Pair<Recipe<*>, ItemNodeVanilla>>
+    lateinit var shapelessRecipes: MutableList<Pair<Recipe<*>, ItemNodeVanilla>>
+
+    private fun getAllShapedRecipesAtRuntime(level: ServerLevel) {
         val manager = level.recipeManager
         val list = mutableListOf<Pair<Recipe<*>, ItemNodeVanilla>>()
 
         manager.recipes.forEach { recipe ->
             if (recipe is CraftingRecipe) { // TODO: some way to mark a recipe? idk, it should be registerable via datapack if I fix the json reading...
-                val centerNode = fromCraftingRecipe(recipe)
+                val centerNode = fromShapedCraftingRecipe(recipe)
                 if (centerNode != null) {
                     list.add(Pair(recipe, centerNode))
                 }
             }
         }
-        recipes =  list
+        shapedRecipes =  list
+    }
+
+    private fun getAllShapelessRecipesAtRuntime(level: ServerLevel) {
+        val manager = level.recipeManager
+        val list = mutableListOf<Pair<Recipe<*>, ItemNodeVanilla>>()
+
+        manager.recipes.forEach { recipe ->
+            if (recipe is CraftingRecipe) { // TODO: some way to mark a recipe? idk, it should be registerable via datapack if I fix the json reading...
+                val centerNode = fromShapelessCraftingRecipe(recipe)
+                if (centerNode != null) {
+                    list.add(Pair(recipe, centerNode))
+                }
+            }
+        }
+        shapelessRecipes =  list
+    }
+
+    // I'm hoping this will always load AFTER all other mods haha...
+    fun init(level: ServerLevel) {
+        getAllShapedRecipesAtRuntime(level)
+        getAllShapelessRecipesAtRuntime(level)
     }
 
     class ItemNodeVanilla(
@@ -43,7 +69,8 @@ object GraphCraftingRecipes {
         val neighbors: MutableList<ItemNodeVanilla> = mutableListOf(),
         val nodeList: MutableList<ItemNodeVanilla> = mutableListOf(),
         val partitions: MutableList<Set<ItemNodeVanilla>> = mutableListOf(),
-        var orientation: Vec3 = Vec3.ZERO
+        var orientation: Vec3 = Vec3.ZERO,
+        val shaped: Boolean
     )
 
     fun differenceInOrientation(desiredOrientation: Vec3, recipeOrientation: Vec3): Double {
@@ -148,7 +175,50 @@ object GraphCraftingRecipes {
         }
     }
 
-    fun fromCraftingRecipe(recipe: CraftingRecipe): ItemNodeVanilla? {
+    // only works on shapeless recipes......
+    // I don't really need to do this, I think, but whatever I might as well
+    // might be useful later
+    fun fromShapelessCraftingRecipe(recipe: CraftingRecipe): ItemNodeVanilla? {
+        // First construct a pretend layout of the items as they would be in a crafting table (in worldspace)
+        val ingredients = recipe.ingredients
+        val items = (recipe as? ShapelessRecipe)?.ingredients?.count() ?: 0
+
+        val nodes = mutableListOf<ItemNodeVanilla>()
+
+        var index = 0 // never exceeds height*width
+        for (x in 0 until items) {
+            val ingredient = ingredients[index]
+            index++
+            // skip empty
+            if (ingredient.test(ItemStack.EMPTY)) continue
+            // all valid ingredients
+            val matchStack = ingredient.items
+            val pos = Vec3(x.toDouble(), 0.0, 0.0) // I'm unsure if I prefer x 0 y or x y 0
+            nodes.add(ItemNodeVanilla(matchStack, pos, shaped=false))
+        }
+
+        // Now make the graph as before
+
+        // empty list to keep track of them later
+        //val connected = mutableSetOf<ItemNodeVanilla>()
+
+        // get center entity, then use this entity to get the centerNode from nodes
+        val centerNode = findCenter(nodes) ?: return null // should only be possible if empty? might be better to do !!
+        // centerNode is referenced in nodes
+        connectNearest(nodes)
+
+        centerNode.nodeList.addAll(nodes)
+
+        makePartitions(centerNode)
+
+        calculateOrientation(centerNode)
+
+        return centerNode
+    }
+
+
+    // only works on shaped recipes......
+    fun fromShapedCraftingRecipe(recipe: CraftingRecipe): ItemNodeVanilla? {
         // First construct a pretend layout of the items as they would be in a crafting table (in worldspace)
         val ingredients = recipe.ingredients
         val width = (recipe as? ShapedRecipe)?.width ?: 0
@@ -166,7 +236,7 @@ object GraphCraftingRecipes {
                 // all valid ingredients
                 val matchStack = ingredient.items
                 val pos = Vec3(x.toDouble(), y.toDouble(), 0.0) // I'm unsure if I prefer x 0 y or x y 0
-                nodes.add(ItemNodeVanilla(matchStack, pos))
+                nodes.add(ItemNodeVanilla(matchStack, pos, shaped=true))
             }
         }
 
@@ -302,12 +372,39 @@ object GraphCraftingRecipes {
     ): Boolean {
 
         val equal = neighborhoodIsEqual(worldRoot, recipeRoot)
+        println("Eq:${equal}")
         if (equal) {
             val partitionsEqualToo = atLeastMatchesRecipe(worldRoot, recipeRoot)
             return partitionsEqualToo
         }
-        println("returning false I guess")
 
+        return false
+    }
+
+    // TODO: would it be faster to just check the items myself than using a container?
+    fun matchShapeless(worldRoot: ItemNode, recipe: Recipe<*>): Boolean {
+        val level = worldRoot.entity.level()
+        val stacks = worldRoot.nodeList.map  { it.entity.item } // should I do item.copy()?
+        // TODO: I'm worried there is an edge case where:
+        // Items exist, but are duplicates, and also in a shapeless recipe
+        // I can' think of any right now but if there is a problem, it's probably that
+
+        val dummyMenu = object : AbstractContainerMenu(null, -1) {
+            override fun quickMoveStack(
+                player: Player,
+                index: Int
+            ): ItemStack? {
+                TODO("Not yet implemented")
+            }
+
+            override fun stillValid(player: Player) = false
+        }
+        val container = TransientCraftingContainer(dummyMenu, 3, 3)
+        stacks.forEachIndexed { index, stack ->
+            container.setItem(index, stack)
+        }
+        if ((recipe as CraftingRecipe).matches(container, level))
+            return true // return right away if any partition is a match
         return false
     }
 
@@ -315,7 +412,17 @@ object GraphCraftingRecipes {
         val worldGraph = GraphCrafting.buildGraph(entities)
         var minimumDistance = Double.MAX_VALUE
         var bestMatch: Recipe<*>? = null
-        for (recipe in recipes) {
+        // if the shapeless recipe matches, don't need to check the shaped one?
+        // Shapeless recipes also have no orientation, so it can return immediately
+        // instead of checking all recipes...
+        for (recipe in shapelessRecipes) {
+            if ( matchShapeless(worldGraph, recipe.first) ) {
+                return Pair(recipe.first, worldGraph)
+            }
+        }
+
+        for (recipe in shapedRecipes) {
+            // print(recipe.first.id)
             if ( matchGraphs(worldGraph, recipe.second) ) {
                 val dist = differenceInOrientation(orientation, recipe.second.orientation)
                 if (dist + EPSILON < minimumDistance) {

@@ -8,6 +8,8 @@ import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.Recipe
+import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 import kotlin.math.pow
@@ -153,7 +155,16 @@ object GraphCrafting {
         return centerNode
     }
 
-    fun subtract(worldItemNode: ItemNode) {
+    fun subtract(worldItemNode: ItemNode, recipe: Recipe<*>) {
+        val shaped = recipe is ShapedRecipe
+        if (shaped) {
+            subtractShaped(worldItemNode)
+        } else {
+            subtractShapeless(worldItemNode)
+        }
+    }
+
+    fun subtractShaped(worldItemNode: ItemNode) {
         val checkedNodes = mutableSetOf<ItemNode>()
         val level = worldItemNode.entity.level()
         for (matchingPartition in worldItemNode.matchingPartitions) {
@@ -178,6 +189,33 @@ object GraphCrafting {
                             )
                         )
                     }
+                }
+            }
+        }
+    }
+
+    fun subtractShapeless(worldItemNode: ItemNode) {
+        val checkedNodes = mutableSetOf<ItemNode>()
+        val level = worldItemNode.entity.level()
+        for (node in worldItemNode.nodeList) {
+            if (!checkedNodes.contains(node)) {
+                checkedNodes.add(node)
+                // TOdo: I guess respawn the items at their positions?
+                val pos = node.entity.position()
+                val stack = node.entity.item;
+                stack.shrink(1)
+                node.entity.discard()
+                if (!stack.isEmpty) {
+                    node.entity.item = stack;
+                    level.addFreshEntity(
+                        ItemEntity(
+                            level,
+                            pos.x,
+                            pos.y,
+                            pos.z,
+                            stack
+                        )
+                    )
                 }
             }
         }
