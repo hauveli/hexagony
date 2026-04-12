@@ -157,7 +157,15 @@ object GraphCrafting {
         for (matchingPartition in worldItemNode.matchingPartitions) {
             println("Subtracting!")
             for (node in matchingPartition) {
-                node.entity.item.shrink(1)
+                val stack = node.entity.item
+                stack.shrink(1)
+
+                // what the fuck? why is this not called in .shrink()?
+                if (stack.isEmpty) {
+                    node.entity.discard()
+                } else {
+                    node.entity.item = stack
+                }
             }
         }
     }
