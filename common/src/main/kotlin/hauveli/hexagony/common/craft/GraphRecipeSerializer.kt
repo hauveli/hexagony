@@ -13,10 +13,10 @@ class GraphRecipeSerializer : RecipeSerializer<GraphRecipe> {
         json: JsonObject
     ): GraphRecipe {
 
-        val graphJson = Gson().fromJson(json, GraphCraftingJson.GraphJson::class.java)
+        val graphJson = Gson().fromJson(json, GraphCraftingJson.Root::class.java)
 
         val (centerNode, resultId) =
-            GraphCraftingJson.buildFromJson(graphJson)
+            GraphCraftingJson.buildFromJson("TODO")
 
         return GraphRecipe(id, centerNode, resultId)
     }

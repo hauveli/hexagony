@@ -2,6 +2,7 @@ package hauveli.hexagony.common.craft
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import net.minecraft.core.NonNullList
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.FriendlyByteBuf
@@ -41,5 +42,10 @@ class GraphRecipe(
 
     override fun getResultItem(registryAccess: RegistryAccess): ItemStack {
         return ItemStack(BuiltInRegistries.ITEM.get(resultId))
+    }
+
+    override fun getRemainingItems(container: Container): NonNullList<ItemStack?>? {
+        // return super.getRemainingItems(container)
+        TODO("Not yet implemented")
     }
 }

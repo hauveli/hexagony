@@ -1,11 +1,14 @@
 package hauveli.hexagony.common.craft
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import hauveli.hexagony.common.craft.GraphCraftingRecipes.ItemNodeVanilla
+import hauveli.hexagony.common.craft.GraphCraftingRecipes.connectBidirectional
 import hauveli.hexagony.common.craft.GraphCraftingRecipes.connectNearest
 import hauveli.hexagony.common.craft.GraphCraftingRecipes.findCenter
+import hauveli.hexagony.common.craft.GraphCraftingRecipes.makePartitions
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
@@ -19,71 +22,99 @@ import net.minecraft.world.item.crafting.ShapedRecipe
 import net.minecraft.world.phys.Vec3
 
 object GraphCraftingJson {
-    data class GraphJson(
-        val nodes: Map<String, NodeJson>,
-        val result: String
+    data class Root(
+        val partitions: Map<String, Map<String, Node>>,
+        val result: ResultItem,
+        val remaining: RemainingItems?
     )
 
-    data class NodeJson(
-        val center: Boolean? = false,
+    data class Node(
+        val center: Boolean? = null,
+        val validIngredients: List<String>,
+        val count: Int? = 1,
+        val relations: List<String>? = emptyList()
+    )
+
+    data class RemainingItems(
+        val items: List<ResultItem>
+    )
+
+    data class ResultItem(
         val item: String,
-        val count: Int = 1,
-        val relations: List<String> = emptyList()
+        val count: Int? = 1
     )
 
-    fun buildFromJson(json: GraphJson): Pair<ItemNodeVanilla, ResourceLocation> {
+    val gson: Gson = GsonBuilder()
+        .setLenient()
+        .create()
 
-        val gsonNodes = json.nodes
+    fun parse(json: String): Root {
+        return gson.fromJson(json, Root::class.java)
+    }
 
-        // Shared node list (important: same reference for all nodes)
-        val nodeList = mutableListOf<ItemNodeVanilla>()
+    fun toStack(itemId: String, count: Int): ItemStack {
+        val item = BuiltInRegistries.ITEM.get(ResourceLocation(itemId))
+        return ItemStack(item, count)
+    }
 
-        // Temporary map ID -> Node
-        val builtNodes = mutableMapOf<String, ItemNodeVanilla>()
+    fun toResult(stack: ResultItem): ItemStack {
+        return toStack(stack.item, stack.count ?: 1)
+    }
 
-        // ---- PASS 1: Create nodes (no relations yet)
-        for ((id, nodeJson) in gsonNodes) {
+    fun ingredientsFromNode(jsonNode: Node): Array<ItemStack> {
+        val count = jsonNode.count ?: 1
+        return jsonNode.validIngredients
+            .map { toStack(it, count) }
+            .toTypedArray()
+    }
 
-            val item = BuiltInRegistries.ITEM.get(ResourceLocation(nodeJson.item))
-            val stack = ItemStack(item, nodeJson.count)
+    fun jsonNodeToItemNode(jsonNode: Node): ItemNodeVanilla {
+        return ItemNodeVanilla(
+            validIngredients = ingredientsFromNode(jsonNode),
+            pos = Vec3.ZERO,
+            shaped = true
+        )
+    }
 
-            val node = ItemNodeVanilla(
-                validIngredients = arrayOf(stack),
-                pos = Vec3.ZERO, // Replace with real positioning if needed
-                nodeList = nodeList,
-                shaped = true
-            )
+    fun buildFromJson(file: String): Pair<ItemNodeVanilla, ResourceLocation> {
 
-            builtNodes[id] = node
-            nodeList.add(node)
-        }
+        val jsonRoot = parse(file)
 
-        // ---- PASS 2: Link relations
-        for ((id, nodeJson) in gsonNodes) {
-            val node = builtNodes[id]!!
+        val partitions = jsonRoot.partitions
+        val resultId = ResourceLocation(jsonRoot.result.item)
+        val remainingItems = jsonRoot.remaining
 
-            for (relationId in nodeJson.relations) {
-                val neighbor = builtNodes[relationId]
-                    ?: error("Unknown relation id: $relationId")
+        val nodes = mutableListOf<ItemNodeVanilla>()
 
-                // bi-directional relationship so I have to add both
-                if (!node.neighbors.contains(neighbor)) {
-                    node.neighbors.add(neighbor)
-                }
-                if (!neighbor.neighbors.contains(node)) {
-                    neighbor.neighbors.add(node)
+        var centerNodeIndex = -1
+        // First, need to get every node from every partition
+        for (partition in partitions) {
+            val partitionNeighborhood: MutableMap<String, ItemNodeVanilla> = mutableMapOf()
+            for (node in partition.value) {
+                val jsonNode = node.value
+                val actualNode = jsonNodeToItemNode(jsonNode)
+                nodes.add(actualNode)
+                partitionNeighborhood[node.key] = actualNode
+                if (jsonNode.center ?: false)
+                    centerNodeIndex = nodes.count() - 1
+            }
+            // second loop, we want to give each node a neighbor
+            for (node in partition.value) {
+                val relations = node.value.relations ?: continue
+                val actualNode = partitionNeighborhood[node.key] ?: continue
+                for (neighbor in relations) {
+                    val actualNeighbor = partitionNeighborhood[neighbor] ?: continue
+                    connectBidirectional(
+                        actualNode,
+                        actualNeighbor
+                    )
                 }
             }
         }
-
-        // ---- Find center node
-        val centerEntry = gsonNodes.entries.find { it.value.center == true }
-            ?: error("No center node defined")
-
-        val centerNode = builtNodes[centerEntry.key]
-            ?: error("Center node missing after build")
-
-        val resultId = ResourceLocation(json.result)
+        if (centerNodeIndex == -1) throw Error("No node was specified as center!")
+        val centerNode = nodes[centerNodeIndex]
+        // I don't even need to read partitions this way...
+        makePartitions(centerNode)
 
         return centerNode to resultId // Pair strcuture is so weird in kotlin, (A,B) would be a bit more clear...
     }

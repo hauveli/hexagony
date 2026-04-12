@@ -339,7 +339,7 @@ object GraphCraftingRecipes {
     // TODO: here, get the partition
     // Note: the important point is that for each partition in the RECIPE, there is at least one matching set of partitions
     // in the world....
-    private fun makePartitions(rootNode: ItemNodeVanilla) {
+    fun makePartitions(rootNode: ItemNodeVanilla) {
         val visited = mutableSetOf<ItemNodeVanilla>()
 
         for (node in rootNode.nodeList) {
