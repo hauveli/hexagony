@@ -7,9 +7,13 @@ import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.item.BucketItem
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.PotionItem
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.ShapedRecipe
+import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 import kotlin.math.pow
@@ -164,45 +168,49 @@ object GraphCrafting {
         }
     }
 
-    fun subtractShaped(worldItemNode: ItemNode) {
-        val checkedNodes = mutableSetOf<ItemNode>()
-        val level = worldItemNode.entity.level()
-        for (matchingPartition in worldItemNode.matchingPartitions) {
-            println("Subtracting!")
-            for (node in matchingPartition) {
-                if (!checkedNodes.contains(node)) {
-                    checkedNodes.add(node)
-                    // TOdo: I guess respawn the items at their positions?
-                    val pos = node.entity.position()
-                    val stack = node.entity.item;
-                    stack.shrink(1)
-                    node.entity.discard()
-                    if (!stack.isEmpty) {
-                        node.entity.item = stack;
-                        level.addFreshEntity(
-                            ItemEntity(
-                                level,
-                                pos.x,
-                                pos.y,
-                                pos.z,
-                                stack
-                            )
-                        )
-                    }
-                }
-            }
-        }
+    fun isFluidContainer(stack: ItemStack): Boolean {
+        val item = stack.item
+
+        return item is BucketItem ||
+                item is PotionItem ||
+                item == Items.GLASS_BOTTLE ||
+                item == Items.HONEY_BOTTLE ||
+                item == Items.DRAGON_BREATH
     }
 
-    fun subtractShapeless(worldItemNode: ItemNode) {
+    // TODO: actually use the recipe to know what is remaining....
+    fun getEmptyFluidContainer(itemStack: ItemStack): ItemStack {
+        val item = itemStack.item
+        when (item) {
+            is BucketItem -> {
+                return Items.BUCKET.defaultInstance
+            }
+            is PotionItem -> {
+                return Items.GLASS_BOTTLE.defaultInstance
+            }
+        }
+        return Items.GLASS_BOTTLE.defaultInstance
+    }
+
+    fun subtractThisSetsItems(nodeSet: Set<ItemNode>, level: Level) {
         val checkedNodes = mutableSetOf<ItemNode>()
-        val level = worldItemNode.entity.level()
-        for (node in worldItemNode.nodeList) {
+        for (node in nodeSet) {
             if (!checkedNodes.contains(node)) {
                 checkedNodes.add(node)
                 // TOdo: I guess respawn the items at their positions?
                 val pos = node.entity.position()
                 val stack = node.entity.item;
+                if (isFluidContainer(stack)) {
+                    level.addFreshEntity(
+                        ItemEntity(
+                            level,
+                            pos.x,
+                            pos.y,
+                            pos.z,
+                            getEmptyFluidContainer(stack)
+                        )
+                    )
+                }
                 stack.shrink(1)
                 node.entity.discard()
                 if (!stack.isEmpty) {
@@ -219,6 +227,19 @@ object GraphCrafting {
                 }
             }
         }
+    }
+
+    fun subtractShaped(worldItemNode: ItemNode) {
+        val level = worldItemNode.entity.level()
+        for (matchingPartition in worldItemNode.matchingPartitions) {
+            println("Subtracting!")
+            subtractThisSetsItems(matchingPartition, level)
+        }
+    }
+
+    fun subtractShapeless(worldItemNode: ItemNode) {
+        val level = worldItemNode.entity.level()
+        subtractThisSetsItems(worldItemNode.nodeList.toSet(), level)
     }
 
     fun sprayAndPray(node: ItemNode) {

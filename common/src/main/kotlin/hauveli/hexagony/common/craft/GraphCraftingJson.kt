@@ -82,7 +82,7 @@ object GraphCraftingJson {
 
         val partitions = jsonRoot.partitions
         val resultId = ResourceLocation(jsonRoot.result.item)
-        val remainingItems = jsonRoot.remaining
+        val remainingItems = jsonRoot.remaining // not supported now, unsure if I want to support it?
 
         val nodes = mutableListOf<ItemNodeVanilla>()
 
