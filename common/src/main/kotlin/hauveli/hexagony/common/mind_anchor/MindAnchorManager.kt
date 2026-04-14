@@ -33,6 +33,7 @@ object MindAnchorManager {
     private val MAX_CAPACITY = 9_000_000_000_000_000_000L
 
     var localPos: Vec3? = null
+    @JvmStatic
     var localMedia: Float? = null
 
     private val runtime = ConcurrentHashMap<UUID, MindAnchorRuntime>()

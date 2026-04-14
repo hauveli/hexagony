@@ -28,12 +28,11 @@ public abstract class LocalPlayerTickDeathMixin {
             MinecraftServer server = level.getServer();
             assert server != null;
             player.sendSystemMessage(Component.nullToEmpty("aaaaaaaaaaa"));
-            ServerPlayer sp = server.getPlayerList().getPlayer(player.getUUID());
-            assert sp != null;
-            player.sendSystemMessage(Component.nullToEmpty("euuuuuuuuuuu"));
-            Long media = MindAnchorManager.INSTANCE.getMedia(sp);
-            if (media != null && media > 0L) {
+            Float media = MindAnchorManager.getLocalMedia();
+            if (media != null && media > 0f) {
                 player.sendSystemMessage(Component.nullToEmpty("YPIIIII"));
+                player.sendSystemMessage(Component.nullToEmpty("ABORTING PROPER DEATH!!!!"));
+                player.sendSystemMessage(Component.nullToEmpty("afterlife"));
                 ci.cancel();
             }
         }
