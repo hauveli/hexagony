@@ -1,20 +1,17 @@
 package hauveli.hexagony.mixin.mindanchor;
 
-import dev.architectury.event.events.common.EntityEvent;
-import hauveli.hexagony.mind_anchor.MindAnchorManager;
+import hauveli.hexagony.common.mind_anchor.MindAnchorManager;
 import hauveli.hexagony.registry.HexagonyItems;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Objects;
-import java.util.UUID;
 
 import static hauveli.hexagony.common.blocks.anchors.MindAnchor.TAG_STORED_PLAYER;
 import static org.apache.commons.lang3.math.NumberUtils.toByte;

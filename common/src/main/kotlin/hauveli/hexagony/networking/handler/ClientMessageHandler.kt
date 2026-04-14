@@ -1,15 +1,11 @@
 package hauveli.hexagony.networking.handler
 
-import dev.architectury.event.events.common.TickEvent
 import dev.architectury.networking.NetworkManager.PacketContext
 import hauveli.hexagony.common.control.PlayerActionAPI
-import hauveli.hexagony.common.control.PlayerActionAPI.onServerTick
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.config.HexagonyServerConfig
-import hauveli.hexagony.mind_anchor.MindAnchorManager
-import hauveli.hexagony.mind_anchor.MindAnchorScanner
+import hauveli.hexagony.common.mind_anchor.MindAnchorManager
 import hauveli.hexagony.networking.msg.*
-import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.world.phys.Vec3
 
 

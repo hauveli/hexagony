@@ -5,7 +5,7 @@ import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.casting.castables.ConstMediaAction
 import at.petrak.hexcasting.api.casting.iota.DoubleIota
 import at.petrak.hexcasting.api.casting.iota.GarbageIota
-import hauveli.hexagony.mind_anchor.MindAnchorManager.getMedia
+import hauveli.hexagony.common.mind_anchor.MindAnchorManager.getMedia
 import net.minecraft.server.level.ServerPlayer
 
 object OpMindAnchorMedia : ConstMediaAction  {

@@ -1,25 +1,16 @@
 package hauveli.hexagony.common.bilocation
 
 import at.petrak.hexcasting.common.lib.HexAttributes
-import hauveli.hexagony.mind_anchor.MindAnchorManager
-import hauveli.hexagony.mind_anchor.MindAnchorManager.getPosition
-import net.minecraft.client.Camera
+import hauveli.hexagony.common.mind_anchor.MindAnchorManager
 import net.minecraft.client.CameraType
 import net.minecraft.client.ClientRecipeBook
 import net.minecraft.client.Minecraft
-import net.minecraft.client.multiplayer.ClientLevel
-import net.minecraft.client.multiplayer.ClientPacketListener
-import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.player.Input
-import net.minecraft.client.player.KeyboardInput
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.stats.StatsCounter
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.MoverType
-import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
-import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -109,6 +100,8 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
         }
 
         fun detachCamera(client: Minecraft) {
+            // TODO: do the shader thing HERE
+            // Shader should likely be set from within detach, and unset from reattach
             println("DetachCamera Called")
             val player = client.player ?: return
             println("Past player")

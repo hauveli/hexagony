@@ -1,10 +1,7 @@
 package hauveli.hexagony.networking.msg
 
-import hauveli.hexagony.common.control.PlayerControlData
-import hauveli.hexagony.mind_anchor.MindAnchorManager
-import hauveli.hexagony.mind_anchor.MindAnchorScanner
+import hauveli.hexagony.common.mind_anchor.MindAnchorManager
 import net.minecraft.network.FriendlyByteBuf
-import org.joml.Vector3f
 
 data class MsgMindAnchorFloatS2C(
     val action: MindAnchorManager.MessageTypesFloat,

@@ -1,12 +1,10 @@
-package hauveli.hexagony.mind_anchor
+package hauveli.hexagony.common.mind_anchor
 
 import dev.architectury.event.events.common.PlayerEvent
-import hauveli.hexagony.Hexagony
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
 import hauveli.hexagony.common.blocks.BlockFullMindAnchor
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.networking.msg.MsgMindAnchorPositionS2C
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
@@ -14,7 +12,6 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.phys.Vec3
-import org.spongepowered.asm.mixin.Unique
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -46,7 +43,7 @@ object MindAnchorManager {
         mindUUID: UUID,
         blockEntity: BlockEntity
     ) {
-        val data = MindAnchorData.get(server)
+        val data = MindAnchorData.Companion.get(server)
         val entry = data.getOrCreate(mindUUID)
 
         entry.type = AnchorType.BLOCK_ENTITY
@@ -57,7 +54,6 @@ object MindAnchorManager {
         // get media here, hmm...
         val be = blockEntity as BlockEntityFullMindAnchor
         entry.media = (MAX_CAPACITY - be.remainingMediaCapacity()).coerceAtLeast(0L)
-
         runtime(mindUUID).trackBlock(blockEntity)
 
         data.setDirty()
@@ -70,7 +66,7 @@ object MindAnchorManager {
         mindUUID: UUID,
         entity: ItemEntity
     ) {
-        val data = MindAnchorData.get(server)
+        val data = MindAnchorData.Companion.get(server)
         val entry = data.getOrCreate(mindUUID)
 
         entry.type = AnchorType.ITEM_ENTITY
@@ -98,7 +94,7 @@ object MindAnchorManager {
         holder: Entity,
         itemStack: ItemStack
     ) {
-        val data = MindAnchorData.get(server)
+        val data = MindAnchorData.Companion.get(server)
         val entry = data.getOrCreate(mindUUID)
 
         entry.type = AnchorType.ITEM_STACK
@@ -193,10 +189,10 @@ object MindAnchorManager {
     }
 
     fun subtractMedia(serverPlayer: ServerPlayer, toSubtract: Long) {
-        val rt = runtime[serverPlayer.uuid]
-        val be = rt?.blockEntity
-        val ie = rt?.itemEntity
-        val it = rt?.itemStack // because itemStack has no position
+        val rt = runtime[serverPlayer.uuid] ?: return
+        val be = rt.blockEntity
+        val ie = rt.itemEntity
+        val it = rt.itemStack // because itemStack has no position
 
         if (be != null) {
             (be as BlockEntityFullMindAnchor)

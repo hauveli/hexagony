@@ -5,7 +5,7 @@ import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.casting.castables.ConstMediaAction
 import at.petrak.hexcasting.api.casting.iota.BooleanIota
 import at.petrak.hexcasting.api.casting.iota.GarbageIota
-import hauveli.hexagony.mind_anchor.MindAnchorManager.getPowered
+import hauveli.hexagony.common.mind_anchor.MindAnchorManager.getPowered
 
 object OpMindAnchorPowered : ConstMediaAction  {
     override val argc = 0

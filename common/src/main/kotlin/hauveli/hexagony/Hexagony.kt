@@ -1,27 +1,22 @@
 package hauveli.hexagony
 
 import dev.architectury.event.events.common.LifecycleEvent
-import dev.architectury.event.events.common.PlayerEvent
 import hauveli.hexagony.common.control.PlayerActionAPI
 import hauveli.hexagony.common.control.PlayerControlData
-import hauveli.hexagony.common.control.PlayerControlData.Companion.onJoinServer
 import hauveli.hexagony.common.craft.GraphCraftingRecipes
 import hauveli.hexagony.common.misc.TickScheduler
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import hauveli.hexagony.config.HexagonyServerConfig
-import hauveli.hexagony.mind_anchor.MindAnchorManager
+import hauveli.hexagony.common.mind_anchor.MindAnchorManager
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.registry.HexagonyActions
 import hauveli.hexagony.registry.HexagonyBlockEntities
 import hauveli.hexagony.registry.HexagonyBlocks
-import hauveli.hexagony.registry.HexagonyDamageTypes
 import hauveli.hexagony.registry.HexagonyItems
 import hauveli.hexagony.registry.HexagonyRecipeSerializers
 import hauveli.hexagony.registry.HexagonyRecipeTypes
-import net.minecraft.server.packs.resources.ResourceManager
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener
 
 /*
 TODO: lore

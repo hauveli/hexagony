@@ -1,17 +1,15 @@
-package hauveli.hexagony.mind_anchor
+package hauveli.hexagony.common.mind_anchor
 
-import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
 import net.minecraft.core.BlockPos
+import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
-import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
-import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
 
@@ -169,7 +167,7 @@ class MindAnchorData : SavedData() {
                 val uuid = e.getUUID("Mind")
                 val type = AnchorType.valueOf(e.getString("Type"))
                 val dim = ResourceKey.create(
-                    net.minecraft.core.registries.Registries.DIMENSION,
+                    Registries.DIMENSION,
                     ResourceLocation(e.getString("Dimension"))
                 )
 

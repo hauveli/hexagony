@@ -9,11 +9,11 @@ import at.petrak.hexcasting.api.misc.MediaConstants;
 import at.petrak.hexcasting.api.pigment.FrozenPigment;
 import at.petrak.hexcasting.common.casting.actions.spells.OpFlight;
 import at.petrak.hexcasting.common.casting.actions.spells.great.OpBrainsweep;
+import at.petrak.hexcasting.common.lib.HexItems;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
-import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor;
 import hauveli.hexagony.common.misc.AdvancementProvider;
-import hauveli.hexagony.mind_anchor.MindAnchorManager;
+import hauveli.hexagony.common.mind_anchor.MindAnchorManager;
 import hauveli.hexagony.registry.HexagonyBlocks;
 import hauveli.hexagony.registry.HexagonyDamageTypes;
 import net.minecraft.core.BlockPos;
@@ -21,7 +21,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -34,6 +33,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -47,7 +47,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
-import java.util.Objects;
 
 
 import at.petrak.hexcasting.api.casting.OperatorUtils;
@@ -282,6 +281,10 @@ public abstract class PlayerEntityOpBrainsweepMixin {
                     .setPlayer(
                         serverPlayer.getGameProfile(),
                         serverPlayer.getUUID()
+                    );
+            ((BlockEntityFullMindAnchor) be)
+                    .insertMedia(
+                            ItemStack.of(HexItems.BATTERY_QUENCHED_BLOCK_STACK.get().getTag())
                     );
             be.setChanged(); // mark dirty so it saves
         }

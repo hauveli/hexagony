@@ -6,8 +6,7 @@ import at.petrak.hexcasting.api.casting.castables.ConstMediaAction
 import at.petrak.hexcasting.api.casting.iota.GarbageIota
 import at.petrak.hexcasting.api.casting.iota.Vec3Iota
 import com.mojang.authlib.GameProfile
-import hauveli.hexagony.mind_anchor.MindAnchorManager.forwardToPlayer
-import hauveli.hexagony.mind_anchor.MindAnchorManager.getPosition
+import hauveli.hexagony.common.mind_anchor.MindAnchorManager.getPosition
 import net.minecraft.client.Minecraft
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.level.GameType

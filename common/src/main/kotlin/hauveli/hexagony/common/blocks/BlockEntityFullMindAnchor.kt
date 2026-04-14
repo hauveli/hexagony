@@ -12,9 +12,6 @@ import at.petrak.hexcasting.common.items.magic.ItemCreativeUnlocker
 import at.petrak.hexcasting.common.lib.HexItems
 import com.mojang.authlib.GameProfile
 import com.mojang.datafixers.util.Pair
-import hauveli.hexagony.common.blocks.anchors.MindAnchor
-import hauveli.hexagony.mind_anchor.MindAnchorData
-import hauveli.hexagony.mind_anchor.MindAnchorManager
 import hauveli.hexagony.registry.HexagonyBlockEntities
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -23,8 +20,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtUtils
 import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
-import net.minecraft.server.MinecraftServer
-import net.minecraft.server.level.ServerLevel
 import net.minecraft.tags.BlockTags
 import net.minecraft.util.Mth
 import net.minecraft.world.WorldlyContainer

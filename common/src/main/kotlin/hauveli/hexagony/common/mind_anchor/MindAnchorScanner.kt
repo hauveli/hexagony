@@ -1,13 +1,9 @@
-package hauveli.hexagony.mind_anchor
+package hauveli.hexagony.common.mind_anchor
 
 import hauveli.hexagony.common.blocks.anchors.MindAnchor.Companion.TAG_STORED_PLAYER
 import net.minecraft.server.MinecraftServer
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.Container
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.item.ItemEntity
-import net.minecraft.world.entity.npc.Villager
-import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.phys.Vec3
 import java.util.UUID
 
