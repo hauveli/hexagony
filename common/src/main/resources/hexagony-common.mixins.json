@@ -9,7 +9,8 @@
     "bilocation.BilocationDisableIngameGuiMixin",
     "bilocation.BilocationNoInputMinecraftMixin",
     "bilocation.BilocationSetPositionCameraMixin",
-    "mindanchor.NoDeathScreenClientPacketListenerMixin"
+    "mindanchor.LocalPlayerTickDeathMixin",
+    "mindanchor.NoDeathScreenMixin"
   ],
   "server": [
   ],
