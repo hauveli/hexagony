@@ -178,7 +178,6 @@ class FakeServerPlayer(
             // target.setExperienceLevels(dummySource.experienceLevel)
             target.setExperiencePoints(dummySource.totalExperience)
 
-            target.health = dummySource.health
             target.foodData.foodLevel = dummySource.foodData.foodLevel
             target.foodData.setSaturation(dummySource.foodData.saturationLevel)
             target.foodData.setExhaustion(dummySource.foodData.exhaustionLevel)
@@ -210,6 +209,7 @@ class FakeServerPlayer(
             // I can't think of a way to determine which modifiers would be bound
             // to the "mind" and which would be bound to the "body"...
             removeHealthCastingPenalty(target)
+            target.health = dummySource.health
 
             target.attributes.load( dummySource.attributes.save() )
 
