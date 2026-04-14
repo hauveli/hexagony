@@ -2,9 +2,8 @@ package hauveli.hexagony.common.bilocation
 
 import com.mojang.authlib.GameProfile
 import hauveli.hexagony.common.control.PlayerControlData
-import net.minecraft.commands.arguments.EntityAnchorArgument
+import hauveli.hexagony.config.HexagonyServerConfig.config
 import net.minecraft.core.BlockPos
-import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.PacketFlow
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
@@ -15,6 +14,8 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
@@ -92,6 +93,27 @@ class FakeServerPlayer(
 
     companion object {
 
+
+        private fun removeHealthCastingPenalty(player: ServerPlayer) {
+            val maxHealth = player.getAttribute(Attributes.MAX_HEALTH) ?: return
+            // can maxHealth be null?
+            val modifiers: MutableCollection<AttributeModifier> = maxHealth.modifiers
+
+            // future me speaking, I should probably just have incremented a single modifier instead of doing this...
+            // TODO: make healthcast penalty modifier a single modifier instead of multiple
+            // todo: and simply decrement the value of it....
+            for (modifier in modifiers.stream().toList()) {
+                if (config.overcastAttributeName == modifier.name) {
+                    // checking against name, not uuid
+                    // It might be better to construct a list of uuids and store those
+                    // but frankly, chance of hexcasting_overcast_penalty
+                    // being used for anything but this is so exceedingly low I dont care
+                    // to implement the cleaner solution, this simple one is ok for now
+                    maxHealth.removeModifier(modifier)
+                }
+            }
+        }
+
         fun respawnFakeClone(server: MinecraftServer, level: ServerLevel, pos: Vec3, uuid: UUID): FakeServerPlayer {
             val clone = FakeServerPlayer(server, level, uuid)
 
@@ -121,81 +143,96 @@ class FakeServerPlayer(
             return clone
         }
 
-        fun copyPlayerDataFromTo(source: ServerPlayer, target: ServerPlayer) {
-            val server = source.server ?: throw IllegalStateException("Server null")
-            val level = source.level() as ServerLevel
-
+        // TODO: figure out how to set the gameMode in a smarter way...
+        fun copyPlayerDataFromTo(realSource: ServerPlayer, dummySource: ServerPlayer, target: ServerPlayer) {
             /*
             println(original.scoreboardName) // Player###
             println(original.name.toString()) // literal{Player###}
             println(original.customName.toString()) // null
              */
-            target.xRot = source.xRot
-            target.yRot = source.yRot
-            target.yHeadRot = source.yHeadRot
-            target.yBodyRot = source.yBodyRot
+            target.xRot = dummySource.xRot
+            target.yRot = dummySource.yRot
+            target.yHeadRot = dummySource.yHeadRot
+            target.yBodyRot = dummySource.yBodyRot
 
             // this shadows the items?
-            for (i in 0 until source.inventory.containerSize) {
-                val stack: ItemStack = source.inventory.getItem(i).copy()
+            for (i in 0 until dummySource.inventory.containerSize) {
+                val stack: ItemStack = dummySource.inventory.getItem(i).copy()
                 target.inventory.setItem(i, stack)
             }
 
             for (slot in EquipmentSlot.entries) {
-                val stack = source.getItemBySlot(slot).copy()
+                val stack = dummySource.getItemBySlot(slot).copy()
                 target.setItemSlot(slot, stack)
             }
 
-            target.experienceLevel = source.experienceLevel
-            target.experienceProgress = source.experienceProgress
-            target.health = source.health
-            target.foodData.foodLevel = source.foodData.foodLevel
-            target.foodData.setSaturation(source.foodData.saturationLevel)
-            target.foodData.setExhaustion(source.foodData.exhaustionLevel)
+            target.removeAllEffects() // hope whatever was applying an important effect wasnt single shot!
+            for (effect in dummySource.activeEffects) {
+                target.addEffect(effect)
+            }
 
-            target.isInvisible = source.isInvisible
-            target.isCustomNameVisible = source.isCustomNameVisible
-            target.customName = source.name
+            target.experienceLevel = dummySource.experienceLevel
+            target.experienceProgress = dummySource.experienceProgress
+            // target.setExperienceLevels(dummySource.experienceLevel)
+            target.setExperiencePoints(dummySource.totalExperience)
 
-            target.invulnerableTime = source.invulnerableTime
-            target.abilities.invulnerable = source.abilities.invulnerable
-            target.isInvulnerable = source.isInvulnerable
-            target.hurtMarked = source.hurtMarked
-            target.remainingFireTicks = source.remainingFireTicks
+            target.health = dummySource.health
+            target.foodData.foodLevel = dummySource.foodData.foodLevel
+            target.foodData.setSaturation(dummySource.foodData.saturationLevel)
+            target.foodData.setExhaustion(dummySource.foodData.exhaustionLevel)
+
+            target.isInvisible = dummySource.isInvisible
+            target.isCustomNameVisible = dummySource.isCustomNameVisible
+            target.customName = dummySource.name
+
+            target.invulnerableTime = dummySource.invulnerableTime
+            target.abilities.invulnerable = dummySource.abilities.invulnerable
+            target.isInvulnerable = dummySource.isInvulnerable
+            target.hurtMarked = dummySource.hurtMarked
+            target.remainingFireTicks = dummySource.remainingFireTicks
             // I could try to check the reply from a packet but that seems like way more effort than this, even if it would be better...
 
 
-            target.abilities.walkingSpeed = source.abilities.walkingSpeed
-            target.abilities.flyingSpeed = source.abilities.flyingSpeed
-            target.abilities.mayfly = source.abilities.mayfly
-            target.abilities.mayBuild = source.abilities.mayBuild
-            target.abilities.instabuild = source.abilities.instabuild
-            target.abilities.invulnerable = source.abilities.invulnerable
-            target.abilities.flying = source.abilities.flying
+            target.abilities.walkingSpeed = dummySource.abilities.walkingSpeed
+            target.abilities.flyingSpeed = dummySource.abilities.flyingSpeed
+            target.abilities.mayfly = dummySource.abilities.mayfly
+            target.abilities.mayBuild = dummySource.abilities.mayBuild
+            target.abilities.instabuild = dummySource.abilities.instabuild
+            target.abilities.invulnerable = dummySource.abilities.invulnerable
+            target.abilities.flying = dummySource.abilities.flying
 
-            target.setMaxUpStep( source.maxUpStep() )
+            target.setMaxUpStep( dummySource.maxUpStep() )
 
-            target.remainingFireTicks = source.remainingFireTicks
+            target.remainingFireTicks = dummySource.remainingFireTicks
 
-            target.attributes.load( source.attributes.save() )
+            // I can't think of a way to determine which modifiers would be bound
+            // to the "mind" and which would be bound to the "body"...
+            removeHealthCastingPenalty(target)
 
-            target.setGameMode(source.gameMode.gameModeForPlayer)
+            target.attributes.load( dummySource.attributes.save() )
+
+            // need real source for this, maybe...
+            target.setGameMode(realSource.gameMode.gameModeForPlayer)
 
             if (target.connection != null) {
                 target.teleportTo(
-                    source.serverLevel(),
-                    source.position().x,
-                    source.position().y,
-                    source.position().z,
-                    source.yRot,
-                    source.xRot
+                    dummySource.serverLevel(),
+                    dummySource.position().x,
+                    dummySource.position().y,
+                    dummySource.position().z,
+                    dummySource.yRot,
+                    dummySource.xRot
                 )
             } else {
-                target.setServerLevel(source.serverLevel())
-                target.setPos(source.position())
+                target.setServerLevel(dummySource.serverLevel())
+                target.setPos(dummySource.position())
             }
 
-            source.discard()
+
+            println("Max health was: ${target.maxHealth} for target")
+            println("Max health was: ${dummySource.maxHealth} for source")
+
+            dummySource.discard()
         }
 
         fun copyPlayerDataFrom(original: ServerPlayer): ServerPlayer {
@@ -222,6 +259,10 @@ class FakeServerPlayer(
             for (slot in EquipmentSlot.entries) {
                 val stack = original.getItemBySlot(slot).copy()
                 dummyHolder.setItemSlot(slot, stack)
+            }
+
+            for (effect in original.activeEffects) {
+                dummyHolder.addEffect(effect)
             }
 
             dummyHolder.experienceLevel = original.experienceLevel
@@ -256,8 +297,6 @@ class FakeServerPlayer(
             dummyHolder.remainingFireTicks = original.remainingFireTicks
 
             dummyHolder.attributes.load( original.attributes.save() )
-
-            dummyHolder.setGameMode(original.gameMode.gameModeForPlayer)
 
             dummyHolder.setPos(original.position())
 
@@ -304,8 +343,8 @@ class FakeServerPlayer(
             // newly spawned dummy should have nothing
             //val dummy = copyPlayerDataFrom(original)
             //copyPlayerDataFromTo(original, dummy)
-
             doFakeConnectionStuff(server, clone)
+
             return clone
         }
     }

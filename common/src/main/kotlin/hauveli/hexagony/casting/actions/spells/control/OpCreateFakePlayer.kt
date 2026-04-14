@@ -110,14 +110,14 @@ object OpCreateFakeplayer : SpellAction {
     fun swapHomunculusAndPlayer(realPlayer: ServerPlayer, homunculus: ServerPlayer) {
         val dummyRealplayer = copyPlayerDataFrom(realPlayer)
         val dummyHomunculus = copyPlayerDataFrom(homunculus)
-        copyPlayerDataFromTo(dummyHomunculus, realPlayer)
-        copyPlayerDataFromTo(dummyRealplayer, dummyHomunculus)
+        copyPlayerDataFromTo(homunculus, dummyHomunculus, realPlayer)
+        copyPlayerDataFromTo(realPlayer, dummyRealplayer, homunculus)
     }
 
     private class Spell(private val pos: Vec3, private val entity: Entity?, val duration: Long) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
 
-            val server = env.getWorld().getServer()
+            val server = env.getWorld().server
             val caster = env.castingEntity
 
             // Wow, did not know origins compatibility existed in that, nice.
