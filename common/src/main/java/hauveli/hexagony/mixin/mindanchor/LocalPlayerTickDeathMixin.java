@@ -17,24 +17,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LocalPlayerTickDeathMixin {
     @Inject(method = "tickDeath", at = @At("HEAD"), cancellable = true)
     private void grafted$disableDeathScreen(CallbackInfo ci) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        player.respawn();
-        ci.cancel();
-        player.sendSystemMessage(Component.nullToEmpty("hrmmmm"));
-        if (player != null
-                && PlayerControlData.Companion.getMyEntry().isDetached()) {
-            player.sendSystemMessage(Component.nullToEmpty("erm erm erm"));
-            Level level = player.level();
-            MinecraftServer server = level.getServer();
-            assert server != null;
-            player.sendSystemMessage(Component.nullToEmpty("aaaaaaaaaaa"));
-            Float media = MindAnchorManager.getLocalMedia();
-            if (media != null && media > 0f) {
-                player.sendSystemMessage(Component.nullToEmpty("YPIIIII"));
-                player.sendSystemMessage(Component.nullToEmpty("ABORTING PROPER DEATH!!!!"));
-                player.sendSystemMessage(Component.nullToEmpty("afterlife"));
-                ci.cancel();
-            }
+        Float media = MindAnchorManager.getLocalMedia();
+        if (media != null && media > 0f) {
+            ci.cancel();
         }
     }
 }

@@ -25,24 +25,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class NoDeathScreenMixin {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void grafted$disableDeathScreen(CallbackInfo ci) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        ci.cancel();
-        player.sendSystemMessage(Component.nullToEmpty("hrmmmm"));
-        if (player != null
-                && PlayerControlData.Companion.getMyEntry().isDetached()) {
-            player.sendSystemMessage(Component.nullToEmpty("erm erm erm"));
-            Level level = player.level();
-            MinecraftServer server = level.getServer();
-            assert server != null;
-            player.sendSystemMessage(Component.nullToEmpty("aaaaaaaaaaa"));
-            ServerPlayer sp = server.getPlayerList().getPlayer(player.getUUID());
-            assert sp != null;
-            player.sendSystemMessage(Component.nullToEmpty("euuuuuuuuuuu"));
-            Long media = MindAnchorManager.INSTANCE.getMedia(sp);
-            if (media != null && media > 0L) {
-                player.sendSystemMessage(Component.nullToEmpty("YPIIIII"));
-                ci.cancel();
-            }
+        Float media = MindAnchorManager.getLocalMedia();
+        if (media != null && media > 0f) {
+            ci.cancel();
         }
     }
 }
