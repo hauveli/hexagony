@@ -110,6 +110,7 @@ object OpCreateFakeplayer : SpellAction {
     fun swapHomunculusAndPlayer(realPlayer: ServerPlayer, homunculus: ServerPlayer) {
         val dummyRealplayer = copyPlayerDataFrom(realPlayer)
         val dummyHomunculus = copyPlayerDataFrom(homunculus)
+        // This is gonna cause some obvious issues, level is not accessible so need to fix that most likely...
         copyPlayerDataFromTo(homunculus, dummyHomunculus, realPlayer)
         copyPlayerDataFromTo(realPlayer, dummyRealplayer, homunculus)
     }

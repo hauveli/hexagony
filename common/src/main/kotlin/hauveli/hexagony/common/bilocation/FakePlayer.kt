@@ -29,14 +29,16 @@ import net.minecraft.world.scores.Team
 import java.util.*
 
 
-class FakeServerPlayer(
+class FakePlayer(
     server: MinecraftServer,
     level: ServerLevel,
-    uuid: UUID
-) : ServerPlayer(
-    server,
+    pos: BlockPos,
+    yRot: Float
+) : Player(
     level,
-    GameProfile(uuid, "Homunculus")
+    pos,
+    yRot,
+    GameProfile(UUID.randomUUID(), "HomunculusDummy")
     ) {
 
     override fun isInvulnerable(): Boolean {
@@ -89,7 +91,6 @@ class FakeServerPlayer(
 
     fun removeForReal() {
         stopTracking()
-        super.disconnect()
         super.discard()
     }
 
@@ -116,37 +117,9 @@ class FakeServerPlayer(
             }
         }
 
-        fun respawnFakeClone(server: MinecraftServer, level: ServerLevel, pos: Vec3, uuid: UUID): FakeServerPlayer {
-            val clone = FakeServerPlayer(server, level, uuid)
-
-            val connection = DummyConnection(PacketFlow.SERVERBOUND)
-            val listener = DummyServerGamePacketListenerImpl(server, connection,clone)
-            connection.setListener(listener)
-            server.playerList.placeNewPlayer(
-                connection,
-                clone
-            )
-            // clone.getAttribute(Attributes.)
-
-            // fuck creative mode
-            clone.setGameMode(GameType.SURVIVAL)
-            clone.stopRiding()
-            clone.tags.add("FakePlayer") // I don't know if there's a better way to get whether a ServerPlayer is fake or not
-
-            clone.setPos(pos)
-
-            server.playerList
-                .broadcastAll(ClientboundTeleportEntityPacket( clone )) //instance.dimension);
-            server.playerList.broadcastAll(
-                ClientboundRotateHeadPacket(clone, (clone.yHeadRot * 256 / 360).toInt().toByte()),
-                level.dimension()
-            )
-
-            return clone
-        }
 
         // TODO: figure out how to set the gameMode in a smarter way...
-        fun copyPlayerDataFromTo(realSource: ServerPlayer, dummySource: FakePlayer, target: ServerPlayer) {
+        fun copyPlayerDataFromTo(realSource: ServerPlayer, dummySource: ServerPlayer, target: ServerPlayer) {
             /*
             println(original.scoreboardName) // Player###
             println(original.name.toString()) // literal{Player###}
@@ -218,7 +191,7 @@ class FakeServerPlayer(
 
             if (target.connection != null) {
                 target.teleportTo(
-                    realSource.serverLevel(),
+                    dummySource.serverLevel(),
                     dummySource.position().x,
                     dummySource.position().y,
                     dummySource.position().z,
@@ -226,7 +199,7 @@ class FakeServerPlayer(
                     dummySource.xRot
                 )
             } else {
-                target.setServerLevel(realSource.serverLevel())
+                target.setServerLevel(dummySource.serverLevel())
                 target.setPos(dummySource.position())
             }
 
@@ -247,7 +220,6 @@ class FakeServerPlayer(
                 original.blockPosition(),
                 original.yRot
             )
-
             // fuck everything
             /*
             println(original.scoreboardName) // Player###
@@ -312,107 +284,11 @@ class FakeServerPlayer(
             return dummyHolder
         }
 
-        fun doFakeConnectionStuff(server: MinecraftServer, fakePlayer: ServerPlayer) {
-            val connection = DummyConnection(PacketFlow.SERVERBOUND)
-            val listener = DummyServerGamePacketListenerImpl(server, connection, fakePlayer)
-            connection.setListener(listener)
-            server.playerList.placeNewPlayer(
-                connection,
-                fakePlayer
-            )
-            // clone.getAttribute(Attributes.)
-
-            // fuck creative mode
-            fakePlayer.setGameMode(GameType.SURVIVAL)
-            fakePlayer.stopRiding()
-            fakePlayer.tags.add("FakePlayer") // I don't know if there's a better way to get whether a ServerPlayer is fake or not
-
-            server.playerList
-                .broadcastAll(ClientboundTeleportEntityPacket( fakePlayer )) //instance.dimension);
-            server.playerList.broadcastAll(
-                ClientboundRotateHeadPacket(fakePlayer, (fakePlayer.yHeadRot * 256 / 360).toInt().toByte()),
-                fakePlayer.level().dimension()
-            )
-
-        }
-
-        fun spawnFakeClone(original: ServerPlayer, pos: Vec3, uuid: UUID): FakeServerPlayer {
-            val server = original.server ?: throw IllegalStateException("Server null")
-            val level = original.level() as ServerLevel
-
-            val clone = FakeServerPlayer(server, level, uuid)
-
-            clone.moveTo(pos.x, pos.y, pos.z, 0f, 0f)
-            // Idk if feet or eyes
-            //clone.lookAt(EntityAnchorArgument.Anchor.FEET, original.eyePosition)
-            // can't call lookat without connection...
-
-            // newly spawned dummy should have nothing
-            //val dummy = copyPlayerDataFrom(original)
-            //copyPlayerDataFromTo(original, dummy)
-            doFakeConnectionStuff(server, clone)
-
-            return clone
-        }
     }
 
     // everything below here is from gnembon's fabric carpet mod (or modified version of it)
     // https://github.com/gnembon/fabric-carpet/blob/1.20.2/src/main/java/carpet/patches/EntityPlayerMPFake.java
     override fun onEquipItem(slot: EquipmentSlot, previous: ItemStack, stack: ItemStack) {
         if (!isUsingItem) super.onEquipItem(slot, previous, stack)
-    }
-
-    override fun tick() {
-        if (this.getServer()!!.tickCount % 10 == 0) {
-            this.connection.resetPosition()
-            this.serverLevel().chunkSource.move(this)
-        }
-        try {
-            super.tick()
-            this.doTick()
-            if (isDeadOrDying) {
-                shakeOff()
-                if (deathTime >= 20) {
-                    removeForReal()
-                }
-            }
-        } catch (ignored: NullPointerException) {
-            // happens with that paper port thingy - not sure what that would fix, but hey
-            // the game not gonna crash violently.
-        }
-    }
-
-    private fun shakeOff() {
-        if (vehicle is Player) stopRiding()
-        for (passenger in indirectPassengers) {
-            if (passenger is Player) passenger.stopRiding()
-        }
-    }
-
-    override fun getIpAddress(): String {
-        return "127.0.0.1"
-    }
-
-    override fun allowsListing(): Boolean {
-        return false
-    }
-
-    override fun checkFallDamage(y: Double, onGround: Boolean, state: BlockState, pos: BlockPos) {
-        doCheckFallDamage(0.0, y, 0.0, onGround)
-    }
-
-    override fun changeDimension(serverLevel: ServerLevel): Entity? {
-        super.changeDimension(serverLevel)
-        if (wonGame) {
-            val p = ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.PERFORM_RESPAWN)
-            connection.handleClientCommand(p)
-        }
-
-        // If above branch was taken, *this* has been removed and replaced, the new instance has been set
-        // on 'our' connection (which is now theirs, but we still have a ref).
-        if (connection.player.isChangingDimension) {
-            connection.player.hasChangedDimension()
-        }
-        return connection.player
     }
 }
