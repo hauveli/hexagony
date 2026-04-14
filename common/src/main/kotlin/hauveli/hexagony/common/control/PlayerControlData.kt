@@ -99,6 +99,7 @@ data class PlayerControlEntry (
     }
 
     fun detach(serverPlayer: ServerPlayer) {
+        isDetached = true
         if (serverPlayer.tags.contains("FakePlayer")) {
             serverPlayer.hurt(serverPlayer.damageSources().genericKill(),
                 (serverPlayer.maxHealth+serverPlayer.absorptionAmount) * 2)
