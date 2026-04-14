@@ -4,27 +4,19 @@ import com.mojang.authlib.GameProfile
 import hauveli.hexagony.common.control.PlayerControlData
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.network.protocol.PacketFlow
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
 import net.minecraft.network.protocol.game.ServerboundClientCommandPacket
 import net.minecraft.server.MinecraftServer
-import net.minecraft.server.TickTask
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.tags.BlockTags
-import net.minecraft.tags.FluidTags
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.food.FoodData
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.GameType
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.PlayerTeam
@@ -128,6 +120,175 @@ class FakeServerPlayer(
             return clone
         }
 
+        fun copyPlayerDataFromTo(source: ServerPlayer, target: ServerPlayer) {
+            val server = source.server ?: throw IllegalStateException("Server null")
+            val level = source.level() as ServerLevel
+
+            /*
+            println(original.scoreboardName) // Player###
+            println(original.name.toString()) // literal{Player###}
+            println(original.customName.toString()) // null
+             */
+            target.xRot = source.xRot
+            target.yRot = source.yRot
+            target.yHeadRot = source.yHeadRot
+            target.yBodyRot = source.yBodyRot
+
+            // this shadows the items?
+            for (i in 0 until source.inventory.containerSize) {
+                val stack: ItemStack = source.inventory.getItem(i).copy()
+                target.inventory.setItem(i, stack)
+            }
+
+            for (slot in EquipmentSlot.entries) {
+                val stack = source.getItemBySlot(slot).copy()
+                target.setItemSlot(slot, stack)
+            }
+
+            target.experienceLevel = source.experienceLevel
+            target.experienceProgress = source.experienceProgress
+            target.health = source.health
+            target.foodData.foodLevel = source.foodData.foodLevel
+            target.foodData.setSaturation(source.foodData.saturationLevel)
+            target.foodData.setExhaustion(source.foodData.exhaustionLevel)
+
+            target.isInvisible = source.isInvisible
+            target.isCustomNameVisible = source.isCustomNameVisible
+            target.customName = source.name
+
+            target.invulnerableTime = source.invulnerableTime
+            target.abilities.invulnerable = source.abilities.invulnerable
+            target.isInvulnerable = source.isInvulnerable
+            target.hurtMarked = source.hurtMarked
+            target.remainingFireTicks = source.remainingFireTicks
+            // I could try to check the reply from a packet but that seems like way more effort than this, even if it would be better...
+
+
+            target.abilities.walkingSpeed = source.abilities.walkingSpeed
+            target.abilities.flyingSpeed = source.abilities.flyingSpeed
+            target.abilities.mayfly = source.abilities.mayfly
+            target.abilities.mayBuild = source.abilities.mayBuild
+            target.abilities.instabuild = source.abilities.instabuild
+            target.abilities.invulnerable = source.abilities.invulnerable
+            target.abilities.flying = source.abilities.flying
+
+            target.setMaxUpStep( source.maxUpStep() )
+
+            target.remainingFireTicks = source.remainingFireTicks
+
+            target.attributes.load( source.attributes.save() )
+
+            target.setGameMode(source.gameMode.gameModeForPlayer)
+
+            target.teleportTo(
+                source.serverLevel(),
+                source.position().x,
+                source.position().y,
+                source.position().z,
+                source.yRot,
+                source.xRot
+            )
+
+            source.discard()
+        }
+
+        fun copyPlayerDataFrom(original: ServerPlayer): ServerPlayer {
+            val server = original.server ?: throw IllegalStateException("Server null")
+            val level = original.level() as ServerLevel
+
+            val dummyHolder = FakeServerPlayer(server, level, UUID.randomUUID())
+            /*
+            println(original.scoreboardName) // Player###
+            println(original.name.toString()) // literal{Player###}
+            println(original.customName.toString()) // null
+             */
+            dummyHolder.xRot = original.xRot
+            dummyHolder.yRot = original.yRot
+            dummyHolder.yHeadRot = original.yHeadRot
+            dummyHolder.yBodyRot = original.yBodyRot
+
+            // this shadows the items?
+            for (i in 0 until original.inventory.containerSize) {
+                val stack: ItemStack = original.inventory.getItem(i).copy()
+                dummyHolder.inventory.setItem(i, stack)
+            }
+
+            for (slot in EquipmentSlot.entries) {
+                val stack = original.getItemBySlot(slot).copy()
+                dummyHolder.setItemSlot(slot, stack)
+            }
+
+            dummyHolder.experienceLevel = original.experienceLevel
+            dummyHolder.experienceProgress = original.experienceProgress
+            dummyHolder.health = original.health
+            dummyHolder.foodData.foodLevel = original.foodData.foodLevel
+            dummyHolder.foodData.setSaturation(original.foodData.saturationLevel)
+            dummyHolder.foodData.setExhaustion(original.foodData.exhaustionLevel)
+
+            dummyHolder.isInvisible = original.isInvisible
+            dummyHolder.isCustomNameVisible = original.isCustomNameVisible
+            dummyHolder.customName = original.customName
+            // dummyHolder.hidePlayerName()
+
+            dummyHolder.invulnerableTime = original.invulnerableTime
+            dummyHolder.isInvulnerable = original.isInvulnerable
+            dummyHolder.hurtMarked = original.hurtMarked
+            dummyHolder.remainingFireTicks = original.remainingFireTicks
+            // I could try to check the reply from a packet but that seems like way more effort than this, even if it would be better...
+
+
+            dummyHolder.abilities.walkingSpeed = original.abilities.walkingSpeed
+            dummyHolder.abilities.flyingSpeed = original.abilities.flyingSpeed
+            dummyHolder.abilities.mayfly = original.abilities.mayfly
+            dummyHolder.abilities.mayBuild = original.abilities.mayBuild
+            dummyHolder.abilities.instabuild = original.abilities.instabuild
+            dummyHolder.abilities.invulnerable = original.abilities.invulnerable
+            dummyHolder.abilities.flying = original.abilities.flying
+
+            dummyHolder.setMaxUpStep( original.maxUpStep() )
+
+            dummyHolder.remainingFireTicks = original.remainingFireTicks
+
+            dummyHolder.attributes.load( original.attributes.save() )
+
+            dummyHolder.setGameMode(original.gameMode.gameModeForPlayer)
+
+            dummyHolder.teleportTo(
+                original.serverLevel(),
+                original.position().x,
+                original.position().y,
+                original.position().z,
+                original.yRot,
+                original.xRot
+            )
+
+            return dummyHolder
+        }
+
+        fun doFakeConnectionStuff(server: MinecraftServer, fakePlayer: ServerPlayer) {
+            val connection = DummyConnection(PacketFlow.SERVERBOUND)
+            val listener = DummyServerGamePacketListenerImpl(server, connection, fakePlayer)
+            connection.setListener(listener)
+            server.playerList.placeNewPlayer(
+                connection,
+                fakePlayer
+            )
+            // clone.getAttribute(Attributes.)
+
+            // fuck creative mode
+            fakePlayer.setGameMode(GameType.SURVIVAL)
+            fakePlayer.stopRiding()
+            fakePlayer.tags.add("FakePlayer") // I don't know if there's a better way to get whether a ServerPlayer is fake or not
+
+            server.playerList
+                .broadcastAll(ClientboundTeleportEntityPacket( fakePlayer )) //instance.dimension);
+            server.playerList.broadcastAll(
+                ClientboundRotateHeadPacket(fakePlayer, (fakePlayer.yHeadRot * 256 / 360).toInt().toByte()),
+                fakePlayer.level().dimension()
+            )
+
+        }
+
         fun spawnFakeClone(original: ServerPlayer, pos: Vec3, uuid: UUID): FakeServerPlayer {
             val server = original.server ?: throw IllegalStateException("Server null")
             val level = original.level() as ServerLevel
@@ -136,83 +297,11 @@ class FakeServerPlayer(
 
             clone.moveTo(pos.x, pos.y, pos.z, 0f, 0f)
 
-            /*
-            println(original.scoreboardName) // Player###
-            println(original.name.toString()) // literal{Player###}
-            println(original.customName.toString()) // null
-             */
+            // newly spawned dummy should have nothing
+            //val dummy = copyPlayerDataFrom(original)
+            //copyPlayerDataFromTo(original, dummy)
 
-            // this shadows the items?
-            for (i in 0 until original.inventory.containerSize) {
-                val stack: ItemStack = original.inventory.getItem(i).copy()
-                clone.inventory.setItem(i, stack)
-            }
-
-            for (slot in EquipmentSlot.entries) {
-                val stack = original.getItemBySlot(slot).copy()
-                clone.setItemSlot(slot, stack)
-            }
-
-            clone.experienceLevel = original.experienceLevel
-            clone.experienceProgress = original.experienceProgress
-            clone.health = original.health
-            clone.foodData.foodLevel = original.foodData.foodLevel
-            clone.foodData.setSaturation(original.foodData.saturationLevel)
-            clone.foodData.setExhaustion(original.foodData.exhaustionLevel)
-
-            clone.isInvisible = false
-            clone.isCustomNameVisible = false
-            clone.customName = Component.literal("Homunculus")
-            clone.hidePlayerName()
-
-            clone.invulnerableTime = 0
-            clone.abilities.invulnerable = false
-            clone.isInvulnerable = false
-            clone.hurtMarked = false
-            clone.remainingFireTicks = 0
-            // I could try to check the reply from a packet but that seems like way more effort than this, even if it would be better...
-
-
-            clone.abilities.walkingSpeed = original.abilities.walkingSpeed
-            clone.abilities.flyingSpeed = original.abilities.flyingSpeed
-            clone.abilities.mayfly = original.abilities.mayfly
-            clone.abilities.mayBuild = original.abilities.mayBuild
-            clone.abilities.instabuild = original.abilities.instabuild
-            clone.abilities.invulnerable = original.abilities.invulnerable
-            clone.abilities.flying = original.abilities.flying
-
-            clone.setMaxUpStep( original.maxUpStep() )
-
-            clone.remainingFireTicks = original.remainingFireTicks
-
-            clone.attributes.load( original.attributes.save() )
-
-            clone.abilities.invulnerable = false
-
-            val connection = DummyConnection(PacketFlow.SERVERBOUND)
-            val listener = DummyServerGamePacketListenerImpl(server, connection,clone)
-            connection.setListener(listener)
-            server.playerList.placeNewPlayer(
-                connection,
-                clone
-            )
-            // clone.getAttribute(Attributes.)
-
-
-            clone.setGameMode(original.gameMode.gameModeForPlayer)
-
-            // fuck creative mode
-            clone.setGameMode(GameType.SURVIVAL)
-            clone.stopRiding()
-            clone.tags.add("FakePlayer") // I don't know if there's a better way to get whether a ServerPlayer is fake or not
-
-            server.playerList
-                .broadcastAll(ClientboundTeleportEntityPacket( clone )) //instance.dimension);
-            server.playerList.broadcastAll(
-                ClientboundRotateHeadPacket(clone, (clone.yHeadRot * 256 / 360).toInt().toByte()),
-                level.dimension()
-            )
-
+            doFakeConnectionStuff(server, clone)
             return clone
         }
     }

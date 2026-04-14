@@ -24,6 +24,8 @@ object MindAnchorManager {
         POSITION
     }
 
+    // /give @p hexcasting:battery{"hexcasting:start_media":810200L, "hexcasting:media":810200L}
+
     private val MAX_CAPACITY = 9_000_000_000_000_000_000L
 
     var localPos: Vec3? = null

@@ -9,6 +9,8 @@ import at.petrak.hexcasting.api.casting.getInt
 import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
+import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.copyPlayerDataFrom
+import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.copyPlayerDataFromTo
 import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.spawnFakeClone
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.common.misc.AdvancementProvider.isTrepanned
@@ -106,30 +108,10 @@ object OpCreateFakeplayer : SpellAction {
     }
 
     fun swapHomunculusAndPlayer(realPlayer: ServerPlayer, homunculus: ServerPlayer) {
-        val targetLevel = homunculus.serverLevel()
-        val targetX = homunculus.position().x
-        val targetY = homunculus.position().y
-        val targetZ = homunculus.position().z
-        val targetLook = homunculus.lookAngle
-        val targetXRot = homunculus.xRot
-        val targetYRot = homunculus.yRot
-        homunculus.teleportTo(
-            realPlayer.serverLevel(),
-            realPlayer.position().x,
-            realPlayer.position().y,
-            realPlayer.position().z,
-            realPlayer.xRot,
-            realPlayer.yRot
-        )
-
-        realPlayer.teleportTo(
-            targetLevel,
-            targetX,
-            targetY,
-            targetZ,
-            targetXRot,
-            targetYRot
-        )
+        val dummyRealplayer = copyPlayerDataFrom(realPlayer)
+        val dummyHomunculus = copyPlayerDataFrom(homunculus)
+        copyPlayerDataFromTo(dummyHomunculus, realPlayer)
+        copyPlayerDataFromTo(dummyRealplayer, dummyHomunculus)
     }
 
     private class Spell(private val pos: Vec3, private val entity: Entity?, val duration: Long) : RenderedSpell {

@@ -1,7 +1,7 @@
 {
   name: "hexagony.book.patterns.spells.bilocation_spells",
   category: "hexcasting:patterns/spells",
-  icon: "minecraft:leather_boots",
+  icon: "minecraft:heart_of_the_sea{CustomModelData:270441}",
   "sortnum": 0,
   advancement: "hexagony:graft_succeeded",
   "read_by_default": false,

@@ -5,10 +5,11 @@
   "minVersion": "0.8",
   "client": [
     "bilocation.BilocationAntiSneakLocalPlayerMixin",
+    "bilocation.BilocationAntiTurnEntityMixin",
     "bilocation.BilocationDisableIngameGuiMixin",
     "bilocation.BilocationNoInputMinecraftMixin",
-    "bilocation.BilocationAntiTurnEntityMixin",
-    "bilocation.BilocationSetPositionCameraMixin"
+    "bilocation.BilocationSetPositionCameraMixin",
+    "mindanchor.NoDeathScreenClientPacketListenerMixin"
   ],
   "server": [
   ],
@@ -20,6 +21,7 @@
     "craft.SetItemStackItemDisplayInvoker",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "mindanchor.AddFreshEntityServerLevelMixin",
+    "mindanchor.GraftedPlayerEntityDieMixin",
     "mindanchor.MindAnchorInventorySlotMixin",
     "mindanchor.PlayerEntityOpBrainsweepMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",

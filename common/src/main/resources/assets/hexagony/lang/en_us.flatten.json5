@@ -1,4 +1,17 @@
 {
+  "macros": {
+    "<b>": "$(l)",
+    "<i>": "$(o)",
+    "</>": "$()",
+    "$(playerdummy)": "homunculus",
+    "$(playerdummys)": "homunculi",
+    "$(Playerdummy)": "Homunculus",
+    "$(Playerdummys)": "Homunculi",
+    "$(order)": "bid",
+    "$(orders)": "bids",
+    "$(Order)": "Bid",
+    "$(Orders)": "Bids",
+  },
   "advancement.hexagony": {
     "graft_attempted": {
       "title": "Trepidation",
@@ -10,7 +23,7 @@
     },
     "try_banish_self": {
       "title": "I Don't Want to Live on this Planet Anymore",
-      "desc": "As a real player, try to cast Banish Creature on yourself."
+      "desc": "As a real player, try to cast Banish Homunculus on yourself."
     },
     "detached": {
       "title": "I hope you planned a-head!",
@@ -65,10 +78,9 @@
     book: {
       "craft": {
         page: {
-          "1": "Deceptively tricky. This spell has nearly driven me mad trying to figure it out. It behaves stupidly simple yet preparing the conditions for the spell to work can become a chore. I placed my materials for a chain, one iron ingot in the center and two iron nuggets at opposite sides. And it worked, no matter the ordering in my list.",
-          "2": "Knowing that their relative positions in the real world matter, I tried to make a pickaxe. Same as before, and with caution to ensure the raw materials were positioned as any good crafty miner might, roughly in the shape of a pickaxe. This time, I got an axe...",
-          "3": "Finally! By precisely measuring out several holes and throwing my materials into them, I was able to construct a pickaxe, equal to that of any smith!",
-          "4": "Looking at the fruits of my casting, I'm reminded of an old arcane painting without direction, yet with structure... But why was there a cleric impetus $(br)and an empty impetus?",
+          "1": "Takes a list of dropped items and a vector to describe the orientation. When I cast this spell, the excess media lost clues me into what it was doing. The dense burst of particles is what Nature has deemed the center-most item, and the lines between each item seem to convey some type of network, or $(l)graph$().",
+          "2": "Each item, or $(l)node$() will tend to cling to its nearest neighbor, within some tolerance. The order of the items in any list and the direction of any individual item seem to have no bearing on the resulting connections. A consequence of these two points is that a $(l)graph$()'s structure, how many groups or $(l)partition$()s it consists of, is within my control.",
+          "3": ""
         }
       },
       "bilocation": {
@@ -107,20 +119,20 @@
           },
           control_spells: {
             "": "Control Spells",
-            "move/stopall" : "An important signal! Stops actions being performed by the creature, continuous and otherwise. Conveniently, an exception to the cost rule facing this page; It's free to cast.",
-            "create": "Bids the creature to the given location, for as many seconds as the integer I provide. Costs a charged amethyst, plus units of Amethyst Dust equal to the square of the duration in hours, starting from 1.",
-            "destroy" :  "Banishes the creature, making it disappear until I call it back. One Shard. These creatures are woefully short-lived as is...",
-            "move/walk" : "Instructs the creature to walk along its facing. A 1 beckons it forth, and a -1 backward. Interestingly, a 0 causes it to stop, as if I had halted it.",
+            "move/stopall" : "An important signal! Stops actions being performed by the homunculus, continuous and otherwise. Conveniently, an exception to the cost rule facing this page; It's free to cast.",
+            "create": "Bids the homunculus to the given location, for as many seconds as the integer I provide. Costs a charged amethyst, plus units of Amethyst Dust equal to the square of the duration in hours, starting from 1.",
+            "destroy" :  "Banishes the homunculus, making it disappear until I call it back. One Shard. These homunculi are woefully short-lived as is...",
+            "move/walk" : "Instructs the homunculus to walk along its facing. A 1 beckons it forth, and a -1 backward. Interestingly, a 0 causes it to stop, as if I had halted it.",
             "move/strafe" :  "As previous, but along strafing. A 1, then, beckons it to the left, and a -1 to the right.",
-            "move/look" : "Instructs the creature to look in a direction. The vector can be of any length. Seems to work on myself in the eyes of Nature, even though I don't feel or see the change.",
-            "move/jump" :  "Takes a boolean and tells the creature to start or stop hopping.",
+            "move/look" : "Instructs the homunculus to look in a direction. The vector can be of any length. Seems to work on myself in the eyes of Nature, even though I don't feel or see the change.",
+            "move/jump" :  "Takes a boolean and tells the homunculus to start or stop hopping.",
             "move/sneak" : "As previous, but with sneaking. Also seems to work on myself, until my synapses kick in a moment after. Maybe it could be of use with other bids?",
-            "move/sprint" :  "As previous, but with sprinting. Even when stationary, the creature produces sprinting particles to denote its intention.",
+            "move/sprint" :  "As previous, but with sprinting. Even when stationary, the homunculus produces sprinting particles to denote its intention.",
             "move/use" : "Now, an interesting pair of instructions. Begin to use or attack with the held item at an interval, in twentieths of a second. $(br)Both work on myself, though the former strangely.",
             "move/attack" :  "Given 0, uses it continuously, such as eating or channeling, or in the case of Attack, mining. Given -1, uses or attacks once and stops.",
             "move/hotbar" : "Takes a number from 1 to 9 inclusive, and instructs to select that slot in its toolbar. Works on myself, but may interrupt things like drawing patterns.",
-            "move/swap_hands" :  "Instructs the creature to hand its mainhand item into its offhand, and vice versa. As previous, in its function to myself.",
-            "move/drop" : "Instructs the creature to drop the item if given False or stack of items it holds in its main hand if given True. Can even yank an item from my own hand, as I'm so familiar with."
+            "move/swap_hands" :  "Instructs the homunculus to hand its mainhand item into its offhand, and vice versa. As previous, in its function to myself.",
+            "move/drop" : "Instructs the homunculus to drop the item if given False or stack of items it holds in its main hand if given True. Can even yank an item from my own hand, as I'm so familiar with."
           }
         },
         great_spells: {
@@ -128,12 +140,13 @@
             "": "Dummy Great Spells",
             "congratulate/great": "Same as $(l:patterns/spells/dummy_spells#hexagony:congratulate)$(action)Congratulate/$, but as a great spell.",
           },
-          control_great_spells: {
-            "": "",
-          },
           craft_great_spells: {
-            "": "Crafting Great Spells",
-            "craft": "I can barely wrap my head around this one... It seems to draw a tree, starting at the center-most item in the list, it then draws lines to the nearest item, or items if they are equidistant..."
+            "": "Craft",
+            "craft": "Deceptively complex for how simple an application it has. Items assembled by this spell appear just as if they had been hand-crafted by any artisan appropriately skilled in their field."
+          },
+          control_great_spells: {
+            "": "Summon Homunculus",
+            "create": "Bids the homunculus to the given location, for as many seconds as the integer I provide. Costs a charged amethyst, plus units of Amethyst Dust equal to the square of the duration in hours, starting from 1."
           }
         },
       },
@@ -150,11 +163,11 @@
         "mind_anchor/media": "Mind Anchor Media",
         "congratulate/great": "Great Congrats!",
         "create": "Summon Homunculus",
-        "destroy": "Banish Homunculus",
-        "move/stopall": "Halt Homunculus",
-        "move/walk": "Bid: Walking",
-        "move/strafe": "Bid: Strafing",
-        "move/look": "Bid: Looking",
+        "destroy": "Bid: Banish",
+        "move/stopall": "Bid: Halt",
+        "move/walk": "Bid: Walk",
+        "move/strafe": "Bid: Strafe",
+        "move/look": "Bid: Look",
         "move/jump": "Bid: Jump",
         "move/sneak": "Bid: Sneak",
         "move/sprint": "Bid: Sprint",

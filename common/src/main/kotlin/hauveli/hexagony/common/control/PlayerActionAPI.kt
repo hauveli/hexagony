@@ -430,7 +430,7 @@ object PlayerActionAPI {
 
 
         if (e.shouldHotbarSlot != -1) {
-            p.inventory.selected = e.shouldHotbarSlot - 1
+            p.inventory.selected = e.shouldHotbarSlot + 1
             e.shouldHotbarSlot = -1 // reset, no reason to be persistent?
         }
 
@@ -477,12 +477,13 @@ object PlayerActionAPI {
                     }
                 }
             }
+
             if (e.durationSeconds < 10L) {
-                if (e.durationSeconds == 0L) {
+                if (!e.isDetached && e.durationSeconds <= 0L) {
                     changed = true // Only bother writing when duration has expired?
                     // TODO: figure out the anchor timing mechanics, then uncomment this
                     PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
-                } else {
+                } else if (e.durationSeconds >= 0) {
                     // I'm assuming player.position() is at feet...
                     p.serverLevel().addParticle(
                         ParticleTypes.DRAGON_BREATH,
