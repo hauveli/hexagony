@@ -20,8 +20,12 @@ import java.util.concurrent.ConcurrentHashMap
 
 object MindAnchorManager {
 
-    enum class MessageTypes {
+    enum class MessageTypesVec {
         POSITION
+    }
+
+    enum class MessageTypesFloat {
+        MEDIA
     }
 
     // /give @p hexcasting:battery{"hexcasting:start_media":810200L, "hexcasting:media":810200L}
@@ -29,6 +33,7 @@ object MindAnchorManager {
     private val MAX_CAPACITY = 9_000_000_000_000_000_000L
 
     var localPos: Vec3? = null
+    var localMedia: Float? = null
 
     private val runtime = ConcurrentHashMap<UUID, MindAnchorRuntime>()
 
@@ -124,7 +129,7 @@ object MindAnchorManager {
         HexagonyNetworking.CHANNEL.sendToPlayer(
             serverPlayer,
             MsgMindAnchorPositionS2C(
-                MessageTypes.POSITION,
+                MessageTypesVec.POSITION,
                 vec.toVector3f()
             )
         )

@@ -588,6 +588,7 @@ class PlayerControlData : SavedData() {
 
             // duration is tracked by server...
             // playerData.duration(playerData.durationSeconds)
+            println(playerData.isDetached)
             if (playerData.isDetached) {
                 playerData.detach(serverPlayer)
             }

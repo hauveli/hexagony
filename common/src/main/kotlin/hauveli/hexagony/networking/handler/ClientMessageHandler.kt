@@ -19,14 +19,22 @@ fun HexagonyMessageS2C.applyOnClient(ctx: PacketContext) = ctx.queue {
             HexagonyServerConfig.onSyncConfig(serverConfig)
         }
 
+        // Todo:
+        // do I maybe want to just have the server dictate everything without letting the client know these values?
+        // hmm....
+
         is MsgMindAnchorPositionS2C -> {
             when (action) {
-                MindAnchorManager.MessageTypes.POSITION -> {
+                MindAnchorManager.MessageTypesVec.POSITION -> {
                     MindAnchorManager.localPos = Vec3(vec.x.toDouble(), vec.y.toDouble(), vec.z.toDouble() )
                 }
+            }
+        }
 
-                else -> {
-
+        is MsgMindAnchorFloatS2C -> {
+            when (action) {
+                MindAnchorManager.MessageTypesFloat.MEDIA -> {
+                    MindAnchorManager.localMedia = value
                 }
             }
         }

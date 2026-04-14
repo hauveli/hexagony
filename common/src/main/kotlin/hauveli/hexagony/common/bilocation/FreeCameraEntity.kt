@@ -109,9 +109,12 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
         }
 
         fun detachCamera(client: Minecraft) {
+            println("DetachCamera Called")
             val player = client.player ?: return
+            println("Past player")
 
             val freeCamera = FreeCameraEntity(client)
+            println("Freecamera created")
             freeCamera.xRot = player.xRot
             freeCamera.yRot = player.yRot
             freeCamera.setPos(player.eyePosition)
@@ -125,7 +128,7 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             freeCamera.input = backupInput
             // player.input = Input()
 
-
+            println("before addFreshEntity")
             client.level?.addFreshEntity(freeCamera)
             client.setCameraEntity(freeCamera)
 

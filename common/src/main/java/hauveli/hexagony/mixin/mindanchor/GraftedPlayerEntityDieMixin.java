@@ -27,10 +27,12 @@ public abstract class GraftedPlayerEntityDieMixin {
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)
     private void grafted$preventDeath(DamageSource source, CallbackInfo ci) {
         ServerPlayer self = (ServerPlayer)(Object)this;
-        self.sendSystemMessage(Component.nullToEmpty("Test: ${self}"));
+        self.sendSystemMessage(Component.nullToEmpty(self.toString()));
         if (!AdvancementProvider.isTrepanned(self)) {
             return;
         }
+
+        self.sendSystemMessage(Component.nullToEmpty("past trepanned"));
 
         Vec3 mindAnchorPos = MindAnchorManager.INSTANCE.getPosition(self);
         if (mindAnchorPos == null) return; // just die instead, maybe also play a sound?

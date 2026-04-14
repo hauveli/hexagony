@@ -7,7 +7,7 @@ import net.minecraft.network.FriendlyByteBuf
 import org.joml.Vector3f
 
 data class MsgMindAnchorPositionS2C(
-    val action: MindAnchorManager.MessageTypes,
+    val action: MindAnchorManager.MessageTypesVec,
     val vec: Vector3f
 ) : HexagonyMessageS2C {
 
@@ -16,7 +16,7 @@ data class MsgMindAnchorPositionS2C(
         override val type = MsgMindAnchorPositionS2C::class.java
 
         override fun decode(buf: FriendlyByteBuf) = MsgMindAnchorPositionS2C(
-            buf.readEnum(MindAnchorManager.MessageTypes::class.java),
+            buf.readEnum(MindAnchorManager.MessageTypesVec::class.java),
             buf.readVector3f()
         )
 

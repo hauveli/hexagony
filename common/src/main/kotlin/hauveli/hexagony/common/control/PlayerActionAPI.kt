@@ -59,10 +59,12 @@ object PlayerActionAPI {
         val e = PlayerControlData.getSelf()
 
         fun detach(bool: Boolean) {
+            e.isDetached = true
             FreeCameraEntity.detachCamera(mc)
         }
 
         fun reattach(bool: Boolean) {
+            e.isDetached = false
             FreeCameraEntity.reattachCamera(mc)
         }
 

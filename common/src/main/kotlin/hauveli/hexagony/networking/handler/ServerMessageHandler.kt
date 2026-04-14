@@ -22,6 +22,7 @@ fun HexagonyMessageC2S.applyOnServer(ctx: PacketContext) = ctx.queue {
                 }
             }
         }
+
         is MsgPlayerControlBooleanC2S -> {
             when (action) {
                 PlayerControlData.MessageTypeSimple.DATA_REQUEST -> {
