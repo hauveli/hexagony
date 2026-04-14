@@ -2,6 +2,7 @@ package hauveli.hexagony.common.bilocation
 
 import com.mojang.authlib.GameProfile
 import hauveli.hexagony.common.control.PlayerControlData
+import net.minecraft.commands.arguments.EntityAnchorArgument
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.PacketFlow
@@ -180,14 +181,19 @@ class FakeServerPlayer(
 
             target.setGameMode(source.gameMode.gameModeForPlayer)
 
-            target.teleportTo(
-                source.serverLevel(),
-                source.position().x,
-                source.position().y,
-                source.position().z,
-                source.yRot,
-                source.xRot
-            )
+            if (target.connection != null) {
+                target.teleportTo(
+                    source.serverLevel(),
+                    source.position().x,
+                    source.position().y,
+                    source.position().z,
+                    source.yRot,
+                    source.xRot
+                )
+            } else {
+                target.setServerLevel(source.serverLevel())
+                target.setPos(source.position())
+            }
 
             source.discard()
         }
@@ -253,14 +259,9 @@ class FakeServerPlayer(
 
             dummyHolder.setGameMode(original.gameMode.gameModeForPlayer)
 
-            dummyHolder.teleportTo(
-                original.serverLevel(),
-                original.position().x,
-                original.position().y,
-                original.position().z,
-                original.yRot,
-                original.xRot
-            )
+            dummyHolder.setPos(original.position())
+
+            dummyHolder.setServerLevel(original.serverLevel())
 
             return dummyHolder
         }
@@ -296,6 +297,9 @@ class FakeServerPlayer(
             val clone = FakeServerPlayer(server, level, uuid)
 
             clone.moveTo(pos.x, pos.y, pos.z, 0f, 0f)
+            // Idk if feet or eyes
+            //clone.lookAt(EntityAnchorArgument.Anchor.FEET, original.eyePosition)
+            // can't call lookat without connection...
 
             // newly spawned dummy should have nothing
             //val dummy = copyPlayerDataFrom(original)
