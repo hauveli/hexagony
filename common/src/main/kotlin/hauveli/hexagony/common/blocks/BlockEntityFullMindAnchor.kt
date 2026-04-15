@@ -54,6 +54,7 @@ class BlockEntityFullMindAnchor(
 
     protected var storedPlayerProfile: GameProfile? = null
     protected var storedPlayer: UUID? = null
+    protected var graftUUID: UUID? = null
 
     protected var cachedDisplayProfile: GameProfile? = null
     protected var cachedDisplayStack: ItemStack? = null
@@ -283,9 +284,10 @@ class BlockEntityFullMindAnchor(
     } //endregion
 
 
-    fun setPlayer(gameProfile: GameProfile, uuid: UUID) {
+    fun setPlayer(gameProfile: GameProfile, uuid: UUID, graftUuid: UUID) {
         this.storedPlayerProfile = gameProfile
         this.storedPlayer = uuid
+        this.graftUUID = graftUuid
     }
 
     fun helperApplyNbt(nbt: CompoundTag) : CompoundTag {

@@ -18,9 +18,12 @@ import java.util.UUID
 import net.minecraft.world.level.saveddata.SavedData
 import net.minecraft.world.phys.Vec3
 
+val placeholderUUID: UUID = UUID.fromString("2cf1d3b8-3230-4a8c-80ee-5d34c508819b")
+
 data class PlayerControlEntry (
     val mindUUID: UUID, // lol
-    var ownerUUID: UUID = UUID.randomUUID(), // placeholder, equals mindUUID if self, this field is technically unneeded, but here for ease
+    var ownerUUID: UUID = placeholderUUID, // placeholder, equals mindUUID if self, this field is technically unneeded, but here for ease
+    var graftUUID: UUID = placeholderUUID,
     var isFakePlayer: Boolean = false, // default to false
     var isDetached: Boolean = false,
     var durationSeconds: Long = -1L,
@@ -47,6 +50,7 @@ data class PlayerControlEntry (
     var shouldDrop: Boolean = false,
     var shouldDropStack: Boolean = false
 ) {
+
 
     fun stop(serverPlayer: ServerPlayer) {
         // TODO:
@@ -358,6 +362,10 @@ data class PlayerControlEntry (
     fun setOwner(uuid: UUID) {
         ownerUUID = uuid // never matters on client
     }
+
+    fun setGraft(uuid: UUID) {
+        graftUUID = uuid // never matters on client
+    }
 }
 
 class PlayerControlData : SavedData() {
@@ -415,6 +423,7 @@ class PlayerControlData : SavedData() {
             // if I knew how I'm sure, just k,v loop
             e.putUUID("mindUUID", entry.mindUUID)
             e.putUUID("ownerUUID", entry.ownerUUID)
+            e.putUUID("graftUUID", entry.graftUUID)
             e.putBoolean("isFakePlayer", entry.isFakePlayer)
             e.putBoolean("isDetached", entry.isDetached)
             e.putLong("durationSeconds", entry.durationSeconds)
@@ -452,9 +461,11 @@ class PlayerControlData : SavedData() {
 
     companion object {
 
+        // Just putting in dummy data for the local entry at the start
         var myEntry = PlayerControlEntry(
-            mindUUID = UUID.fromString("2cf1d3b8-3230-4a8c-80ee-5d34c508819b"), // not used when local player.
-            ownerUUID = UUID.fromString("2cf1d3b8-3230-4a8c-80ee-5d34c508819b"),
+            mindUUID = placeholderUUID, // not used when local player.
+            ownerUUID = placeholderUUID,
+            graftUUID = placeholderUUID,
             isFakePlayer = false,
             isDetached = false,
             durationSeconds = -1L,
@@ -519,6 +530,7 @@ class PlayerControlData : SavedData() {
                     PlayerControlEntry(
                         uuid,
                         e.getUUID("ownerUUID"),
+                        e.getUUID("graftUUID"),
                         e.getBoolean("isFakePlayer"),
                         e.getBoolean("isDetached"),
                         e.getLong("durationSeconds"),

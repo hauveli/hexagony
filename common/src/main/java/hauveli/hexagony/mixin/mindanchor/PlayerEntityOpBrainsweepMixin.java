@@ -12,6 +12,7 @@ import at.petrak.hexcasting.common.casting.actions.spells.great.OpBrainsweep;
 import at.petrak.hexcasting.common.lib.HexItems;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor;
+import hauveli.hexagony.common.control.PlayerControlData;
 import hauveli.hexagony.common.misc.AdvancementProvider;
 import hauveli.hexagony.common.mind_anchor.MindAnchorManager;
 import hauveli.hexagony.registry.HexagonyBlocks;
@@ -47,6 +48,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.UUID;
 
 
 import at.petrak.hexcasting.api.casting.OperatorUtils;
@@ -277,15 +279,20 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         serverLevel.setBlock(pos, state, 3);
         BlockEntity be = serverLevel.getBlockEntity(pos);
         if (be instanceof BlockEntityFullMindAnchor) {
+            UUID graftUUID = UUID.randomUUID();
+
             ((BlockEntityFullMindAnchor) be)
                     .setPlayer(
                         serverPlayer.getGameProfile(),
-                        serverPlayer.getUUID()
+                        serverPlayer.getUUID(),
+                        graftUUID
                     );
             ((BlockEntityFullMindAnchor) be)
                     .insertMedia(
                             ItemStack.of(HexItems.BATTERY_QUENCHED_BLOCK_STACK.get().getTag())
                     );
+
+            PlayerControlData.Companion.get(serverPlayer.server).getOrCreate(serverPlayer.getUUID()).setGraft(graftUUID);
             be.setChanged(); // mark dirty so it saves
         }
     }

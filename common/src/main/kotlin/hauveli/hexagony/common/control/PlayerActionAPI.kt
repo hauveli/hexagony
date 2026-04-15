@@ -455,6 +455,10 @@ object PlayerActionAPI {
     // Todo: get PlayerControlData.get(server) and store is somewhere so it's more convenient and better
     // todo: store actual player in some sort of field? I don't want to call getPlayer multiple times each tick...
 
+    // todo: check graftUUID to see if the player has a valid mind anchor, and if the player is grafted but has no valid anchor,
+    // begin sapping the most recently stored media value from the anchor, and if that hits 0 before the anchor is found,
+    // kill the player.
+
     val connectedPlayers: MutableMap<UUID, Pair<ServerPlayer, PlayerControlEntry>> = mutableMapOf()
 
     var counter = 0
@@ -487,7 +491,8 @@ object PlayerActionAPI {
                             PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
                             changed = true // Only bother writing when duration has expired?
                         }
-                        else if (MindAnchorData.get(server).anchors.containsKey(p.uuid) && !e.isDetached) {
+                        else if (MindAnchorData.get(server).anchors.containsKey(p.uuid)
+                            && !e.isDetached) {
                             PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
                             changed = true // Only bother writing when duration has expired?
                         }
