@@ -100,11 +100,14 @@ data class PlayerControlEntry (
 
     fun detach(serverPlayer: ServerPlayer) {
         isDetached = true
+        println("OK checking thing!!!")
         if (serverPlayer.tags.contains("FakePlayer")) {
             serverPlayer.hurt(serverPlayer.damageSources().genericKill(),
                 (serverPlayer.maxHealth+serverPlayer.absorptionAmount) * 2)
             serverPlayer.hurtMarked = true
         } else {
+            println("About to send message!!!")
+            println(isDetached)
             HexagonyNetworking.CHANNEL.sendToPlayer(
                 serverPlayer,
                 MsgPlayerControlBooleanS2C(PlayerControlData.MessageTypeBoolean.SHOULD_DETACH, true)

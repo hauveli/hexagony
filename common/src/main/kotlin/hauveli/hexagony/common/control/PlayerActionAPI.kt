@@ -361,6 +361,11 @@ object PlayerActionAPI {
     fun onClientTick() {
         val p = player ?: return
         val e = PlayerControlData.getSelf()
+        // This seems to have done it, finally...
+        // Oh well, two additional boolean comparisons at most per tick shouldn't be too bad....
+        if (e.isDetached && !FreeCameraEntity.active) {
+            FreeCameraEntity.Companion.detachCamera(Minecraft.getInstance())
+        }
         // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
         if (e.shouldMoveForwardBackward != 0f || e.shouldMoveLeftRight != 0f) {
             // p.input.forwardImpulse = e.shouldMoveForwardBackward

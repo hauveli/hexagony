@@ -1,6 +1,7 @@
 package hauveli.hexagony.common.bilocation
 
 import at.petrak.hexcasting.common.lib.HexAttributes
+import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.common.mind_anchor.MindAnchorManager
 import net.minecraft.client.CameraType
 import net.minecraft.client.ClientRecipeBook
@@ -122,7 +123,8 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             // player.input = Input()
 
             println("before addFreshEntity")
-            client.level?.addFreshEntity(freeCamera)
+            // client.level?.addFreshEntity(freeCamera)
+
             client.setCameraEntity(freeCamera)
 
             //client.options.hideGui = true
@@ -132,6 +134,7 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
         }
 
         fun updateFreeCam() {
+            // janky bugfix
             if (!active) return
             val freeCamera = freeCam ?: return
             val mc = Minecraft.getInstance()
@@ -207,6 +210,10 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
             freeCam?.discard()
             freeCam = null
             active = false
+        }
+
+        fun onLeave(client: Minecraft) {
+            reattachCamera(client)
         }
     }
 }
