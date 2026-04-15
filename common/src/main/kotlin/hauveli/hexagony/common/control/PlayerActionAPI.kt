@@ -474,10 +474,7 @@ object PlayerActionAPI {
                 // This returns right away if no player matched
                 // (if no player is in the MindAnchorManager.runtime list
                 println("Subtracting!!")
-                MindAnchorManager.subtractMedia(
-                    p,
-                    MediaConstants.DUST_UNIT
-                ) // subtraction multiplier happens inside the function
+                MindAnchorManager.onTick(server,p)
                 e.durationSeconds--
                 if (e.isDetached) {
                     // update position at least once a second...?

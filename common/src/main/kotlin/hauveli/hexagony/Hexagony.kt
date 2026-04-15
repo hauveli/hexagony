@@ -48,6 +48,8 @@ object Hexagony {
         // It works and I'm lazy?
         HexagonyNetworking.init()
 
+        // TOdo move these into an initServer thing or something?
+        // todo: figure out how im supposed to actuall use init(server) etc
         LifecycleEvent.SERVER_STARTED.register({
             server ->
             // custom weirdo recipe stuff
@@ -57,6 +59,8 @@ object Hexagony {
             PlayerControlData.init(server)
         })
         TickScheduler.init()
+
+        // TOdo: important!! get this shit out of here!!! and make it work!!!
         initServer()
     }
 

@@ -1,16 +1,20 @@
 package hauveli.hexagony.common.mind_anchor
 
 import at.petrak.hexcasting.api.misc.MediaConstants
+import dev.architectury.event.events.common.LifecycleEvent
 import dev.architectury.event.events.common.PlayerEvent
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
 import hauveli.hexagony.common.blocks.BlockFullMindAnchor
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.common.control.placeholderUUID
+import hauveli.hexagony.common.craft.GraphCraftingRecipes
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.networking.msg.MsgMindAnchorPositionS2C
 import net.minecraft.core.BlockPos
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
@@ -18,6 +22,7 @@ import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.phys.Vec3
+import java.sql.DataTruncation
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -85,21 +90,42 @@ object MindAnchorManager {
         pe.graftUUID = placeholderUUID
     }
 
+    val warningEffect = MobEffectInstance(
+        MobEffects.BLINDNESS,
+        2, // in ticks
+        1,
+        false,
+        false,
+        false
+    );
+
     // Variable for iff mind anchor can not be found, but media must be subtracted?
+    // only tick anchors of players who are connected to the server btw
     fun onTick(server: MinecraftServer, serverPlayer: ServerPlayer) {
         val uuid = serverPlayer.uuid
-        val MA = MindAnchorData.get(server).getOrCreate(uuid)
-        val gU = PlayerControlData.get(server).getOrCreate(uuid).graftUUID
-        if (MA.graftUUID == gU) {
-            MA.media -= MediaConstants.DUST_UNIT
-            if (MA.media <= 0) {
+        val me = MindAnchorData.get(server).getOrCreate(uuid)
+        val pe = PlayerControlData.get(server).getOrCreate(uuid)
+        if (me.graftUUID == pe.graftUUID) {
+            subtractMedia(serverPlayer, MediaConstants.DUST_UNIT)
+            if (me.media == 0L) { // -1 is infinite
                 // fucking explode
                 println("KABOOM!!!")
                 fuckingExplodeAndDie(serverPlayer)
-            }
+            } else if (me.media <= MediaConstants.QUENCHED_SHARD_UNIT) {
+                println("Erm below safety threshold for media...")
+                pe.detach(serverPlayer)
+            } else if (me.media <= MediaConstants.QUENCHED_BLOCK_UNIT) {
+                // TODO: try to indicate to the player that they are about to die
+                val proportion = MediaConstants.QUENCHED_SHARD_UNIT.div(me.media) // Greater than or equal to 1
+                serverPlayer.addEffect(
+                    warningEffect
+                )
+            } // Do nothing otherwise
 
         } else {
-
+            // Stop tracking it internally, I don't know all the ways this state would be reached
+            // but it likely can be reached somehow, definitely with creative
+            MindAnchorData.get(server).anchors.remove(uuid)
         }
     }
 
@@ -203,6 +229,23 @@ object MindAnchorManager {
             serverPlayer ->
             onJoin(serverPlayer)
         }
+
+        LifecycleEvent.SERVER_STARTED.register {
+            server ->
+            removeLooseHanging(server)
+        }
+    }
+
+    fun removeLooseHanging(server: MinecraftServer) {
+        val md = MindAnchorData.get(server)
+        for (player in PlayerControlData.get(server).players) {
+            val uuid: UUID = player.component1()
+            if (md.anchors[uuid]?.graftUUID != player.component2().graftUUID ) {
+                println("Hexagony: Cleaning up lost reference to mind anchor for player: ${uuid}")
+                md.anchors.remove(uuid)
+                md.setDirty() // I still dont udnerstand when I want to do this and when not
+            }
+        }
     }
 
     fun onJoin(serverPlayer: ServerPlayer) {
@@ -266,11 +309,15 @@ object MindAnchorManager {
         val be = rt.blockEntity
         val ie = rt.itemEntity
         val it = rt.itemStack // because itemStack has no position
+        var cost = toSubtract
+        if (PlayerControlData.get(serverPlayer.server).getOrCreate(serverPlayer.uuid).isDetached) {
+            cost = toSubtract / MediaConstants.DUST_UNIT // cost less if detached
+        }
 
         if (be != null) {
             println("Trying blockentity!!!")
             (be as BlockEntityFullMindAnchor)
-            be.media = (be.media - toSubtract).coerceAtLeast(0)
+            be.media = (be.media - cost).coerceAtLeast(0)
 
         } else if (ie != null) {
             println("trying itementity!!!")
@@ -278,7 +325,7 @@ object MindAnchorManager {
             val beTag = itemStack?.tag?.getCompound("BlockEntityTag")
             val media = beTag?.getLong("media")
             if (media != null) {
-                beTag.putLong("media", (media - toSubtract).coerceAtLeast(0))
+                beTag.putLong("media", (media - cost).coerceAtLeast(0))
             }
 
         } else if (it != null) {
@@ -286,7 +333,7 @@ object MindAnchorManager {
             val beTag = it.tag?.getCompound("BlockEntityTag")
             val media = beTag?.getLong("media")
             if (media != null) {
-                beTag.putLong("media", (media - toSubtract).coerceAtLeast(0))
+                beTag.putLong("media", (media - cost).coerceAtLeast(0))
             }
         }
     }
