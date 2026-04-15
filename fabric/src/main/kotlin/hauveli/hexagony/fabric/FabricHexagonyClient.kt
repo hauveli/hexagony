@@ -1,5 +1,6 @@
 package hauveli.hexagony.fabric
 
+import hauveli.hexagony.Hexagony
 import hauveli.hexagony.HexagonyClient
 import hauveli.hexagony.common.bilocation.CameraExtension
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
@@ -11,6 +12,7 @@ import net.minecraft.client.Minecraft
 object FabricHexagonyClient : ClientModInitializer {
     override fun onInitializeClient() {
         HexagonyClient.init()
+        Hexagony.initServer()
 
         WorldRenderEvents.AFTER_ENTITIES.register { context ->
             if (!FreeCameraEntity.active) return@register

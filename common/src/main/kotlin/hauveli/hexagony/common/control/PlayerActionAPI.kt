@@ -5,7 +5,9 @@ import at.petrak.hexcasting.api.misc.MediaConstants
 import dev.architectury.event.events.common.PlayerEvent
 import dev.architectury.event.events.common.TickEvent
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
+import hauveli.hexagony.common.mind_anchor.MindAnchorData
 import hauveli.hexagony.common.mind_anchor.MindAnchorManager
+import hauveli.hexagony.common.mind_anchor.MindAnchorRuntime
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.particles.ParticleTypes
@@ -459,7 +461,6 @@ object PlayerActionAPI {
     var changed = false
     fun onServerTick(server: MinecraftServer) {
         counter++
-        println("Where am i...")
         val currentTick = server.tickCount
         connectedPlayers.forEach { (uuid, pair) ->
             val p = pair.component1()
@@ -480,22 +481,28 @@ object PlayerActionAPI {
                         MindAnchorManager.forwardToPlayer(p, it)
                     }
                 }
-            }
-
-            if (e.durationSeconds < 10L) {
-                if (!e.isDetached && e.durationSeconds <= 0L) {
-                    changed = true // Only bother writing when duration has expired?
-                    // TODO: figure out the anchor timing mechanics, then uncomment this
-                    PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
-                } else if (e.durationSeconds >= 0) {
-                    // I'm assuming player.position() is at feet...
-                    p.serverLevel().addParticle(
-                        ParticleTypes.DRAGON_BREATH,
-                        p.position().x, p.position().y + p.bbHeight / 2, p.position().z,
-                        (0.5 - Random.nextDouble()) * 3, (0.5 - Random.nextDouble()) * 3, (0.5 - Random.nextDouble()) * 3
-                    )
+                if (e.durationSeconds < 10L) {
+                    if (e.durationSeconds <= 0L ) {
+                        if (e.isFakePlayer) {
+                            PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
+                            changed = true // Only bother writing when duration has expired?
+                        }
+                        else if (MindAnchorData.get(server).anchors.containsKey(p.uuid) && !e.isDetached) {
+                            PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
+                            changed = true // Only bother writing when duration has expired?
+                        }
+                        // TODO: figure out the anchor timing mechanics, then uncomment this
+                    } else if (e.durationSeconds >= 0) {
+                        // I'm assuming player.position() is at feet...
+                        p.serverLevel().addParticle(
+                            ParticleTypes.DRAGON_BREATH,
+                            p.position().x, p.position().y + p.bbHeight / 2, p.position().z,
+                            (0.5 - Random.nextDouble()) * 3, (0.5 - Random.nextDouble()) * 3, (0.5 - Random.nextDouble()) * 3
+                        )
+                    }
                 }
             }
+
             if (!p.tags.contains("FakePlayer")) return@forEach
             // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
             if (e.shouldSprint && p.canSprint()) {
