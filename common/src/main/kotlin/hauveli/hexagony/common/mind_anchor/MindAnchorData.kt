@@ -32,6 +32,8 @@ class MindAnchorRuntime {
     var entity: Entity? = null
         private set
 
+    var media: Long? = null
+
     fun trackBlock(be: BlockEntity) {
         clear()
         blockEntity = be

@@ -51,8 +51,8 @@ object Hexagony {
         LifecycleEvent.SERVER_STARTED.register({
             server ->
             // custom weirdo recipe stuff
+            // do I still need to do this?
             GraphCraftingRecipes.init(server.overworld().level)
-            // GraphRecipeLoader.loadAll() // TODO: only run this once somehow...
             // player clone and control stuff
             PlayerControlData.init(server)
         })

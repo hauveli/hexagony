@@ -459,13 +459,16 @@ object PlayerActionAPI {
     var changed = false
     fun onServerTick(server: MinecraftServer) {
         counter++
+        println("Where am i...")
         val currentTick = server.tickCount
         connectedPlayers.forEach { (uuid, pair) ->
             val p = pair.component1()
             val e = pair.component2()
+            println(p.toString())
             if (currentTick % 20 == 19) {
                 // This returns right away if no player matched
                 // (if no player is in the MindAnchorManager.runtime list
+                println("Subtracting!!")
                 MindAnchorManager.subtractMedia(
                     p,
                     MediaConstants.DUST_UNIT
@@ -608,8 +611,10 @@ object PlayerActionAPI {
             onServerTick(server)
         }
         PlayerEvent.PLAYER_JOIN.register { serverPlayer ->
+            println("Adding player to thing")
             val server = serverPlayer.server
             connectedPlayers[serverPlayer.uuid] = Pair(serverPlayer, PlayerControlData.get(server).getOrCreate(serverPlayer.uuid))
+            println(connectedPlayers)
         }
         PlayerEvent.PLAYER_QUIT.register { serverPlayer ->
             connectedPlayers.remove(serverPlayer.uuid)

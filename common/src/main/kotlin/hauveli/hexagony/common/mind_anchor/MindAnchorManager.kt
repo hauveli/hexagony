@@ -168,48 +168,60 @@ object MindAnchorManager {
         val be = rt?.blockEntity
         val ie = rt?.itemEntity
         val it = rt?.itemStack // because itemStack has no position
+        println(rt)
 
         val media: Long?
         if (be != null) {
             (be as BlockEntityFullMindAnchor)
             // maybe I should get it via tag....
-            media = (MAX_CAPACITY - be.remainingMediaCapacity()).coerceAtLeast(0L)
-
+            (be as BlockEntityFullMindAnchor)
+            media = be.updateTag.getLong("media")
         } else if (ie != null) {
-            val ieCom = it?.tag?.getCompound("BlockEntityTag")
-            media = ieCom?.getLong("media")
-
+            println("itemEntity")
+            val itemStack = ie.item
+            val beTag = itemStack?.tag?.getCompound("BlockEntityTag")
+            println(beTag.toString())
+            media = beTag?.getLong("media")
         } else if (it != null) {
-            val itCom = it.tag?.getCompound("BlockEntityTag")
-            media = itCom?.getLong("media")
+            println("itemStack")
+            val beTag = it.tag?.getCompound("BlockEntityTag")
+            println(beTag.toString())
+            media = beTag?.getLong("media")
         } else {
             media = null
         }
+        println(media)
         return media // can be null...
     }
 
     fun subtractMedia(serverPlayer: ServerPlayer, toSubtract: Long) {
+        println("Inside subtract! Right beofre return!")
         val rt = runtime[serverPlayer.uuid] ?: return
+        println("made it past return!!!")
         val be = rt.blockEntity
         val ie = rt.itemEntity
         val it = rt.itemStack // because itemStack has no position
 
         if (be != null) {
+            println("Trying blockentity!!!")
             (be as BlockEntityFullMindAnchor)
             val media = be.updateTag.getLong("media")
             be.updateTag.putLong("media", (media - toSubtract).coerceAtLeast(0))
 
         } else if (ie != null) {
-            val ieCom = it?.tag?.getCompound("BlockEntityTag")
-            val media = ieCom?.getLong("media")
+            println("trying itementity!!!")
+            val itemStack = ie.item
+            val beTag = itemStack?.tag?.getCompound("BlockEntityTag")
+            val media = beTag?.getLong("media")
             if (media != null)
-                ieCom.putLong("media", (media - toSubtract).coerceAtLeast(0))
+                beTag.putLong("media", (media - toSubtract).coerceAtLeast(0))
 
         } else if (it != null) {
-            val itCom = it.tag?.getCompound("BlockEntityTag")
-            val media = itCom?.getLong("media")
+            println("trying itemstack....")
+            val beTag = it.tag?.getCompound("BlockEntityTag")
+            val media = beTag?.getLong("media")
             if (media != null)
-                itCom.putLong("media", (media - toSubtract).coerceAtLeast(0))
+                beTag.putLong("media", (media - toSubtract).coerceAtLeast(0))
         }
     }
 
