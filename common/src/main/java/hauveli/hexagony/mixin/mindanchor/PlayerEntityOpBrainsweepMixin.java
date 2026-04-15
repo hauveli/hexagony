@@ -13,6 +13,7 @@ import at.petrak.hexcasting.common.lib.HexItems;
 import at.petrak.hexcasting.mixin.accessor.AccessorLivingEntity;
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor;
 import hauveli.hexagony.common.control.PlayerControlData;
+import hauveli.hexagony.common.mind_anchor.MindAnchorData;
 import hauveli.hexagony.common.misc.AdvancementProvider;
 import hauveli.hexagony.common.mind_anchor.MindAnchorManager;
 import hauveli.hexagony.registry.HexagonyBlocks;
@@ -280,7 +281,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         BlockEntity be = serverLevel.getBlockEntity(pos);
         if (be instanceof BlockEntityFullMindAnchor) {
             UUID graftUUID = UUID.randomUUID();
-
+            MindAnchorData.Companion.get(serverPlayer.server).getOrCreate(serverPlayer.getUUID()).setGraftUUID(graftUUID);
             ((BlockEntityFullMindAnchor) be)
                     .setPlayer(
                         serverPlayer.getGameProfile(),

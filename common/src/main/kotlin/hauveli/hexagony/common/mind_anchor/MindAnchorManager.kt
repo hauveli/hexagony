@@ -1,8 +1,10 @@
 package hauveli.hexagony.common.mind_anchor
 
+import at.petrak.hexcasting.api.misc.MediaConstants
 import dev.architectury.event.events.common.PlayerEvent
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
 import hauveli.hexagony.common.blocks.BlockFullMindAnchor
+import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.networking.msg.MsgMindAnchorPositionS2C
 import net.minecraft.server.MinecraftServer
@@ -10,6 +12,8 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Explosion
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.phys.Vec3
 import java.util.*
@@ -37,6 +41,39 @@ object MindAnchorManager {
 
     private fun runtime(uuid: UUID) =
         runtime.computeIfAbsent(uuid) { MindAnchorRuntime() }
+
+    fun setGraft(server: MinecraftServer, uuid: UUID, graftUUID: UUID) {
+        val anchor = MindAnchorData.get(server).anchors[uuid] ?: return
+        anchor.graftUUID = graftUUID
+    }
+
+    // Variable for iff mind anchor can not be found, but media must be subtracted?
+    fun onTick(server: MinecraftServer, player: ServerPlayer) {
+        val uuid = player.uuid
+        val MA = MindAnchorData.get(server).getOrCreate(uuid)
+        val gU = PlayerControlData.get(server).getOrCreate(uuid).graftUUID
+        if (MA.graftUUID == gU) {
+            MA.media -= MediaConstants.DUST_UNIT
+            if (MA.media <= 0) {
+                // fucking explode
+                println("KABOOM!!!")
+                val pos = getPosition(player) ?: player.position()
+                player.level().explode(
+                    player,
+                    pos.x,
+                    pos.y,
+                    pos.z,
+                    3f,
+                    Level.ExplosionInteraction.BLOCK
+                )
+                MindAnchorData.get(server).anchors.remove(uuid)
+
+            }
+
+        } else {
+
+        }
+    }
 
     fun trackBlock(
         server: MinecraftServer,

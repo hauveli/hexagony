@@ -62,6 +62,7 @@ data class MindAnchorEntry(
     val mindUUID: UUID,
     var type: AnchorType,
     var activeUUID: UUID?,
+    var graftUUID: UUID?,
     var dimension: ResourceKey<Level>,
     var pos: BlockPos,
     var media: Long
@@ -116,6 +117,7 @@ class MindAnchorData : SavedData() {
                 uuid,
                 AnchorType.ITEM_STACK,
                 null,
+                null,
                 Level.OVERWORLD,
                 BlockPos.ZERO,
                 0L
@@ -133,6 +135,7 @@ class MindAnchorData : SavedData() {
             e.putString("Type", entry.type.name)
             e.putString("Dimension", entry.dimension.location().toString())
             entry.activeUUID?.let { e.putUUID("ActiveUUID", it) }
+            entry.graftUUID?.let { e.putUUID("graftUUID", it) }
 
             e.putInt("X", entry.pos.x)
             e.putInt("Y", entry.pos.y)
@@ -176,6 +179,9 @@ class MindAnchorData : SavedData() {
                 val activeUUID =
                     if (e.hasUUID("ActiveUUID")) e.getUUID("ActiveUUID") else null
 
+                val graftUUID =
+                    if (e.hasUUID("graftUUID")) e.getUUID("graftUUID") else null
+
                 val pos = BlockPos(
                     e.getInt("X"),
                     e.getInt("Y"),
@@ -185,7 +191,7 @@ class MindAnchorData : SavedData() {
                 val media = e.getLong("Media")
 
                 data.anchors[uuid] =
-                    MindAnchorEntry(uuid, type, activeUUID, dim, pos, media)
+                    MindAnchorEntry(uuid, type, activeUUID, graftUUID, dim, pos, media)
             }
 
             return data
