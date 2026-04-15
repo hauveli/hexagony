@@ -57,6 +57,7 @@ object Hexagony {
             PlayerControlData.init(server)
         })
         TickScheduler.init()
+        initServer()
     }
 
     fun initServer() {

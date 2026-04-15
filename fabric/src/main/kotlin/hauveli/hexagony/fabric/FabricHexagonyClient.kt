@@ -12,11 +12,11 @@ import net.minecraft.client.Minecraft
 object FabricHexagonyClient : ClientModInitializer {
     override fun onInitializeClient() {
         HexagonyClient.init()
-        Hexagony.initServer()
+        val mc = Minecraft.getInstance()
 
         WorldRenderEvents.AFTER_ENTITIES.register { context ->
             if (!FreeCameraEntity.active) return@register
-            val mc = Minecraft.getInstance()
+            //val mc = Minecraft.getInstance()
             val player = mc.player ?: return@register
 
             if (mc.cameraEntity != player) {

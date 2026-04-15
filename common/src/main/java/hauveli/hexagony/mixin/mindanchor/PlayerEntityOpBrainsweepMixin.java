@@ -280,20 +280,18 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         serverLevel.setBlock(pos, state, 3);
         BlockEntity be = serverLevel.getBlockEntity(pos);
         if (be instanceof BlockEntityFullMindAnchor) {
+            // Must place media in before doing the rest
+            ((BlockEntityFullMindAnchor) be).setMedia(MediaConstants.QUENCHED_BLOCK_UNIT);
             UUID graftUUID = UUID.randomUUID();
             MindAnchorData.Companion.get(serverPlayer.server).getOrCreate(serverPlayer.getUUID()).setGraftUUID(graftUUID);
+            PlayerControlData.Companion.get(serverPlayer.server).getOrCreate(serverPlayer.getUUID()).setGraft(graftUUID);
             ((BlockEntityFullMindAnchor) be)
                     .setPlayer(
                         serverPlayer.getGameProfile(),
                         serverPlayer.getUUID(),
                         graftUUID
                     );
-            ((BlockEntityFullMindAnchor) be)
-                    .insertMedia(
-                            ItemStack.of(HexItems.BATTERY_QUENCHED_BLOCK_STACK.get().getTag())
-                    );
 
-            PlayerControlData.Companion.get(serverPlayer.server).getOrCreate(serverPlayer.getUUID()).setGraft(graftUUID);
             be.setChanged(); // mark dirty so it saves
         }
     }

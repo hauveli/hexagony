@@ -469,8 +469,8 @@ object PlayerActionAPI {
         connectedPlayers.forEach { (uuid, pair) ->
             val p = pair.component1()
             val e = pair.component2()
-            println(p.toString())
             if (currentTick % 20 == 19) {
+                println(p.toString())
                 // This returns right away if no player matched
                 // (if no player is in the MindAnchorManager.runtime list
                 println("Subtracting!!")

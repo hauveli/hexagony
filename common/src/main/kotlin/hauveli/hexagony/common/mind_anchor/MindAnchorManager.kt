@@ -5,8 +5,10 @@ import dev.architectury.event.events.common.PlayerEvent
 import hauveli.hexagony.common.blocks.BlockEntityFullMindAnchor
 import hauveli.hexagony.common.blocks.BlockFullMindAnchor
 import hauveli.hexagony.common.control.PlayerControlData
+import hauveli.hexagony.common.control.placeholderUUID
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.networking.msg.MsgMindAnchorPositionS2C
+import net.minecraft.core.BlockPos
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
@@ -47,9 +49,45 @@ object MindAnchorManager {
         anchor.graftUUID = graftUUID
     }
 
+    private fun fuckingExplodeAndDie(serverPlayer: ServerPlayer) {
+        val server = serverPlayer.server
+        val uuid = serverPlayer.uuid
+        val pos = getPosition(serverPlayer) ?: serverPlayer.position()
+        val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
+        val pe = PlayerControlData.get(server).getOrCreate(uuid)
+        val me = MindAnchorData.get(server).getOrCreate(uuid)
+        val level = server.getLevel(me.dimension)
+        val blockAtPos = level?.getBlockEntity(blockPos)
+        if (blockAtPos is BlockEntityFullMindAnchor) {
+            println("Block rebound")
+            level.removeBlockEntity(blockPos)
+            blockAtPos.setRemoved()
+            level.explode(
+                serverPlayer,
+                pos.x,
+                pos.y,
+                pos.z,
+                3f,
+                Level.ExplosionInteraction.BLOCK
+            )
+        } else if (!pe.isDetached) {
+            println("Player rebound")
+            serverPlayer.level().explode(
+                serverPlayer,
+                pos.x,
+                pos.y,
+                pos.z,
+                3f,
+                Level.ExplosionInteraction.BLOCK
+            )
+        }
+        MindAnchorData.get(server).anchors.remove(uuid)
+        pe.graftUUID = placeholderUUID
+    }
+
     // Variable for iff mind anchor can not be found, but media must be subtracted?
-    fun onTick(server: MinecraftServer, player: ServerPlayer) {
-        val uuid = player.uuid
+    fun onTick(server: MinecraftServer, serverPlayer: ServerPlayer) {
+        val uuid = serverPlayer.uuid
         val MA = MindAnchorData.get(server).getOrCreate(uuid)
         val gU = PlayerControlData.get(server).getOrCreate(uuid).graftUUID
         if (MA.graftUUID == gU) {
@@ -57,17 +95,7 @@ object MindAnchorManager {
             if (MA.media <= 0) {
                 // fucking explode
                 println("KABOOM!!!")
-                val pos = getPosition(player) ?: player.position()
-                player.level().explode(
-                    player,
-                    pos.x,
-                    pos.y,
-                    pos.z,
-                    3f,
-                    Level.ExplosionInteraction.BLOCK
-                )
-                MindAnchorData.get(server).anchors.remove(uuid)
-
+                fuckingExplodeAndDie(serverPlayer)
             }
 
         } else {
@@ -242,23 +270,24 @@ object MindAnchorManager {
         if (be != null) {
             println("Trying blockentity!!!")
             (be as BlockEntityFullMindAnchor)
-            val media = be.updateTag.getLong("media")
-            be.updateTag.putLong("media", (media - toSubtract).coerceAtLeast(0))
+            be.media = (be.media - toSubtract).coerceAtLeast(0)
 
         } else if (ie != null) {
             println("trying itementity!!!")
             val itemStack = ie.item
             val beTag = itemStack?.tag?.getCompound("BlockEntityTag")
             val media = beTag?.getLong("media")
-            if (media != null)
+            if (media != null) {
                 beTag.putLong("media", (media - toSubtract).coerceAtLeast(0))
+            }
 
         } else if (it != null) {
             println("trying itemstack....")
             val beTag = it.tag?.getCompound("BlockEntityTag")
             val media = beTag?.getLong("media")
-            if (media != null)
+            if (media != null) {
                 beTag.putLong("media", (media - toSubtract).coerceAtLeast(0))
+            }
         }
     }
 

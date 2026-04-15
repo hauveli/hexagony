@@ -59,7 +59,7 @@ class BlockEntityFullMindAnchor(
     protected var cachedDisplayProfile: GameProfile? = null
     protected var cachedDisplayStack: ItemStack? = null
 
-    protected var media: Long = 0
+    var media: Long = 0
 
     // these are null together
     var displayMsg: Component? = null
