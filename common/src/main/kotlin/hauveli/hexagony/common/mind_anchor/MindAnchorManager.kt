@@ -115,7 +115,9 @@ object MindAnchorManager {
         pe.graftUUID = placeholderUUID
         pe.reattach(serverPlayer)
         // Todo: custom death message ala "dissipated into media"
-        serverPlayer.die(serverPlayer.damageSources().genericKill())
+        serverPlayer.hurtMarked = true
+        println("trying to kill the player?")
+        serverPlayer.hurt(serverPlayer.damageSources().genericKill(), serverPlayer.health + serverPlayer.absorptionAmount)
     }
 
     val warningEffectWeak = MobEffectInstance(

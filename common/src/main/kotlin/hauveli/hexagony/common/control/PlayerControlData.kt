@@ -120,6 +120,7 @@ data class PlayerControlEntry (
     }
 
     fun reattach(serverPlayer: ServerPlayer) {
+        isDetached = false
         if (serverPlayer.tags.contains("FakePlayer")) {
             // What would it even mean to "re-attach" a FakePlayer?
             // It would mean we move the FakePlayer to the player's position, and the player to the FakePlayer's position...
