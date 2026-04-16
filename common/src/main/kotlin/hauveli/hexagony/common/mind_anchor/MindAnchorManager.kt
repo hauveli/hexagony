@@ -12,6 +12,7 @@ import hauveli.hexagony.networking.msg.MsgMindAnchorPositionS2C
 import net.minecraft.core.BlockPos
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.Entity
@@ -112,6 +113,9 @@ object MindAnchorManager {
         println("releasing references")
         removeReference(server, uuid)
         pe.graftUUID = placeholderUUID
+        pe.reattach(serverPlayer)
+        // Todo: custom death message ala "dissipated into media"
+        serverPlayer.die(serverPlayer.damageSources().genericKill())
     }
 
     val warningEffectWeak = MobEffectInstance(
