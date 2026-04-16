@@ -54,18 +54,36 @@ object MindAnchorManager {
     private fun fuckingExplodeAndDie(serverPlayer: ServerPlayer) {
         val server = serverPlayer.server
         val uuid = serverPlayer.uuid
-        val pos = getPosition(serverPlayer) ?: serverPlayer.position()
-        val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
         val pe = PlayerControlData.get(server).getOrCreate(uuid)
         val me = MindAnchorData.get(server).getOrCreate(uuid)
         val level = server.getLevel(me.dimension)
-        val blockAtPos = level?.getBlockEntity(blockPos)
-        println("before blockpos stuff: ${blockAtPos}")
-        if (blockAtPos is BlockEntityFullMindAnchor) {
-            println("Block rebound")
-            level.removeBlockEntity(blockPos)
-            blockAtPos.setRemoved()
-            level.explode(
+        var pos: Vec3? = null
+        val rt = runtime[uuid]
+        if (rt != null) {
+            if (rt.blockEntity != null) {
+                pos = rt.blockEntity!!.blockPos.center
+                level?.removeBlockEntity(rt.blockEntity!!.blockPos)
+                rt.blockEntity!!.setRemoved()
+            } else if (rt.itemEntity != null) {
+                //rt.itemEntity!!.setRemoved(Entity.RemovalReason.DISCARDED)
+                //rt.itemEntity!!.kill()
+                pos = rt.itemEntity!!.position()
+                rt.itemEntity!!.discard()
+            } else if (rt.itemStack != null) {
+                if (rt.entity != null) {
+                    pos = rt.entity!!.position()
+                }
+                rt.itemStack!!.count-- // max stack size is 1 so this should work?
+            } else if (rt.entity != null) {
+                // erm... I'm not sure what I want to do here yet
+                println("item was being held when meant to die...")
+            } else {
+                println("All runtime things were NULL! AHHH")
+            }
+        }
+        if (pos != null) {
+            println("exploding at player!!!")
+            serverPlayer.level().explode(
                 serverPlayer,
                 pos.x,
                 pos.y,
@@ -73,9 +91,11 @@ object MindAnchorManager {
                 3f,
                 Level.ExplosionInteraction.BLOCK
             )
-        } else if (!pe.isDetached) {
-            println("Player rebound")
-            serverPlayer.level().explode(
+        }
+        if (!pe.isDetached) {
+            println("trying to explode player")
+            pos = serverPlayer.position()
+            level?.explode(
                 serverPlayer,
                 pos.x,
                 pos.y,
