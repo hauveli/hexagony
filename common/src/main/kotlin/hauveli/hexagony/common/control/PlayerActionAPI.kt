@@ -1,13 +1,11 @@
 package hauveli.hexagony.common.control
 
 // import at.petrak.hexcasting.ktxt.UseOnContext
-import at.petrak.hexcasting.api.misc.MediaConstants
 import dev.architectury.event.events.common.PlayerEvent
 import dev.architectury.event.events.common.TickEvent
 import hauveli.hexagony.common.bilocation.FreeCameraEntity
 import hauveli.hexagony.common.mind_anchor.MindAnchorData
 import hauveli.hexagony.common.mind_anchor.MindAnchorManager
-import hauveli.hexagony.common.mind_anchor.MindAnchorRuntime
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.particles.ParticleTypes
@@ -474,7 +472,7 @@ object PlayerActionAPI {
                 // This returns right away if no player matched
                 // (if no player is in the MindAnchorManager.runtime list
                 println("Subtracting!!")
-                MindAnchorManager.onTick(server,p)
+                MindAnchorManager.perSecond(server,p)
                 e.durationSeconds--
                 if (e.isDetached) {
                     // update position at least once a second...?
@@ -487,9 +485,9 @@ object PlayerActionAPI {
                         if (e.isFakePlayer) {
                             PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
                             changed = true // Only bother writing when duration has expired?
-                        }
-                        else if (MindAnchorData.get(server).anchors.containsKey(p.uuid)
-                            && !e.isDetached) {
+                        } else if (!e.isDetached
+                            && MindAnchorData.get(server).getOrCreate(uuid).graftUUID
+                            == PlayerControlData.get(server).getOrCreate(uuid).graftUUID) {
                             PlayerControlData.get(server).getOrCreate(p.uuid).detach(p)
                             changed = true // Only bother writing when duration has expired?
                         }

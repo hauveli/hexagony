@@ -13,7 +13,10 @@ public abstract class LocalPlayerTickDeathMixin {
     private void grafted$disableDeathScreen(CallbackInfo ci) {
         Float media = MindAnchorManager.getLocalMedia();
         // Server should control and inform the client of the amount of media left
-        if (media != null && media > 0f) {
+        if (media == null) {
+            // request data?
+
+        } else if (media > 0f) {
             ci.cancel();
         }
     }

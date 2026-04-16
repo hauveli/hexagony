@@ -34,6 +34,8 @@ class MindAnchorRuntime {
 
     var media: Long? = null
 
+    var lastSeenTick: Int? = null
+
     fun trackBlock(be: BlockEntity) {
         clear()
         blockEntity = be
