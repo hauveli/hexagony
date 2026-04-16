@@ -61,16 +61,21 @@ object MindAnchorManager {
         val rt = runtime[uuid]
         if (rt != null) {
             if (rt.blockEntity != null) {
+                println("exploding at blockEntity!!!")
                 pos = rt.blockEntity!!.blockPos.center
                 level?.removeBlockEntity(rt.blockEntity!!.blockPos)
+                level?.removeBlock(rt.blockEntity!!.blockPos, false)
+                level?.destroyBlock(rt.blockEntity!!.blockPos, false)
                 rt.blockEntity!!.setRemoved()
             } else if (rt.itemEntity != null) {
                 //rt.itemEntity!!.setRemoved(Entity.RemovalReason.DISCARDED)
                 //rt.itemEntity!!.kill()
+                println("exploding at itemEntity!!!")
                 pos = rt.itemEntity!!.position()
                 rt.itemEntity!!.discard()
             } else if (rt.itemStack != null) {
                 if (rt.entity != null) {
+                    println("exploding at holder!!!")
                     pos = rt.entity!!.position()
                 }
                 rt.itemStack!!.count-- // max stack size is 1 so this should work?
@@ -82,7 +87,7 @@ object MindAnchorManager {
             }
         }
         if (pos != null) {
-            println("exploding at player!!!")
+            println("exploding!!!")
             serverPlayer.level().explode(
                 serverPlayer,
                 pos.x,
