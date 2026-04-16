@@ -140,7 +140,8 @@ object MindAnchorManager {
                 fuckingExplodeAndDie(serverPlayer)
             } else if (currentMedia <= MediaConstants.QUENCHED_SHARD_UNIT) {
                 println("Erm below safety threshold for media...")
-                pe.detach(serverPlayer)
+                if (!pe.isDetached)
+                    pe.detach(serverPlayer)
             } else if (currentMedia <= MediaConstants.QUENCHED_BLOCK_UNIT) {
                 // TODO: try to indicate to the player that they are about to die using SHADERS
                 // it is already betwen 0 and 4 because of math, but I'm making it explicit so that
@@ -158,6 +159,8 @@ object MindAnchorManager {
             // but it likely can be reached somehow, definitely with creative
             removeReference(server, uuid)
         }
+        println("ended up? ${me.media}") //todo: why is the effect ufcked
+        println("ended current: ${currentMedia}")
     }
 
     private const val TICK_THRESHOLD = 1000
@@ -363,8 +366,9 @@ object MindAnchorManager {
         val it = rt.itemStack // because itemStack has no position
         var cost = toSubtract
         if (!PlayerControlData.get(serverPlayer.server).getOrCreate(serverPlayer.uuid).isDetached) {
-            cost = toSubtract * MediaConstants.DUST_UNIT // cost more if not detached
+            cost = toSubtract * 10 // cost more if not detached
         }
+        println("cost is: ${cost}")
 
         if (be != null) {
             println("Trying blockentity!!!")

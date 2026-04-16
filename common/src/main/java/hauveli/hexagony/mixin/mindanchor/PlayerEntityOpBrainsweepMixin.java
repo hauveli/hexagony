@@ -281,7 +281,7 @@ public abstract class PlayerEntityOpBrainsweepMixin {
         BlockEntity be = serverLevel.getBlockEntity(pos);
         if (be instanceof BlockEntityFullMindAnchor) {
             // Must place media in before doing the rest
-            ((BlockEntityFullMindAnchor) be).setMedia(MediaConstants.QUENCHED_BLOCK_UNIT);
+            ((BlockEntityFullMindAnchor) be).setMedia(MediaConstants.QUENCHED_BLOCK_UNIT * 10);
             UUID graftUUID = UUID.randomUUID();
             MindAnchorData.Companion.get(serverPlayer.server).getOrCreate(serverPlayer.getUUID()).setGraftUUID(graftUUID);
             PlayerControlData.Companion.get(serverPlayer.server).getOrCreate(serverPlayer.getUUID()).setGraft(graftUUID);

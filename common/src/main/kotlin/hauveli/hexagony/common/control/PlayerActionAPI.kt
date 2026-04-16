@@ -457,6 +457,9 @@ object PlayerActionAPI {
     // begin sapping the most recently stored media value from the anchor, and if that hits 0 before the anchor is found,
     // kill the player.
 
+    // todo: when swapping player and homunculus, also swap active control settings like jumping, attacking etc
+    // don't forget the hotbar slot either
+
     val connectedPlayers: MutableMap<UUID, Pair<ServerPlayer, PlayerControlEntry>> = mutableMapOf()
 
     var counter = 0
@@ -473,7 +476,7 @@ object PlayerActionAPI {
                 // (if no player is in the MindAnchorManager.runtime list
                 println("Subtracting!!")
                 MindAnchorManager.perSecond(server,p)
-                e.durationSeconds--
+                e.durationSeconds -= 1
                 if (e.isDetached) {
                     // update position at least once a second...?
                     MindAnchorManager.getPosition(p)?.let {
@@ -492,7 +495,7 @@ object PlayerActionAPI {
                             changed = true // Only bother writing when duration has expired?
                         }
                         // TODO: figure out the anchor timing mechanics, then uncomment this
-                    } else if (e.durationSeconds >= 0) {
+                    } else if (e.durationSeconds >= 2L) {
                         // I'm assuming player.position() is at feet...
                         p.serverLevel().addParticle(
                             ParticleTypes.DRAGON_BREATH,
