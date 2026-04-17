@@ -16,6 +16,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
+import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
@@ -366,21 +367,30 @@ object PlayerActionAPI {
         val e = PlayerControlData.getSelf()
         // This seems to have done it, finally...
         // Oh well, two additional boolean comparisons at most per tick shouldn't be too bad....
-        if (e.isDetached && !FreeCameraEntity.active) {
-            FreeCameraEntity.Companion.detachCamera(Minecraft.getInstance())
+        if (e.isDetached) {
+            if (!FreeCameraEntity.active) {
+                FreeCameraEntity.Companion.detachCamera(Minecraft.getInstance())
+            }
+
+            // Fixes for detached player behaviour????
+            // TODO: actually try to fix the freecamera to use an armor stand? I strongly suspect the issue is there...
+            if (p.fallDistance > 3) {
+                p.hurt(p.damageSources().fall(), (p.fallDistance-3) / 2)
+            }
         }
+        // no attributes in this version, TODO: 1.21.1 use generic.gravity, generic.safe_fall_distance, generic.fall_damage_multiplier and player.block_break_speed attributes.
         // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
         if (e.shouldMoveForwardBackward != 0f || e.shouldMoveLeftRight != 0f) {
             // p.input.forwardImpulse = e.shouldMoveForwardBackward
-            p.zza = e.shouldMoveForwardBackward
-            p.xxa = e.shouldMoveLeftRight
-            /*
+            // If the player is detached, p.zza and p.xxa work great...
+            // But still only do things client-side....
+            //p.zza = e.shouldMoveForwardBackward
+            //p.xxa = e.shouldMoveLeftRight
             customMovement(p,
                 Vec3(
                     e.shouldMoveLeftRight.toDouble(),
                     0.0,
                     e.shouldMoveForwardBackward.toDouble()))
-             */
         }
         if (e.shouldLook) {
             p.yRot = e.shouldLookLeftRight
