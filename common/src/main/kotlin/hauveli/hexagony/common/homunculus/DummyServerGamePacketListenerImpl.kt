@@ -1,9 +1,7 @@
-package hauveli.hexagony.common.bilocation
+package hauveli.hexagony.common.homunculus
 
-import net.minecraft.network.Connection
 import net.minecraft.network.PacketSendListener
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.PacketFlow
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import net.minecraft.server.MinecraftServer

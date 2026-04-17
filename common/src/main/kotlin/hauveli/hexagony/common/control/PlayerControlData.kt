@@ -1,12 +1,11 @@
 package hauveli.hexagony.common.control
 
-import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.respawnFakeClone
+import hauveli.hexagony.common.homunculus.FakeServerPlayer.Companion.respawnFakeClone
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.networking.msg.MsgPlayerControlBooleanC2S
 import hauveli.hexagony.networking.msg.MsgPlayerControlBooleanS2C
 import hauveli.hexagony.networking.msg.MsgPlayerControlFloatS2C
 import hauveli.hexagony.networking.msg.MsgPlayerControlIntegerS2C
-import net.minecraft.client.Minecraft
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag

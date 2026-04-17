@@ -9,13 +9,12 @@ import at.petrak.hexcasting.api.casting.getInt
 import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.copyPlayerDataFrom
-import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.copyPlayerDataFromTo
-import hauveli.hexagony.common.bilocation.FakeServerPlayer.Companion.spawnFakeClone
+import hauveli.hexagony.common.homunculus.FakeServerPlayer.Companion.copyPlayerDataFrom
+import hauveli.hexagony.common.homunculus.FakeServerPlayer.Companion.copyPlayerDataFromTo
+import hauveli.hexagony.common.homunculus.FakeServerPlayer.Companion.spawnFakeClone
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.common.misc.AdvancementProvider.isTrepanned
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity

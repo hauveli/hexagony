@@ -1,5 +1,6 @@
 package hauveli.hexagony.common.bilocation
 
+import hauveli.hexagony.common.homunculus.DummyConnection
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientPacketListener
 import net.minecraft.network.protocol.Packet

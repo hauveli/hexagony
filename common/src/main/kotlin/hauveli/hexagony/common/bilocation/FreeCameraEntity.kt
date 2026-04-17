@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.stats.StatsCounter
 import net.minecraft.world.entity.MoverType
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.scores.Scoreboard
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -30,29 +31,25 @@ class FreeCameraEntity(minecraft: Minecraft) : LocalPlayer(
         noPhysics = true
         isNoGravity = true
         // isInvisibleTo()
-        // isInvisible = true
+        isInvisible = true
         abilities.invulnerable = true // unneeded? idk...
         abilities.mayfly = true
         abilities.flying = true
         // isSpectator = true // not needed if I can set invuln+flying+invisible?
     }
 
-
-    override fun tick() {
-        super.tick()
-        /*
-        xo = x
-        yo = y
-        zo = z
-
-        xOld = x
-        yOld = y
-        zOld = z
-        */
-        // super.tick()
-
-        // movement logic...
+    override fun getScoreboard(): Scoreboard? {
+        return null
     }
+
+    override fun isSpectator(): Boolean {
+        return true
+    }
+
+    override fun isCreative(): Boolean {
+        return false
+    }
+
 
     // override fun defineSynchedData() {}
     override fun readAdditionalSaveData(pCompound: CompoundTag) {}
