@@ -1,6 +1,7 @@
 package hauveli.hexagony.mixin.mindanchor;
 
 import at.petrak.hexcasting.api.misc.MediaConstants;
+import hauveli.hexagony.common.blocks.anchors.MindAnchor;
 import hauveli.hexagony.common.control.PlayerControlData;
 import hauveli.hexagony.common.control.PlayerControlEntry;
 import hauveli.hexagony.common.misc.AdvancementProvider;
@@ -39,7 +40,10 @@ public abstract class GraftedPlayerEntityDieMixin {
         PlayerControlEntry e = PlayerControlData.Companion.get(self.server).getOrCreate(self.getUUID());
 
         long deathCost = MediaConstants.CRYSTAL_UNIT * 1_000;
-        if (deathCost > mindAnchorMedia) return; // die
+        if (deathCost > mindAnchorMedia) {
+            MindAnchorManager.fuckingExplodeAndDie(self);
+            return; // die
+        }
         Long punishmentCost = mindAnchorMedia / 2 + deathCost;
 
         if (!e.isDetached()) {

@@ -59,9 +59,6 @@ object Hexagony {
             PlayerControlData.init(server)
         })
         TickScheduler.init()
-
-        // TOdo: important!! get this shit out of here!!! and make it work!!!
-        initServer()
     }
 
     fun initServer() {

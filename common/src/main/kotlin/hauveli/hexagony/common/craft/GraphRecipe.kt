@@ -16,6 +16,7 @@ import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.item.crafting.RecipeSerializer
 import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 
 // https://github.com/object-Object/HexDebug/blob/057b8100cdbc35138364c38bee6db9b72c1a2b8e/Common/src/main/kotlin/gay/object/hexdebug/recipes/FocusHolderFillingShapedRecipe.kt#L19
 class GraphRecipe(
@@ -94,10 +95,25 @@ class GraphRecipe(
         // Erm, because of the nature of the graph recipe
         // I'm not sure if I actually need these...
         override fun fromNetwork(recipeId: ResourceLocation, buf: FriendlyByteBuf): GraphRecipe {
-            TODO()
-            //val recipe = super.fromNetwork(recipeId, buf)
-            //val resultInner = buf.readItem()
-            // return fromShapedRecipe(recipe, resultInner)
+
+            // This sucks
+            // TOdo: actually do this
+            val resultInner = buf.readItem()
+            val bullshitNode = GraphCraftingRecipes.ItemNodeVanilla(
+                arrayOf(resultInner),
+                pos = Vec3.ZERO,
+                shaped = true
+            )
+            val recipe = GraphRecipe(
+                recipeId,
+                centerNode = bullshitNode,
+                result = resultInner,
+                resultInner = resultInner,
+            )
+            return fromShapedRecipe(
+                recipe, resultInner,
+                centerNode = bullshitNode
+            )
         }
 
         override fun toNetwork(
@@ -105,8 +121,9 @@ class GraphRecipe(
             recipe: GraphRecipe
         ) {
             //super.toNetwork(buf, recipe)
-            //buf.writeItem((recipe as GraphRecipe).resultInner)
-            TODO()
+            // ???? does this even matter?
+            buf.writeItem((recipe as GraphRecipe).resultInner)
+
         }
     }
 }

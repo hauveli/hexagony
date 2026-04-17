@@ -57,14 +57,14 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
 
     val MIND_ANCHOR_POS = make("mind_anchor/pos", HexDir.WEST, "qaqqaeeqe", OpMindAnchorPosition)
 
-    val MIND_ANCHOR_POWER = make("mind_anchor/state", HexDir.WEST, "qaqqaeeq", OpMindAnchorPowered)
+    val MIND_ANCHOR_MEDIA = make("mind_anchor/media", HexDir.WEST, "qaqqadqeq", OpMindAnchorMedia)
 
-    val MIND_ANCHOR_SIGNAL = make("mind_anchor/signal", HexDir.WEST, "qaqqaee", OpMindAnchorSignalStrength)
+    // Other mods already implement these, and I would rather add fewer patterns than more patterns
+    //val MIND_ANCHOR_POWER = make("mind_anchor/state", HexDir.WEST, "qaqqaeeq", OpMindAnchorPowered)
 
-    // todo: actually make the media spell
-    val MIND_ANCHOR_MEDIA = make("mind_anchor/media", HexDir.WEST, "qaqqae", OpMindAnchorMedia)
+    //val MIND_ANCHOR_SIGNAL = make("mind_anchor/signal", HexDir.WEST, "qaqqaee", OpMindAnchorSignalStrength)
 
-    val GREAT_CONGRATULATE = make("congratulate/great", HexDir.EAST, "qwwqqqwwqwded", OpCongratulate)
+    //val GREAT_CONGRATULATE = make("congratulate/great", HexDir.EAST, "qwwqqqwwqwded", OpCongratulate)
 
     private fun make(name: String, startDir: HexDir, signature: String, action: Action) =
         make(name, startDir, signature) { action }

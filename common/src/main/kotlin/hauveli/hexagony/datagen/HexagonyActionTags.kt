@@ -18,7 +18,7 @@ class HexagonyActionTags(
     override fun addTags(provider: HolderLookup.Provider) {
         // per-world great spells
         for (entry in arrayOf(
-            HexagonyActions.GREAT_CONGRATULATE,
+            //HexagonyActions.GREAT_CONGRATULATE,
             HexagonyActions.CRAFT,
             HexagonyActions.CREATE
         )) {

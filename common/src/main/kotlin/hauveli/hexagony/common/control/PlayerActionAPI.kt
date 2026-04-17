@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.BlockHitResult
@@ -235,7 +236,9 @@ object PlayerActionAPI {
 
         // Maximum length of rotated must be 4 or 5 ish? 3 works well enough for the feel of it
         val finalMult = min(sneakMult * sprintMult * groundAccel * viscosityMult, 3.0)
-        entity.addDeltaMovement(rotated.multiply(finalMult,1.0,finalMult))
+        val finalVec = rotated.multiply(finalMult,1.0,finalMult)
+        entity.addDeltaMovement(finalVec)
+        // entity.move(MoverType.SELF, finalVec)
     }
 
     private var breaking = false
@@ -369,11 +372,15 @@ object PlayerActionAPI {
         // If shouldMoveForwardBackward is 0 and we set p.zza it may conflict, check needed, I think...
         if (e.shouldMoveForwardBackward != 0f || e.shouldMoveLeftRight != 0f) {
             // p.input.forwardImpulse = e.shouldMoveForwardBackward
+            p.zza = e.shouldMoveForwardBackward
+            p.xxa = e.shouldMoveLeftRight
+            /*
             customMovement(p,
                 Vec3(
                     e.shouldMoveLeftRight.toDouble(),
                     0.0,
                     e.shouldMoveForwardBackward.toDouble()))
+             */
         }
         if (e.shouldLook) {
             p.yRot = e.shouldLookLeftRight
@@ -480,7 +487,7 @@ object PlayerActionAPI {
                 if (e.isDetached) {
                     // update position at least once a second...?
                     MindAnchorManager.getPosition(p)?.let {
-                        MindAnchorManager.forwardToPlayer(p, it)
+                        MindAnchorManager.forwardPosToPlayer(p, it)
                     }
                 }
                 if (e.durationSeconds < 10L) {

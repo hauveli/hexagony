@@ -1,5 +1,5 @@
 {
-  "parent": "hexcasting:root",
+  "parent": "hexcasting:enlightenment",
   "criteria": {
     "crafted": {
       "trigger": "minecraft:impossible"

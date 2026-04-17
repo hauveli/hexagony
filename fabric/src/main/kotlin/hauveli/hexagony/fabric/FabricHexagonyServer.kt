@@ -7,6 +7,7 @@ import hauveli.hexagony.Hexagony
 import hauveli.hexagony.common.control.PlayerActionAPI.onServerTick
 
 import net.fabricmc.api.DedicatedServerModInitializer
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
@@ -19,16 +20,15 @@ import java.util.function.BiConsumer
 
 object FabricHexagonyServer : DedicatedServerModInitializer {
     override fun onInitializeServer() {
+        println("Initserver is being called!!!!")
         Hexagony.initServer()
         initRegistries()
 
-        /*
-        ServerTickEvents.END_SERVER_TICK.register(ServerTickEvents.EndTick { server ->
-            onServerTick(server)
+        ServerLifecycleEvents.SERVER_STARTED.register{
+            server ->
             println("Hello...")
             server.sendSystemMessage(Component.nullToEmpty("Hello!!!!"))
-        })
-        */
+        }
     }
 
     private fun initRegistries() {

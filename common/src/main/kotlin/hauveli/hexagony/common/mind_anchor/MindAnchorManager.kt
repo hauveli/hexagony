@@ -8,6 +8,7 @@ import hauveli.hexagony.common.blocks.BlockFullMindAnchor
 import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.common.control.placeholderUUID
 import hauveli.hexagony.networking.HexagonyNetworking
+import hauveli.hexagony.networking.msg.MsgMindAnchorFloatS2C
 import hauveli.hexagony.networking.msg.MsgMindAnchorPositionS2C
 import net.minecraft.core.BlockPos
 import net.minecraft.server.MinecraftServer
@@ -52,7 +53,8 @@ object MindAnchorManager {
         anchor.graftUUID = graftUUID
     }
 
-    private fun fuckingExplodeAndDie(serverPlayer: ServerPlayer) {
+    @JvmStatic
+    fun fuckingExplodeAndDie(serverPlayer: ServerPlayer) {
         val server = serverPlayer.server
         val uuid = serverPlayer.uuid
         val pe = PlayerControlData.get(server).getOrCreate(uuid)
@@ -117,7 +119,10 @@ object MindAnchorManager {
         // Todo: custom death message ala "dissipated into media"
         serverPlayer.hurtMarked = true
         println("trying to kill the player?")
-        serverPlayer.hurt(serverPlayer.damageSources().genericKill(), serverPlayer.health + serverPlayer.absorptionAmount)
+        serverPlayer.hurt(
+            serverPlayer.damageSources().genericKill(),
+            serverPlayer.health + serverPlayer.absorptionAmount
+        )
     }
 
     val warningEffectWeak = MobEffectInstance(
@@ -289,10 +294,10 @@ object MindAnchorManager {
 
     fun forwardToUuid(uuid: UUID, server: MinecraftServer, vec: Vec3) {
         val player = server.playerList.getPlayer(uuid) ?: return
-        forwardToPlayer(player, vec) // Update the player's info...
+        forwardPosToPlayer(player, vec) // Update the player's info...
     }
 
-    fun forwardToPlayer(serverPlayer: ServerPlayer, vec: Vec3) {
+    fun forwardPosToPlayer(serverPlayer: ServerPlayer, vec: Vec3) {
         HexagonyNetworking.CHANNEL.sendToPlayer(
             serverPlayer,
             MsgMindAnchorPositionS2C(
@@ -302,6 +307,17 @@ object MindAnchorManager {
         )
     }
 
+    fun forwardMediaToPlayer(serverPlayer: ServerPlayer, media: Float) {
+        HexagonyNetworking.CHANNEL.sendToPlayer(
+            serverPlayer,
+            MsgMindAnchorFloatS2C(
+                MessageTypesFloat.MEDIA,
+                media
+            )
+        )
+    }
+
+    // erm, I think the anchors that matter are only ever checked once on startup OR if the player has joiend
     // Gotta sync the position just in case...
     fun initServer() {
         PlayerEvent.PLAYER_JOIN.register {
@@ -327,9 +343,12 @@ object MindAnchorManager {
         }
     }
 
+    //honestlty i forgot why I was doing this im so tired right now
     fun onJoin(serverPlayer: ServerPlayer) {
         val pos = getPosition(serverPlayer) ?: return
-        forwardToPlayer(serverPlayer, pos)
+        forwardPosToPlayer(serverPlayer, pos)
+        val media = getMedia(serverPlayer) ?: return
+        forwardMediaToPlayer(serverPlayer, media.toFloat())
     }
 
     fun getPosition(serverPlayer: ServerPlayer): Vec3? {
