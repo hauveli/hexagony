@@ -6,6 +6,7 @@ import hauveli.hexagony.networking.msg.MsgPlayerControlBooleanC2S
 import hauveli.hexagony.networking.msg.MsgPlayerControlBooleanS2C
 import hauveli.hexagony.networking.msg.MsgPlayerControlFloatS2C
 import hauveli.hexagony.networking.msg.MsgPlayerControlIntegerS2C
+import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.Tag
@@ -50,7 +51,13 @@ data class PlayerControlEntry (
     var shouldDropStack: Boolean = false
 ) {
 
+    // not persistent, but should it be? I feel like this will auto-resolve on world-reload and is a very fringe edge-case if it causes a problem...
+    var using = false
+    var breaking = false
+    var blockDestroyStage = 0
+    var lastInteractingWithBlockPos: BlockPos? = null
 
+    // TODO: Ok so I tried and then I got somewhere and then I did git stash and lost track of it so whatever I'm just gonna make this work as it is
     fun stop(serverPlayer: ServerPlayer) {
         // TODO:
         // I've considered calling removeEntry() here, but I think a better solution

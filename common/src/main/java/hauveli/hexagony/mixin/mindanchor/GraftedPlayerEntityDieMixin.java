@@ -32,12 +32,16 @@ public abstract class GraftedPlayerEntityDieMixin {
 
         Vec3 mindAnchorPos = MindAnchorManager.INSTANCE.getPosition(self);
         Long mindAnchorMedia = MindAnchorManager.INSTANCE.getMedia(self);
-        if (mindAnchorPos == null || mindAnchorMedia == null) return; // just die instead, maybe also play a sound?
+        PlayerControlEntry e = PlayerControlData.Companion.get(self.server).getOrCreate(self.getUUID());
+        if (mindAnchorPos == null || mindAnchorMedia == null) {
+            // I was thinking about making micro-optimizations here but then I thought again after considering that players dying likely takes up <0.00001% of cpu time...
+            e.reattach(self); // necessary, we may have been detached
+            return; // just die instead, maybe also play a sound?
+        }
         self.sendSystemMessage(Component.nullToEmpty(mindAnchorPos.toString()));
 
         // somehow letting the player know why they didn't detach would be good...
 
-        PlayerControlEntry e = PlayerControlData.Companion.get(self.server).getOrCreate(self.getUUID());
 
         long deathCost = MediaConstants.CRYSTAL_UNIT * 1_000;
         if (deathCost > mindAnchorMedia) {

@@ -14,15 +14,17 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.ai.attributes.Attribute
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
-import java.util.UUID
+import java.util.*
 import kotlin.math.min
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -242,7 +244,7 @@ object PlayerActionAPI {
         // entity.move(MoverType.SELF, finalVec)
     }
 
-    private var breaking = false
+    private var localBreaking = false
     // Do I want to implement this for server-only players as well? I think I do but I'm tired...
     fun emulateLeftClick() {
         val p = player ?: return
@@ -258,7 +260,7 @@ object PlayerActionAPI {
 
             HitResult.Type.BLOCK -> {
                 val blockHit = hit as BlockHitResult
-                if (breaking) {
+                if (localBreaking) {
                     if (gameMode.destroyStage != 10) {
                         gameMode.continueDestroyBlock(blockHit.blockPos, blockHit.direction)
                     }
@@ -270,23 +272,103 @@ object PlayerActionAPI {
                     */
                 } else {
                     gameMode.startDestroyBlock(blockHit.blockPos, blockHit.direction)
-                    breaking = true
+                    localBreaking = true
                 }
                 p.swing(InteractionHand.MAIN_HAND)
             }
 
             HitResult.Type.MISS -> {
-                if (breaking) {
+                if (localBreaking) {
                     gameMode.stopDestroyBlock()
-                    breaking = false
+                    localBreaking = false
                 }
                 p.swing(InteractionHand.MAIN_HAND)
             }
         }
     }
 
+    fun getPlayerHitResult(player: ServerPlayer, range: Double): HitResult {
+        val eyePos = player.eyePosition
+        val lookVec = player.lookAngle
+        val endPos = eyePos.add(lookVec.x * range, lookVec.y * range, lookVec.z * range)
+
+        val context = ClipContext( // its da basic raycast hex
+            eyePos,
+            endPos,
+            ClipContext.Block.OUTLINE,
+            ClipContext.Fluid.NONE,
+            player
+        )
+
+        return player.level().clip(context)
+    }
+
+    // I can't wait for the modding scene to be on the version with mannequins... 1.21.9+.... 26.1 is so far away...
+    // todo: make use of attribute for range
+    // 1.21.1: player.attributes.getValue(Attributes.interaction_range) exists since 1.20.5
+    fun emulateLeftClickServerPlayer(player: ServerPlayer, e: PlayerControlEntry) {
+        val defaultInteractionRangeLeftClick = 3.0
+        val hit = getPlayerHitResult(player, defaultInteractionRangeLeftClick)
+        e.breaking
+        val gameModeServer = player.gameMode
+        val breakerId = player.id
+
+        when (hit.type) {
+            HitResult.Type.ENTITY -> {
+                val entity = (hit as EntityHitResult).entity
+                player.attack(entity)
+                player.swing(InteractionHand.MAIN_HAND)
+            }
+
+            HitResult.Type.BLOCK -> {
+                val blockHit = hit as BlockHitResult
+                if (e.lastInteractingWithBlockPos != blockHit.blockPos) {
+                    e.blockDestroyStage = 0
+                }
+                e.lastInteractingWithBlockPos = blockHit.blockPos
+                val blockState = player.level().getBlockState(blockHit.blockPos)
+                val destroySpeed = player.getDestroySpeed(blockState)
+                println("destroyspeed: ${destroySpeed}")
+                if (e.breaking) {
+                    if (e.blockDestroyStage != 100) {
+                        e.blockDestroyStage++
+                        // continueDestroyBlock(blockHit.blockPos, blockHit.direction)
+                        player.level().destroyBlockProgress(breakerId, blockHit.blockPos, e.blockDestroyStage )
+                    } else {
+                        gameModeServer.destroyBlock(blockHit.blockPos)
+                        e.blockDestroyStage = 0
+                    }
+
+                    /*
+                    else {
+                        gameMode.destroyBlock(blockHit.blockPos)
+                        breaking = false
+                    }
+                    */
+                } else {
+                    e.blockDestroyStage = 0
+                    player.level().destroyBlockProgress(breakerId, blockHit.blockPos, e.blockDestroyStage )
+                    e.breaking = true
+                }
+                player.swing(InteractionHand.MAIN_HAND)
+            }
+
+            HitResult.Type.MISS -> {
+                if (e.breaking) {
+                    e.blockDestroyStage = 0
+                    val bp = e.lastInteractingWithBlockPos
+                    if (bp != null) {
+                        player.level().destroyBlockProgress(breakerId, bp, e.blockDestroyStage )
+                    }
+                    e.breaking = false
+                }
+                player.swing(InteractionHand.MAIN_HAND)
+            }
+        }
+    }
+
     // TODO: specify which hand to use in argument
-    private var using = false
+    private var localUsing = false
     fun emulateRightClick(hand: InteractionHand) {
         val p = player ?: return
         val lp = mc.player ?: return
@@ -328,10 +410,10 @@ object PlayerActionAPI {
 
                 // Ok so this is needed for sure, I don't get how to make food work yet though....
                 if (p.isUsingItem) {
-                    using = true
-                } else if (using) {
+                    localUsing = true
+                } else if (localUsing) {
                     gameMode.releaseUsingItem(p)
-                    using = false
+                    localUsing = false
                 }
 
                 val stack = p.getItemInHand(hand)

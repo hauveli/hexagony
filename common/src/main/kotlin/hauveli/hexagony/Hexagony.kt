@@ -59,11 +59,11 @@ object Hexagony {
             PlayerControlData.init(server)
         })
         TickScheduler.init()
+        PlayerActionAPI.initServer()
+        MindAnchorManager.initServer()
     }
 
     fun initServer() {
         HexagonyServerConfig.initServer()
-        PlayerActionAPI.initServer()
-        MindAnchorManager.initServer()
     }
 }
