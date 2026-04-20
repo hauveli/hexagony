@@ -5,7 +5,10 @@ import hauveli.hexagony.common.control.PlayerControlData
 import hauveli.hexagony.config.HexagonyServerConfig.config
 import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.PacketFlow
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
+import net.minecraft.network.protocol.game.ClientboundTabListPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
 import net.minecraft.network.protocol.game.ServerboundClientCommandPacket
 import net.minecraft.server.MinecraftServer
@@ -85,11 +88,40 @@ class FakeServerPlayer(
         PlayerControlData.removeEntry(uuid, ser) // This is important, more than actually dying important.
     }
 
+    fun sendDisconnected() {
+        val connection = DummyConnection(PacketFlow.SERVERBOUND)
+        val listener = DummyServerGamePacketListenerImpl(server, connection, this)
+        connection.setListener(listener)
+        server.playerList.remove(
+            this
+        )
+        // clone.getAttribute(Attributes.)
+        // server.playerList.broadcastAll(ClientboundPlayerInfoRemovePacket( this )) //instance.dimension);
+        server.playerList.broadcastAll(ClientboundPlayerInfoRemovePacket(listOf(this.uuid)))
+    }
+
+
+
+
     fun removeForReal() {
         stopTracking()
-        super.disconnect()
-        super.discard()
+        this.discard()
+        this.remove(RemovalReason.DISCARDED)
+        // AHHH i don't know how to make this fake player go away
+        sendDisconnected() // PLEASSSEEEEE
+        this.disconnect() // move this up if it doesnt work
     }
+
+    override fun die(damageSource: DamageSource) {
+        super.die(damageSource)
+        removeForReal()
+    }
+
+    override fun kill() {
+        super.kill()
+        removeForReal()
+    }
+
 
     companion object {
 

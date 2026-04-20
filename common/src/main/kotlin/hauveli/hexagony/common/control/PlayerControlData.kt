@@ -112,6 +112,7 @@ data class PlayerControlEntry (
         isDetached = true
         println("OK checking thing!!!")
         if (serverPlayer.tags.contains("FakePlayer")) {
+            println("Killing fakeplayer")
             serverPlayer.hurt(serverPlayer.damageSources().genericKill(),
                 (serverPlayer.maxHealth+serverPlayer.absorptionAmount) * 2)
             serverPlayer.hurtMarked = true
