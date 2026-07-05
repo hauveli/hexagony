@@ -1,0 +1,21 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+# https://copier.readthedocs.io/en/stable/updating/#never-change-the-answers-file-manually
+_commit: v1.3.2
+_src_path: gh:Master-Bw3/Hex-Casting-1.21.1-Addon-Template
+advanced: true
+classname: Hexagony
+default_branch: main
+description: Hexagony addon for Hex Casting
+display_name: Hexagony
+github_repo: hexagony
+github_user: hauveli
+homepage_url: https://hauveli.github.io/hexagony
+issues_url: https://github.com/hauveli/hexagony/issues
+java_package: hauveli.hexagony
+kotlin_package: hauveli.hexagony
+minecraft_version_in_mod_version: true
+mit_license: true
+mod_version: 0.0.1
+modid: hexagony
+nix_shell: true
+sources_url: https://github.com/hauveli/hexagony
