@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "hexcasting:escape",
+    "hexcasting:open_paren",
+    "hexcasting:close_paren",
+    "hexcasting:undo",
+    "hexcasting:eval",
+    "hexcasting:eval/cc",
+    "hexcasting:halt",
+    "hexcasting:read",
+    "hexcasting:read/entity",
+    "hexcasting:write",
+    "hexcasting:write/entity",
+    "hexcasting:readable",
+    "hexcasting:readable/entity",
+    "hexcasting:writable",
+    "hexcasting:writable/entity",
+    "hexcasting:read/local",
+    "hexcasting:write/local",
+    "hexcasting:thanatos"
+  ]
+}

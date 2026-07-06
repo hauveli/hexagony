@@ -1,0 +1,19 @@
+package hauveli.hexagony.features.mind_anchor.item
+
+import com.google.common.collect.Multimap
+import net.minecraft.world.entity.ai.attributes.Attribute
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.item.ItemStack
+
+
+// import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
+
+/**
+ * Why don't we just use the same API mod on Forge and Fabric? Beats me. botania does it like this.
+ * I feel like botnia probably does it this way becase it's older than xplat curios
+ */
+interface MindContainerItem {
+
+    // this is for bauble stuff originally, do we even want to use this?
+    fun getMindContainerAttrs(stack: ItemStack?): Multimap<Attribute?, AttributeModifier?>?
+}

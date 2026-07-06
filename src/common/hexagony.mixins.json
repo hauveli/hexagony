@@ -7,6 +7,10 @@
     "ExampleMixin"
   ],
   "mixins": [
+    "enlightenment.PiggyBackInventoryChangeTriggerMixin",
+    "enlightenment.RequireScrollMishapUnenlightenedMixin",
+    "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",
+    "overcast.RemovePenaltyAtHeadStopSleepInBedMixin"
   ],
   "injectors": {
     "defaultRequire": 1

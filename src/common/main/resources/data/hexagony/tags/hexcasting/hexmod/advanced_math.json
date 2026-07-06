@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "hexcasting:sin",
+    "hexcasting:cos",
+    "hexcasting:tan",
+    "hexcasting:arcsin",
+    "hexcasting:arccos",
+    "hexcasting:arctan",
+    "hexcasting:arctan2",
+    "hexcasting:logarithm",
+    "hexcasting:modulo"
+  ]
+}

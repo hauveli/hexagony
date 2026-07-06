@@ -1,0 +1,24 @@
+{
+  "replace": false,
+  "values": [
+    "hexcasting:append",
+    "hexcasting:unappend",
+    "hexcasting:concat",
+    "hexcasting:index",
+    "hexcasting:for_each",
+    "hexcasting:list_size",
+    "hexcasting:singleton",
+    "hexcasting:empty_list",
+    "hexcasting:reverse",
+    "hexcasting:last_n_list",
+    "hexcasting:splat",
+    "hexcasting:index_of",
+    "hexcasting:remove_from",
+    "hexcasting:slice",
+    "hexcasting:replace",
+    "hexcasting:construct",
+    "hexcasting:deconstruct",
+    "hexcasting:interop/pehkui/get",
+    "hexcasting:interop/pehkui/set"
+  ]
+}

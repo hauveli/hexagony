@@ -55,7 +55,7 @@ repositories {
     maven("https://maven.theillusivec4.top/")
 
     // Accessories, oωo Lib
-    maven("https://maven.wispforest.io/releases")
+    // maven("https://maven.wispforest.io/releases")
 
     maven("https://jitpack.io")
 
@@ -94,7 +94,7 @@ cloche {
 
         mappings {
             official()
-            parchment("2024.11.17")
+            // parchment("2024.11.17")
         }
 
         dependencies {
@@ -122,7 +122,7 @@ cloche {
 
         mappings {
             official()
-            parchment("2024.11.17")
+            // parchment("2024.11.17")
         }
 
         dependencies {
@@ -139,7 +139,7 @@ cloche {
             modRuntimeOnly(libs.architectury.fabric)
 
             modImplementation(libs.modMenu)
-            modImplementation(libs.owoLib.fabric)
+            // modImplementation(libs.owoLib.fabric)
             modImplementation(libs.fzzyConfig.fabric)
         }
 
@@ -157,10 +157,12 @@ cloche {
                 adapter = "kotlin"
             }
             dependencies {
+                /*
                 dependency {
                     modId = "owo"
                     version(libs.versions.owoLib.fabric.get())
                 }
+                 */
                 dependency {
                     modId = "fzzy_config"
                     version(libs.versions.fzzyConfig.fabric.get())
@@ -169,9 +171,7 @@ cloche {
         }
 
         runs {
-            client {
-                jvmArguments.add("-XX:+AllowEnhancedClassRedefinition")
-            }
+            client() // { jvmArguments.add("-XX:+AllowEnhancedClassRedefinition") }
             server()
             data()
         }
@@ -186,7 +186,7 @@ cloche {
 
         mappings {
             official()
-            parchment("2024.11.17")
+            // parchment("2024.11.17")
         }
 
         dependencies {
@@ -199,16 +199,18 @@ cloche {
             }
             modRuntimeOnly(libs.architectury.neoforge)
 
-            modImplementation(libs.owoLib.neoforge)
+            // modImplementation(libs.owoLib.neoforge)
             modImplementation(libs.fzzyConfig.neoforge)
         }
 
         metadata {
             dependencies {
+                /*
                 dependency {
                     modId = "owo"
                     version(libs.versions.owoLib.neoforge.get())
                 }
+                 */
                 dependency {
                     modId = "fzzy_config"
                     version(libs.versions.fzzyConfig.neoforge.get())
@@ -217,9 +219,7 @@ cloche {
         }
 
         runs {
-            client {
-                jvmArguments.add("-XX:+AllowEnhancedClassRedefinition")
-            }
+            client() // { jvmArguments.add("-XX:+AllowEnhancedClassRedefinition") }
             server()
             data()
         }

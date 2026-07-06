@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=north": { "model": "hexagony:block/mind_anchor/empty" },
+    "facing=south": { "model": "hexagony:block/mind_anchor/empty", "y": 180 },
+    "facing=west":  { "model": "hexagony:block/mind_anchor/empty", "y": 270 },
+    "facing=east":  { "model": "hexagony:block/mind_anchor/empty", "y": 90 },
+    "facing=up":    { "model": "hexagony:block/mind_anchor/empty", "x": 270 },
+    "facing=down":  { "model": "hexagony:block/mind_anchor/empty", "x": 90 }
+  }
+}

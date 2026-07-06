@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "hexcasting:swap",
+    "hexcasting:rotate",
+    "hexcasting:rotate_reverse",
+    "hexcasting:duplicate",
+    "hexcasting:over",
+    "hexcasting:tuck",
+    "hexcasting:2dup",
+    "hexcasting:stack_len",
+    "hexcasting:duplicate_n",
+    "hexcasting:fisherman",
+    "hexcasting:fisherman/copy",
+    "hexcasting:swizzle"
+  ]
+}

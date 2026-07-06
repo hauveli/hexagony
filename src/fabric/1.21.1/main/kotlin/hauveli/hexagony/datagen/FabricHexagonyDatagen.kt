@@ -8,5 +8,6 @@ object FabricHexagonyDatagen : DataGeneratorEntrypoint {
         val pack = gen.createPack()
 
         pack.addProvider(::HexagonyActionTags)
+        pack.addProvider(::HexagonyAdvancements)
     }
 }

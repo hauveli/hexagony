@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "#hexagony:hexcasting/hexmod/advanced_math.json",
+    "#hexagony:hexcasting/hexmod/consts.json",
+    "#hexagony:hexcasting/hexmod/entities.json",
+    "#hexagony:hexcasting/hexmod/getters.json",
+    "#hexagony:hexcasting/hexmod/lists.json",
+    "#hexagony:hexcasting/hexmod/logic.json",
+    "#hexagony:hexcasting/hexmod/math.json",
+    "#hexagony:hexcasting/hexmod/meta_stuff.json",
+    "#hexagony:hexcasting/hexmod/modify_stack.json",
+    "#hexagony:hexcasting/hexmod/sets.json",
+    "#hexagony:hexcasting/hexmod/spell_circle_getters.json"
+  ]
+}

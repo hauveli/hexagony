@@ -4,8 +4,14 @@ import hauveli.hexagony.config.HexagonyConfigs
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import hauveli.hexagony.networking.HexagonyNetworking
+//import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.registry.HexagonyActions
+import hauveli.hexagony.registry.HexagonyBlockEntities
+import hauveli.hexagony.registry.HexagonyBlocks
+import hauveli.hexagony.registry.HexagonyCriterions
+import hauveli.hexagony.registry.HexagonyItems
+import hauveli.hexagony.registry.HexagonyRecipeSerializers
+import hauveli.hexagony.registry.HexagonyRecipeTypes
 
 object Hexagony {
     const val MODID = "hexagony"
@@ -19,10 +25,16 @@ object Hexagony {
     fun id(path: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath(MODID, path)
 
     fun init() {
+        HexagonyCriterions.init()
         initRegistries(
             HexagonyActions,
+            HexagonyBlocks,
+            HexagonyBlockEntities,
+            HexagonyItems,
+            HexagonyRecipeTypes,
+            HexagonyRecipeSerializers
         )
-        HexagonyNetworking.init()
+        // HexagonyNetworking.init()
         HexagonyConfigs.init()
     }
 

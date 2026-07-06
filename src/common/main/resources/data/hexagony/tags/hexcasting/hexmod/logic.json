@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "hexcasting:and",
+    "hexcasting:or",
+    "hexcasting:not",
+    "hexcasting:xor",
+    "hexcasting:greater",
+    "hexcasting:less",
+    "hexcasting:greater_eq",
+    "hexcasting:less_eq",
+    "hexcasting:equals",
+    "hexcasting:not_equals",
+    "hexcasting:type_equals",
+    "hexcasting:type_not_equals",
+    "hexcasting:bool_coerce",
+    "hexcasting:if",
+    "hexcasting:random"
+  ]
+}

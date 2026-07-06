@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "hexcasting:get_entity",
+    "hexcasting:get_entity/animal",
+    "hexcasting:get_entity/monster",
+    "hexcasting:get_entity/item",
+    "hexcasting:get_entity/player",
+    "hexcasting:get_entity/living",
+    "hexcasting:zone_entity",
+    "hexcasting:zone_entity/animal",
+    "hexcasting:zone_entity/not_animal",
+    "hexcasting:zone_entity/monster",
+    "hexcasting:zone_entity/not_monster",
+    "hexcasting:zone_entity/item",
+    "hexcasting:zone_entity/not_item",
+    "hexcasting:zone_entity/player",
+    "hexcasting:zone_entity/not_player",
+    "hexcasting:zone_entity/living",
+    "hexcasting:zone_entity/not_living"
+  ]
+}

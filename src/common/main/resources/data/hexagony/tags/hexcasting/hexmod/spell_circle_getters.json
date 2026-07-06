@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "hexcasting:circle/impetus_pos",
+    "hexcasting:circle/impetus_dir",
+    "hexcasting:circle/bounds/min",
+    "hexcasting:circle/bounds/max"
+  ]
+}

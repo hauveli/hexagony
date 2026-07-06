@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "hexcasting:add",
+    "hexcasting:sub",
+    "hexcasting:mul",
+    "hexcasting:div",
+    "hexcasting:abs",
+    "hexcasting:pow",
+    "hexcasting:floor",
+    "hexcasting:ceil",
+    "hexcasting:construct_vec",
+    "hexcasting:deconstruct_vec",
+    "hexcasting:coerce_axial"
+  ]
+}

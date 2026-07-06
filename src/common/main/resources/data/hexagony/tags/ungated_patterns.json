@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "#hexagony:hexcasting/patterns.json",
+    "#hexagony:hexcasting/spells.json"
+  ]
+}

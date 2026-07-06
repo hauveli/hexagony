@@ -1,0 +1,29 @@
+{
+  "parent": "hexagony:crafted",
+  "criteria": {
+    "graft_attempted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  },
+  "display": {
+    "announce_to_chat": true,
+    "bold": true,
+    "color": "dark_purple",
+    "description": {
+      "translate": "advancement.hexagony.graft_attempted.desc"
+    },
+    "frame": "goal",
+    "hidden": true,
+    "icon": {
+      "item": "minecraft:heart_of_the_sea",
+	  "nbt": "{CustomModelData:270439}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancement.hexagony.graft_attempted.title"
+    }
+  }
+}

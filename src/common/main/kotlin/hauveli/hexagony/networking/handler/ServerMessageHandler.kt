@@ -1,6 +1,7 @@
 package hauveli.hexagony.networking.handler
 
 import hauveli.hexagony.networking.msg.*
+/*
 import io.wispforest.owo.network.ServerAccess
 
 fun HexagonyMessageC2S.applyOnServer(access: ServerAccess) = access.player().server.execute {
@@ -14,3 +15,4 @@ fun HexagonyMessageC2S.applyOnServer(access: ServerAccess) = access.player().ser
     }
     */
 }
+ */

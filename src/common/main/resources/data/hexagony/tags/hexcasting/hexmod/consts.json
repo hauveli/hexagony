@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "hexcasting:const/null",
+    "hexcasting:const/true",
+    "hexcasting:const/false",
+    "hexcasting:const/vec/px",
+    "hexcasting:const/vec/py",
+    "hexcasting:const/vec/pz",
+    "hexcasting:const/vec/nx",
+    "hexcasting:const/vec/ny",
+    "hexcasting:const/vec/nz",
+    "hexcasting:const/vec/0",
+    "hexcasting:const/double/pi",
+    "hexcasting:const/double/tau",
+    "hexcasting:const/double/e",
+    "hexcasting:const/double/phi"
+  ]
+}
