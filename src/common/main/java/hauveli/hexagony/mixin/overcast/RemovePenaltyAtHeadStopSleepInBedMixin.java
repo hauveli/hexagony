@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 
 /*
+ * todo: figure out a bentter way of doing this?
  * This mixin /tries/ to detect when a player has rested and then removes one penalty counter
  * from the player(s) that have slept. I hope this works in multiplayer...
  * Amount recovered per night is stored in the config in the integer recoveryPerRest
@@ -26,7 +27,6 @@ public abstract class RemovePenaltyAtHeadStopSleepInBedMixin {
     @Inject(method = "stopSleepInBed", at = @At("HEAD"))
     private void stopSleeping(CallbackInfo ci) {
         ServerPlayer player = (ServerPlayer)(Object)this;
-        // make level() calls safer?
         if (player.level().isClientSide) return;
 
         // I dont understand why I need Stats.CUSTOM.get(Stat)
@@ -39,6 +39,7 @@ public abstract class RemovePenaltyAtHeadStopSleepInBedMixin {
     }
 
     /*
+     * thank you past me
      * tries to check if enough players are asleep to pass the night, and if the player
      * waking up got enough rest, and the night is about to pass.
      */
@@ -57,12 +58,6 @@ public abstract class RemovePenaltyAtHeadStopSleepInBedMixin {
 
     }
 
-    /**
-     * removes recoveryPerRest max health modifier(s) with the name "hexcasting_overcast_penalty"
-     * note: these are modifiers, NOT raw health
-     * Each counter may be more or less than 1 health, ex 0.5 or 3.14 health.
-     * recoveryPerRest will remove one such modifier per rest
-     */
     @Unique
     private void hexagony$removeHexcastingOvercastPenalty(ServerPlayer player) {
         OvercastUtils.addModifierValue(player, HexagonyConfigs.INSTANCE.getCOMMON_CONFIG().getRecoveryPerRest().get());

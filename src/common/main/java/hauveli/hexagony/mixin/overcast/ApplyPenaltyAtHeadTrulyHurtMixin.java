@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /*
+ * // TODO: I forget if I double checked the numbers, but last I tested my math was off by 1 or something
  * This mixin applies a penalty to players when they healthcast, lowering their maximum HP by an amount configured
  * via the variable maximumHealthPenaltyMultiplier, which is a double.
  * 0 means disabled, 1 means 1 max health lost per damage taken, 3 means 3 max health lost per damage taken

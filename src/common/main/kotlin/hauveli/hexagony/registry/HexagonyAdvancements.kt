@@ -36,24 +36,25 @@ object HexagonyAdvancements {
 
     @JvmStatic
     fun tryRevokingAdvancement(serverPlayer: ServerPlayer, advancementResLoc: ResourceLocation) {
-        val advancement: AdvancementHolder = checkNotNull(serverPlayer.server.advancements.get(advancementResLoc))
+        val advancement: AdvancementHolder = serverPlayer.server.advancements.get(advancementResLoc) ?: return
         val progress = serverPlayer.advancements.getOrStartProgress(advancement)
         for (criterion in progress.remainingCriteria) {
             serverPlayer.advancements.revoke(advancement, criterion)
         }
     }
 
-    fun getAdvancement(serverPlayer: ServerPlayer, advancement: ResourceLocation): Advancement? {
-        return serverPlayer.getServer()?.advancements?.get(advancement)?.value()
+    fun getAdvancement(serverPlayer: ServerPlayer, advancement: ResourceLocation): AdvancementHolder? {
+        return serverPlayer.getServer()?.advancements?.get(advancement)
     }
 
-    fun getAdvancementProgress(serverPlayer: ServerPlayer, advancementResLoc: ResourceLocation): AdvancementProgress? {
-        val advancement: AdvancementHolder = checkNotNull(serverPlayer.server.advancements.get(advancementResLoc))
-        return serverPlayer.advancements.getOrStartProgress(advancement)
+    fun getAdvancementProgress(serverPlayer: ServerPlayer, advancementHolder: AdvancementHolder): AdvancementProgress {
+        return serverPlayer.advancements.getOrStartProgress(advancementHolder)
     }
 
+    @JvmStatic
     fun hasAdvancement(serverPlayer: ServerPlayer, advancement: ResourceLocation): Boolean {
-        return getAdvancementProgress(serverPlayer, advancement)?.isDone ?: false
+        val advancementHolder = getAdvancement(serverPlayer, advancement) ?: return false
+        return getAdvancementProgress(serverPlayer, advancementHolder ).isDone
     }
 
     @JvmStatic

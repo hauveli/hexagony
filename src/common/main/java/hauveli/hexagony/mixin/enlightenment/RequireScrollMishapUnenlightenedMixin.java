@@ -5,41 +5,23 @@ import at.petrak.hexcasting.api.casting.mishaps.Mishap;
 import at.petrak.hexcasting.api.casting.mishaps.MishapInvalidPattern;
 import at.petrak.hexcasting.api.casting.mishaps.MishapUnenlightened;
 import at.petrak.hexcasting.api.casting.iota.Iota;
-import at.petrak.hexcasting.common.items.storage.ItemScroll;
-
-import com.google.common.collect.Iterables;
-
 import hauveli.hexagony.config.HexagonyCommonConfig;
 import hauveli.hexagony.config.HexagonyConfigs;
 
+import hauveli.hexagony.registry.HexagonyAdvancements;
 import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-// import javax.naming.Context; awesopme linting
 import java.util.List;
 
-import static at.petrak.hexcasting.api.utils.HexUtils.isOfTag;
-
-//import static at.petrak.hexcasting.common.items.storage.ItemScroll.ANCIENT_PREDICATE;
-
-// from https://github.com/FallingColors/HexMod/blob/532fe9a60138544112e096812c7aefb78b3d7364/Common/src/main/java/at/petrak/hexcasting/api/casting/iota/PatternIota.java
-
-// It should be fine to have ineffecient code here, it is only called before we enlighten and surely, SURELY
-// there are no HexCaster so insane they would willingly not enlighten, but also install this mod?
-
-/*
- * This mixin prevents players from enlightening themselves via brute force.
- * An ancient scroll is required for enlightenment if requireScrollForEnlightenment is true.
- */
 @Mixin(value = MishapUnenlightened.class)
 public class RequireScrollMishapUnenlightenedMixin {
 
@@ -51,7 +33,7 @@ public class RequireScrollMishapUnenlightenedMixin {
     private void execute(
             CastingEnvironment env,
             Mishap.Context errorCtx,
-            List<Iota> iotaList, // if stack is empty and last iota is greater spell, then what?
+            List<Iota> iotaList, // if stack is empty and last iota is greater spell, then what? (I forget what I was yapping about but I think the concern is that this list may be empty somehow some way (not true?))
             CallbackInfo ci) {
         HexagonyCommonConfig conf = HexagonyConfigs.INSTANCE.getCOMMON_CONFIG();
         if (!conf.getRequireScrollForEnlightenment().get()) return;
@@ -59,41 +41,33 @@ public class RequireScrollMishapUnenlightenedMixin {
         if (caster.level().isClientSide) return;
         try {
             if (caster instanceof ServerPlayer player) {
-                if (hexagony$hasRequiredScrolls(player, errorCtx)) return;
+                if (hexagony$hasHeldScroll(player, errorCtx)) return;
                 // if we don't have what we need, cancel the enlightenment
                 ci.cancel();
                 throw new MishapInvalidPattern(errorCtx.getPattern());
             }
         } catch (Mishap mishap) {
             // TODO: push garbage onto stack and play bad sound
+            // todo: did I do the above already?
             Mishap.Context fakeContext = new Mishap.Context(errorCtx.getPattern(), null);
             caster.sendSystemMessage(mishap.errorMessageWithName(env, fakeContext));
         }
     }
+    
+    @Unique
+    private static final String hexagony$advancementTemplate = "hexagony:gated/";
 
     @Unique
-    private static boolean hexagony$hasRequiredScrolls(ServerPlayer player, Mishap.Context errorCtx) {
-        assert errorCtx.getName() != null;
+    private static boolean hexagony$hasHeldScroll(ServerPlayer player, Mishap.Context errorCtx) {
+        if (errorCtx.getName() == null) return true; // I don't fucking know
         if (errorCtx.getName().getContents() instanceof TranslatableContents translatableIota) {
-            String iotaTranslationKey = translatableIota.getKey();
-            // Loop main inventory
-            for (ItemStack stack : Iterables.concat(player.getInventory().items, player.getInventory().offhand, player.getInventory().armor) ) {
-                if (stack.getItem() instanceof ItemScroll) {
-                    if (stack.getItem().getName(stack).getContents() instanceof TranslatableContents translatableItem) {
-                        Object[] itemTranslationArgs = translatableItem.getArgs();
-                        for (Object arg : itemTranslationArgs) {
-                            if (arg instanceof MutableComponent comp &&
-                                    comp.getContents() instanceof TranslatableContents translatableArg) {
-                                // This tells us exactly what the item `stack` is
-                                String itemTranslationKey = translatableArg.getKey();
-                                if (iotaTranslationKey.equals(itemTranslationKey)) {
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            String iotaTranslationKey = hexagony$advancementTemplate
+                    + translatableIota.getKey()
+                    // I don't like this
+                    .replace("hexcasting.action.", "")
+                    .replace("/", "_")
+                    .replace(":", "/");
+            return HexagonyAdvancements.hasAdvancement(player, ResourceLocation.parse(iotaTranslationKey));
         }
         return false;
     }

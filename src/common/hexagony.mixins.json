@@ -9,6 +9,7 @@
   "mixins": [
     "enlightenment.PiggyBackInventoryChangeTriggerMixin",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
+    "enlightenment.RequireScrollPatternIotaMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",
     "overcast.RemovePenaltyAtHeadStopSleepInBedMixin"
   ],

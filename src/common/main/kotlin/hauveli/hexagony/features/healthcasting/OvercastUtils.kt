@@ -8,6 +8,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 
 object OvercastUtils {
 
+    // todo in future: abstract and move stuff around so that it's not hardcoded to overcast penalty
+    // (iff I need it)
+
     val HEALTHCAST_PENALTY_ID = Hexagony.id("overcast_penalty")
 
     private fun newModifier(penalty: Double): AttributeModifier {

@@ -15,6 +15,7 @@ import net.minecraft.world.phys.Vec3
 import java.util.Optional
 import kotlin.collections.iterator
 
+// wip but also todo: properly implement CODEC so I can make an awesome JEI/EMI plugin that shows the crafts
 object GraphCraftingJson {
     val PARTITIONS_CODEC =
         Codec.unboundedMap(

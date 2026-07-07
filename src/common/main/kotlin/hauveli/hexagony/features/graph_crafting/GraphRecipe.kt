@@ -60,14 +60,8 @@ class GraphRecipe(
 
     override fun getRemainingItems(p0: CraftingInput): NonNullList<ItemStack> {
         // return super.getRemainingItems(container)
-        TODO("Report to developer if reached") // I don't think I actually have to do this?
+        TODO("Report to developer if reached") // I don't think I actually have to do this? but I may as well so that if it ever is reached, I get a bug report and learn how it was reached (not likely)
     }
-
-    /*
-    override fun getId(): ResourceLocation {
-        return ID
-    }
-     */
 
     companion object {
         private fun fromShapedRecipe(recipe: GraphRecipe,
@@ -104,7 +98,6 @@ class GraphRecipe(
                 centerNode,
                 resultItem,
                 resultItem)
-            println("Hello!!!!! GRAPHTING!!!")
             // technically, this should probably be its own recipe type, as it is shaped, but not 2D.
             // GraphCraftingRecipes.graphRecipes.add(Pair(recipe, centerNode))
             //println("Loaded graph recipe: $path")

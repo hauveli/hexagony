@@ -21,6 +21,7 @@ class HexagonyCommonConfig : Config(Hexagony.id("common_config")) {
         )
     }
 
+    // todo: number entry field that coerces instead of a stupid slider
     // var dummyServerConfigOption: ValidatedInt = ValidatedInt(64, 100, 0).addDescription() as ValidatedInt
     var recoveryPerRest: ValidatedDouble = ValidatedDouble(1.0, 100.0, 0.0).addDescription() as ValidatedDouble
     var maximumHealthPenaltyMultiplier: ValidatedDouble = ValidatedDouble(1.0, 100.0, -100.0).addDescription() as ValidatedDouble

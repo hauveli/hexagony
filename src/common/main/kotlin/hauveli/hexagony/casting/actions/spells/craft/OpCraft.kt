@@ -23,6 +23,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.phys.Vec3
 
+// todo: decide if I'm satisfied with the visuals or not and remove comments if I am satisfied
 
 object DisplayItemHelper {
     /*
@@ -241,9 +242,7 @@ object OpCraft : SpellAction  {
                 val entity = (iota as? EntityIota)?.getEntity(env.world)
                 entity as? ItemEntity
             }
-            println(itemEntities)
 
-            // Now you have List<ItemEntity>
             val match = GraphCraftingFromNormalRecipes.matchRecipe(itemEntities, orientation)
             val recipe = match.first
             val worldGraph = match.second
@@ -256,7 +255,6 @@ object OpCraft : SpellAction  {
                     casterMaybePlayer,
                     HexagonyAdvancements.GRAPHTING)
 
-                // println(recipe.id)
                 GraphCrafting.sprayAndPray(worldGraph)
                 theatrics(itemEntities, recipe, worldGraph)
             } else {

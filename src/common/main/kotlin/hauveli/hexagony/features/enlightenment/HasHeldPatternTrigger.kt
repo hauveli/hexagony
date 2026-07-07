@@ -1,20 +1,26 @@
 package hauveli.hexagony.features.enlightenment
 
 import at.petrak.hexcasting.api.HexAPI
+import at.petrak.hexcasting.api.casting.ActionRegistryEntry
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.casting.iota.PatternIota
+import at.petrak.hexcasting.api.casting.math.HexPattern
 import at.petrak.hexcasting.api.item.IotaHolderItem
+import at.petrak.hexcasting.common.casting.PatternRegistryManifest
 import at.petrak.hexcasting.common.impl.HexAPIImpl
 import at.petrak.hexcasting.common.items.storage.ItemScroll
 import at.petrak.hexcasting.common.lib.HexItems
 import at.petrak.hexcasting.common.lib.HexItems.SCROLL_LARGE
 import at.petrak.hexcasting.common.lib.HexRegistries
 import at.petrak.hexcasting.common.lib.hex.HexActions
+import at.petrak.hexcasting.common.loot.AddPerWorldPatternToScrollFunc
+import at.petrak.hexcasting.server.ScrungledPatternsSave
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import hauveli.hexagony.Hexagony
 import net.minecraft.advancements.critereon.ContextAwarePredicate
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.item.ItemStack
@@ -36,22 +42,22 @@ class HasHeldPatternTrigger
             return this.playerPredicate
         }
 
-        fun requirementsMet(itemStack: ItemStack): Boolean {
+        fun requirementsMet(itemStack: ItemStack, serverPlayer: ServerPlayer): Boolean {
             val scrollItemMaybe = itemStack.item
-
-            val whyDoesThisNotWork: HexItems.SCROLL_LARGE
-
-
-            if (scrollItemMaybe !is HexItems.SCROLL_LARGE) return false
+            // This will cause essentially no impact in all instances *except* when a player is holding a SCROLL_LARGE
+            if (scrollItemMaybe != SCROLL_LARGE) return false
+            if (scrollItemMaybe !is IotaHolderItem) return false
             val iota: Iota? = scrollItemMaybe.readIota(itemStack)
-            return if (iota is PatternIota) {
-                Hexagony.LOGGER.info("_______")
-                Hexagony.LOGGER.info(pattern)
-                Hexagony.LOGGER.info("_______")
-                iota.pattern == HexActions.REGISTRY.get(pattern) // erm I'm not super happy with this, will the compiler even know it can cache this value?
-            } else {
-                false
-            }
+            if (iota !is PatternIota) return false
+            // oh my gog this rots
+            val resourceKey: ResourceKey<ActionRegistryEntry> =
+                HexActions.REGISTRY.getHolder(pattern).get().key()
+            val pat = PatternRegistryManifest.getCanonicalStrokesPerWorld(
+                resourceKey,
+                serverPlayer.serverLevel()
+            )
+            return iota.pattern == pat // erm I'm not super happy with this, will the compiler even know it can cache this value?
+
         }
 
         companion object {
@@ -72,7 +78,7 @@ class HasHeldPatternTrigger
 
     fun trigger(player: ServerPlayer, itemStack: ItemStack) {
         this.trigger(player) { conditions ->
-            conditions.requirementsMet(itemStack)
+            conditions.requirementsMet(itemStack, player)
         }
     }
 }

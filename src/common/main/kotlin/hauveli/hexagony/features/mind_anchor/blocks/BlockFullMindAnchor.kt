@@ -20,8 +20,14 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.phys.BlockHitResult
 import org.jetbrains.annotations.Nullable
 
-// BlockAbstractImpetus happens to have a lot of useful features I want so that's convenient
-// Also I get to avoid having to construct quite a few classes which is awesome
+/*
+   Todo: I have the opportunity to think twice about how to implement this now (again), so I should think about how I want to do it.
+   I was mostly satisfied with the behavior, at least.
+
+   BlockAbstractImpetus happens to have a lot of useful features I want so that's convenient
+   Also I get to avoid having to construct quite a few classes which is awesome
+
+ */
 class BlockFullMindAnchor(properties: Properties) :
     BlockAbstractMindAnchor(properties) {
 
