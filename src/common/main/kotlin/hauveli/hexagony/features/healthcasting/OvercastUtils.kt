@@ -1,6 +1,7 @@
 package hauveli.hexagony.features.healthcasting
 
 import hauveli.hexagony.Hexagony
+import hauveli.hexagony.config.HexagonyConfigs
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.AttributeInstance
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
@@ -10,6 +11,55 @@ object OvercastUtils {
 
     // todo in future: abstract and move stuff around so that it's not hardcoded to overcast penalty
     // (iff I need it)
+    enum class ValueMode {
+        NONE, // add/sub 0 health
+        CONSTANT, // add/sub x health
+        VARIABLE, // add/sub f(x) health
+        BASE_MAX, // add/sub (base_max_hp) * percentage health
+        CURRENT_MAX  // add/sub (current_max_hp) * percentage health
+    }
+
+    fun resolveValue(
+        entity: LivingEntity,
+        amount: Double,
+        multiplier: Double = 1.0,
+        mode: ValueMode
+    ): Double = when (mode) {
+        ValueMode.NONE -> 0.0
+        ValueMode.CONSTANT -> amount
+        ValueMode.VARIABLE -> amount * multiplier
+        ValueMode.BASE_MAX ->
+            entity.getAttributeBaseValue(Attributes.MAX_HEALTH) * amount
+        ValueMode.CURRENT_MAX ->
+            entity.maxHealth.toDouble() * amount
+    }
+
+    @JvmStatic
+    fun resolveValueGain(
+        entity: LivingEntity,
+        amount: Double,
+        multiplier: Double = 1.0,
+    ): Double {
+        return resolveValue(entity, amount, multiplier, HexagonyConfigs.COMMON_CONFIG.healthcastingRest.mode.get())
+    }
+
+    @JvmStatic
+    fun resolveValuePenalty(
+        entity: LivingEntity,
+        amount: Double,
+        multiplier: Double = 1.0,
+    ): Double {
+        return resolveValue(entity, amount, multiplier, HexagonyConfigs.COMMON_CONFIG.healthcastingPenalty.mode.get())
+    }
+
+    @JvmStatic
+    fun resolveValueDamage(
+        entity: LivingEntity,
+        amount: Double,
+        multiplier: Double = 1.0,
+    ): Double {
+        return resolveValue(entity, amount, multiplier, HexagonyConfigs.COMMON_CONFIG.healthcastingDamage.mode.get())
+    }
 
     val HEALTHCAST_PENALTY_ID = Hexagony.id("overcast_penalty")
 

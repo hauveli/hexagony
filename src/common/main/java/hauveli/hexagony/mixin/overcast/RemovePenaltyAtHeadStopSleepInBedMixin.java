@@ -1,5 +1,7 @@
 package hauveli.hexagony.mixin.overcast;
 
+import hauveli.hexagony.Hexagony;
+import hauveli.hexagony.config.HexagonyCommonConfig;
 import hauveli.hexagony.config.HexagonyConfigs;
 import hauveli.hexagony.features.healthcasting.OvercastUtils;
 
@@ -60,7 +62,14 @@ public abstract class RemovePenaltyAtHeadStopSleepInBedMixin {
 
     @Unique
     private void hexagony$removeHexcastingOvercastPenalty(ServerPlayer player) {
-        OvercastUtils.addModifierValue(player, HexagonyConfigs.INSTANCE.getCOMMON_CONFIG().getRecoveryPerRest().get());
+        HexagonyCommonConfig.HealthcastingOption conf = HexagonyConfigs.INSTANCE.getCOMMON_CONFIG().getHealthcastingRest();
+        double recoveryPerRest = conf.getPerInstance();
+        double valueAfterSettings = OvercastUtils.resolveValueGain(player, recoveryPerRest, recoveryPerRest);
+
+        double additionalRecoveryPerRest = conf.getAdditional();
+        OvercastUtils.addModifierValue(player, valueAfterSettings + additionalRecoveryPerRest);
+
+        // I don't want to overshoot and this is the simplest fix
         if (OvercastUtils.getModifierValue(player) > 0) {
             OvercastUtils.setModifierValue(player, 0);
         }

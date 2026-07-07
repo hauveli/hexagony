@@ -12,6 +12,7 @@ import at.petrak.hexcasting.common.items.storage.ItemScroll
 import at.petrak.hexcasting.common.lib.HexItems
 import at.petrak.hexcasting.common.lib.HexItems.SCROLL_LARGE
 import at.petrak.hexcasting.common.lib.HexRegistries
+import at.petrak.hexcasting.common.lib.HexSounds
 import at.petrak.hexcasting.common.lib.hex.HexActions
 import at.petrak.hexcasting.common.loot.AddPerWorldPatternToScrollFunc
 import at.petrak.hexcasting.server.ScrungledPatternsSave
@@ -23,6 +24,7 @@ import net.minecraft.advancements.critereon.SimpleCriterionTrigger
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.item.ItemStack
 import java.util.*
 
@@ -56,7 +58,15 @@ class HasHeldPatternTrigger
                 resourceKey,
                 serverPlayer.serverLevel()
             )
-            return iota.pattern == pat // erm I'm not super happy with this, will the compiler even know it can cache this value?
+            val matched = iota.pattern == pat
+            if (matched) {
+                // I could do this from the advancement, but I am lazy, this is more convenient and is still only called
+                // when the advancement is granted.
+                // todo: add custom sound? maybe unwrapping old scroll papery sound? or book opening in pathcouli sound
+                serverPlayer.playNotifySound(HexSounds.READ_LORE_FRAGMENT, SoundSource.PLAYERS, 1f, 1f)
+                // serverPlayer.playSound(HexSounds.READ_LORE_FRAGMENT, 1f, 1f) // some type of notification
+            }
+            return matched // erm I'm not super happy with this, will the compiler even know it can cache this value?
 
         }
 

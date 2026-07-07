@@ -4,6 +4,8 @@ import me.fzzyhmstrs.fzzy_config.api.ConfigApi
 import me.fzzyhmstrs.fzzy_config.api.RegisterType
 
 object HexagonyConfigs {
+    const val BASE_KEY = ".config."
+
     //instance of your config loaded from file and automatically registered to the SyncedConfigRegistry and ClientConfigRegistry using the getId() method
     val COMMON_CONFIG = ConfigApi.registerAndLoadConfig(::HexagonyCommonConfig)
 

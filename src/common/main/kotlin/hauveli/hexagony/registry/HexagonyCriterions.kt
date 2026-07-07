@@ -11,17 +11,15 @@ import net.minecraft.world.item.ItemStack
 
 
 object HexagonyCriterions {
-
-    val HAS_HELD_PATTERN: HasHeldPatternTrigger = CriteriaTriggers.register(
-        Hexagony.id("has_held_pattern").toString(), // um... why?
-        HasHeldPatternTrigger()
-    )
-
     fun <T> register(path: String, trigger: T): T
             where T : SimpleCriterionTrigger<*> {
         return CriteriaTriggers.register(path, trigger)
     }
 
+    val HAS_HELD_PATTERN: HasHeldPatternTrigger = CriteriaTriggers.register(
+        Hexagony.id("has_held_pattern").toString(), // um... why?
+        HasHeldPatternTrigger()
+    )
     fun onInventoryChange(serverPlayer: ServerPlayer, itemStack: ItemStack) {
         HAS_HELD_PATTERN.trigger(serverPlayer, itemStack)
     }

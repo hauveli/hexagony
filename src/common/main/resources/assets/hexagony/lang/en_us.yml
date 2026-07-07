@@ -57,6 +57,9 @@ death:
     hidden: ''
     hidden.player: ''
 hexagony:
+  config:
+    gated_spells:
+      condition_not_met: "'Require Scroll For Enlightenment' must be enabled for this setting."
   book:
     great_spells:
       craft:
