@@ -1,12 +1,14 @@
 package hauveli.hexagony.registry
 
 import hauveli.hexagony.Hexagony
-import net.minecraft.advancements.Advancement
+import hauveli.hexagony.mixin.enlightenment.ClientAdvancementsProgressAccessor
 import net.minecraft.advancements.AdvancementHolder
 import net.minecraft.advancements.AdvancementProgress
+import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.ClientAdvancements
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
+
 
 object HexagonyAdvancements {
     val TREPIDATION = Hexagony.id("graft_attempted")
@@ -57,8 +59,49 @@ object HexagonyAdvancements {
         return getAdvancementProgress(serverPlayer, advancementHolder ).isDone
     }
 
+    fun getAdvancement(advancement: ResourceLocation): AdvancementHolder? {
+        val mc = Minecraft.getInstance()
+        val advancements: ClientAdvancements = mc.connection!!.advancements
+        return advancements.get(advancement)
+    }
+
+    fun getAdvancementProgress(advancementHolder: AdvancementHolder): AdvancementProgress? {
+        val mc = Minecraft.getInstance()
+        val advancements: ClientAdvancements = mc.connection!!.advancements
+        val progress: MutableMap<AdvancementHolder?, AdvancementProgress?>? =
+            (advancements as ClientAdvancementsProgressAccessor).getProgress()
+        return progress?.get(advancementHolder)
+    }
+
+    @JvmStatic
+    fun hasAdvancement(advancement: ResourceLocation): Boolean {
+        val advancementHolder = getAdvancement(advancement) ?: return false
+        return getAdvancementProgress(advancementHolder)?.isDone ?: return false
+    }
+
     @JvmStatic
     fun isTrepanned(serverPlayer: ServerPlayer): Boolean {
         return hasAdvancement(serverPlayer, TREPANNED)
+    }
+
+    // I don't like this, but it's not called often so whatever, but I should maybe cache the stuff as bools...
+    private const val SCROLL_ADVANCEMENT_PREFIX: String = "hexagony:gated/"
+    private fun spellLocToAdvancementLoc(resourceKey: String): ResourceLocation {
+        val advancementResLoc = SCROLL_ADVANCEMENT_PREFIX +
+            resourceKey
+                .replace("hexcasting.action.", "")
+                .replace("/", "_")
+                .replace(":", "/")
+        return ResourceLocation.parse(advancementResLoc)
+    }
+
+    @JvmStatic
+    fun hasHeldScroll(resourceKey: String): Boolean {
+        return hasAdvancement(spellLocToAdvancementLoc(resourceKey))
+    }
+
+    @JvmStatic
+    fun hasHeldScroll(serverPlayer: ServerPlayer, resourceKey: String): Boolean {
+        return hasAdvancement(serverPlayer, spellLocToAdvancementLoc(resourceKey))
     }
 }

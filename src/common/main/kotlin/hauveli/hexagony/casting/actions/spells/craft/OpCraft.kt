@@ -25,30 +25,6 @@ import net.minecraft.world.phys.Vec3
 
 // todo: decide if I'm satisfied with the visuals or not and remove comments if I am satisfied
 
-object DisplayItemHelper {
-    /*
-    fun setDisplayItem(display: ItemDisplay, itemStack: ItemStack) {
-        (display as SetItemStackItemDisplayInvoker).setStack(itemStack)
-    }
-
-    fun setInterpolationDuration(display: ItemDisplay, ticks: Int) {
-        (display as SetInterpolationDurationDisplayInvoker).setLerpDur(ticks)
-    }
-
-    fun setInterpolationDelay(display: ItemDisplay, ticks: Int) {
-        (display as SetInterpolationDurationDisplayInvoker).setLerpDelay(ticks)
-    }
-
-    fun setTransformation(display: ItemDisplay, trans: Transformation) {
-        (display as SetInterpolationDurationDisplayInvoker).setTrans(trans)
-    }
-
-    fun setBillboardConstraints(display: ItemDisplay, constraints: Display.BillboardConstraints) {
-        (display as SetInterpolationDurationDisplayInvoker).setBillboard(constraints)
-    }
-     */
-}
-
 object OpCraft : SpellAction  {
     override val argc = 2
 

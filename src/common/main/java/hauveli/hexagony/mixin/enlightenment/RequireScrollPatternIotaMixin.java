@@ -43,20 +43,8 @@ public class RequireScrollPatternIotaMixin {
         LivingEntity caster = castingVM.getEnv().getCastingEntity();
         if (caster.level().isClientSide) return;
         if (caster instanceof ServerPlayer player) {
-            if (hexagony$hasHeldScroll(player, key)) return;
+            if (HexagonyAdvancements.hasHeldScroll(player, key.toString())) return;
             throw new MishapUnenlightened();
         }
-    }
-
-    @Unique
-    private static final String hexagony$advancementTemplate = "hexagony:gated/";
-
-    @Unique
-    private static boolean hexagony$hasHeldScroll(ServerPlayer player, ResourceKey<ActionRegistryEntry> resourceKey) {
-        String iotaTranslationKey = hexagony$advancementTemplate
-                + resourceKey.location().toString()
-                .replace("/", "_")
-                .replace(":", "/");
-        return HexagonyAdvancements.hasAdvancement(player, ResourceLocation.parse(iotaTranslationKey));
     }
 }

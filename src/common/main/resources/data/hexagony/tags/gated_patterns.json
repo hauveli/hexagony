@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "#hexagony:hexcasting/great_spells.json"
+    "#hexagony:hexcasting/great_spells.json",
+    "#hexagony:hexagony/great_spells.json"
   ]
 }

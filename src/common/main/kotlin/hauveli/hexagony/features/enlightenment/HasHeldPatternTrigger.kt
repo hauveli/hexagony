@@ -26,6 +26,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.item.ItemStack
+import vazkii.patchouli.common.base.PatchouliSounds
 import java.util.*
 
 
@@ -63,8 +64,16 @@ class HasHeldPatternTrigger
                 // I could do this from the advancement, but I am lazy, this is more convenient and is still only called
                 // when the advancement is granted.
                 // todo: add custom sound? maybe unwrapping old scroll papery sound? or book opening in pathcouli sound
-                serverPlayer.playNotifySound(HexSounds.READ_LORE_FRAGMENT, SoundSource.PLAYERS, 1f, 1f)
+                serverPlayer.playNotifySound(PatchouliSounds.BOOK_OPEN, SoundSource.PLAYERS, 0.5f, 0.5f)
                 // serverPlayer.playSound(HexSounds.READ_LORE_FRAGMENT, 1f, 1f) // some type of notification
+                // I want the player to save the info about the scrolls they have here.
+                // something(resourceKey, pat)
+                /*
+                    resourceKey.toString()
+                    pat.angles.toString()
+                    pat.startDir.name
+                 */
+                // may need to be networked?
             }
             return matched // erm I'm not super happy with this, will the compiler even know it can cache this value?
 

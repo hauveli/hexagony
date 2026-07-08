@@ -1,7 +1,7 @@
 package hauveli.hexagony.networking.msg
 
 import hauveli.hexagony.Hexagony
-/*
+
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.networking.handler.applyOnClient
 import hauveli.hexagony.networking.handler.applyOnServer
@@ -53,4 +53,3 @@ sealed interface HexagonyMessageCompanion<T> where T : HexagonyMessage, T : Reco
         channel.registerServerbound(type) { msg, access -> apply(msg, access) }
     }
 }
-*/

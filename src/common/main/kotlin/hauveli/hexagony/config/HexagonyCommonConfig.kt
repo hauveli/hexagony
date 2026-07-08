@@ -24,6 +24,7 @@ import net.minecraft.network.chat.Component
 // guide: https://moddedmc.wiki/en/project/fzzy-config/latest/docs/config-design/New-Configs#2-config-creation
 class HexagonyCommonConfig : Config(Hexagony.id("common_config")) {
 
+    // todo: add a detailed description text field in this class to explain in greater detail how it works
     class HealthcastingOption(mode: OvercastUtils.ValueMode, perInstance: Double, additional: Double): Walkable {
         constructor(): this(OvercastUtils.ValueMode.NONE, 1.0, 1.0)
         var mode = ValidatedEnum(mode, ValidatedEnum.WidgetType.SCROLLABLE)
@@ -49,5 +50,4 @@ class HexagonyCommonConfig : Config(Hexagony.id("common_config")) {
             requireScrollForEnlightenment,
             Component.translatable("hexagony.config.gated_spells.condition_not_met"),
             { false })
-
 }

@@ -55,19 +55,10 @@ public class RequireScrollMishapUnenlightenedMixin {
     }
     
     @Unique
-    private static final String hexagony$advancementTemplate = "hexagony:gated/";
-
-    @Unique
     private static boolean hexagony$hasHeldScroll(ServerPlayer player, Mishap.Context errorCtx) {
         if (errorCtx.getName() == null) return true; // I don't fucking know
         if (errorCtx.getName().getContents() instanceof TranslatableContents translatableIota) {
-            String iotaTranslationKey = hexagony$advancementTemplate
-                    + translatableIota.getKey()
-                    // I don't like this
-                    .replace("hexcasting.action.", "")
-                    .replace("/", "_")
-                    .replace(":", "/");
-            return HexagonyAdvancements.hasAdvancement(player, ResourceLocation.parse(iotaTranslationKey));
+            return HexagonyAdvancements.hasHeldScroll(translatableIota.toString());
         }
         return false;
     }

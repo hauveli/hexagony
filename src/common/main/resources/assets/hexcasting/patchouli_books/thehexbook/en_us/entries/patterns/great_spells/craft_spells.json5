@@ -2,7 +2,8 @@
   name: "hexagony.book.great_spells.craft.title",
   category: "hexcasting:patterns/great_spells",
   icon: "minecraft:crafting_table",
-  "sortnum": 0,
+  advancement: "hexcasting:root",
+  "sortnum": 99,
   "read_by_default": false,
   pages: [
     {

@@ -1,6 +1,7 @@
 package hauveli.hexagony
 
 import hauveli.hexagony.config.HexagonyConfigs
+import hauveli.hexagony.networking.HexagonyNetworking
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -34,7 +35,7 @@ object Hexagony {
             HexagonyRecipeTypes,
             HexagonyRecipeSerializers
         )
-        // HexagonyNetworking.init()
+        HexagonyNetworking.init()
         HexagonyConfigs.init()
     }
 

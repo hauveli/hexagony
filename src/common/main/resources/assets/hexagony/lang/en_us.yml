@@ -57,6 +57,8 @@ death:
     hidden: ''
     hidden.player: ''
 hexagony:
+  hexagonycommonconfig:
+    requireScrollForEnlightenment: Require scroll for enlightenment
   config:
     gated_spells:
       condition_not_met: "'Require Scroll For Enlightenment' must be enabled for this setting."
@@ -119,27 +121,26 @@ hexagony:
           create: Bids the homunculus to the given location, for as many seconds as the integer I provide. Costs a charged amethyst, plus units of Amethyst Dust equal to the square of the duration in hours, starting from 1.
 hexcasting:
   action:
-    'hexagony:':
-      craft: Craft Item
-      mind_anchor/pos: Mind Anchor Location
-      mind_anchor/state: Mind Anchor State
-      mind_anchor/signal: Mind Anchor Signal Strength
-      mind_anchor/media: Mind Anchor Media
-      congratulate/great: Great Congrats!
-      create: Summon Homunculus
-      destroy: 'Bid: Banish'
-      move/stopall: 'Bid: Halt'
-      move/walk: 'Bid: Walk'
-      move/strafe: 'Bid: Strafe'
-      move/look: 'Bid: Look'
-      move/jump: 'Bid: Jump'
-      move/sneak: 'Bid: Sneak'
-      move/sprint: 'Bid: Sprint'
-      move/use: 'Bid: Use'
-      move/attack: 'Bid: Attack'
-      move/swap_hands: 'Bid: Swap Hands'
-      move/hotbar: 'Bid: Select Toolbar'
-      move/drop: 'Bid: Drop Item'
+    hexagony:craft: Craft Item
+    hexagony:mind_anchor/pos: Mind Anchor Location
+    hexagony:mind_anchor/state: Mind Anchor State
+    hexagony:mind_anchor/signal: Mind Anchor Signal Strength
+    hexagony:mind_anchor/media: Mind Anchor Media
+    hexagony:congratulate/great: Great Congrats!
+    hexagony:create: Summon Homunculus
+    hexagony:destroy: 'Bid: Banish'
+    hexagony:move/stopall: 'Bid: Halt'
+    hexagony:move/walk: 'Bid: Walk'
+    hexagony:move/strafe: 'Bid: Strafe'
+    hexagony:move/look: 'Bid: Look'
+    hexagony:move/jump: 'Bid: Jump'
+    hexagony:move/sneak: 'Bid: Sneak'
+    hexagony:move/sprint: 'Bid: Sprint'
+    hexagony:move/use: 'Bid: Use'
+    hexagony:move/attack: 'Bid: Attack'
+    hexagony:move/swap_hands: 'Bid: Swap Hands'
+    hexagony:move/hotbar: 'Bid: Select Toolbar'
+    hexagony:move/drop: 'Bid: Drop Item'
     book:
       'hexagony:':
         mind_anchor/pos: Anchor Reflection Position
