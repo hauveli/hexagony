@@ -9,6 +9,7 @@ object NeoForgeHexagonyDatagen {
     fun init(event: GatherDataEvent) {
         event.apply {
             addVanillaProvider(includeServer()) { HexagonyActionTags(it, lookupProvider) }
+            addVanillaProvider(includeServer()) { HexagonyAdvancements(it, lookupProvider) }
         }
     }
 }

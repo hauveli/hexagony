@@ -36,6 +36,7 @@ public abstract class RequireScrollPatchouliAbstractPatternComponentMixin {
             int mouseY,
             CallbackInfo ci
     ) {
+        if (!HexagonyConfigs.INSTANCE.getCLIENT_CONFIG().getRevealGreatSpellsOnHeldInBook().get()) return;
         if ((Object) this instanceof LookupPatternComponent lookupPatternComponent) {
             HexagonyCommonConfig conf = HexagonyConfigs.INSTANCE.getCOMMON_CONFIG();
             if (!conf.getRequireScrollForAllGatedSpells().get()) return;

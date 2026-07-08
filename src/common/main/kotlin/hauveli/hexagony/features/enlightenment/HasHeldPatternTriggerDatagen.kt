@@ -40,7 +40,7 @@ class HasHeldPatternTriggerDatagen(
             Advancement.Builder.advancement()
                 .addCriterion(
                     "unlock",
-                    HexagonyCriterions.HAS_HELD_PATTERN.createCriterion(
+                    HexagonyCriterions.HAS_HELD_PATTERN.value.createCriterion(
                         HasHeldPatternTrigger.Conditions(
                             Optional.empty(),
                             pattern

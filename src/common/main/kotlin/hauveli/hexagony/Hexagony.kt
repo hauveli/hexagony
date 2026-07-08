@@ -26,8 +26,8 @@ object Hexagony {
     fun id(path: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath(MODID, path)
 
     fun init() {
-        HexagonyCriterions.init()
         initRegistries(
+            HexagonyCriterions,
             HexagonyActions,
             HexagonyBlocks,
             HexagonyBlockEntities,
