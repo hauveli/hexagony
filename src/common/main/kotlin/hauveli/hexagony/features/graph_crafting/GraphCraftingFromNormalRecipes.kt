@@ -419,11 +419,10 @@ object GraphCraftingFromNormalRecipes {
 
         val container = TransientCraftingContainer(dummyMenu, 3, 3)
         stacks.forEachIndexed { index, stack ->
-            container.setItem(index, stack)
+            if (index >= container.containerSize) return false // large clusters of items will errore otherwise
+            container.setItem(index, stack) // what the fuck? index 9 oob for length 9? how did that happen?
         }
-        if ((recipe as CraftingRecipe).matches(container.asCraftInput(), level))
-            return true // return right away if any partition is a match
-        return false
+        return (recipe as CraftingRecipe).matches(container.asCraftInput(), level) // return right away if any partition is a match
     }
 
     fun matchRecipe(entities: List<ItemEntity>, orientation: Vec3): Pair<Recipe<*>?,ItemNode> {

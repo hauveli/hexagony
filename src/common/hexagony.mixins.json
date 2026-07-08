@@ -5,8 +5,8 @@
   "minVersion": "0.8",
   "client": [
     "enlightenment.ClientAdvancementsProgressAccessor",
-    "enlightenment.RequireScrollPatchouliOverrideLookupPatternComponentMixin",
-    "enlightenment.RequireScrollPatchouliAbstractLookupPatternComponentMixin"
+    "enlightenment.RequireScrollPatchouliLookupPatternComponentMixin",
+    "enlightenment.RequireScrollPatchouliAbstractPatternComponentMixin"
   ],
   "mixins": [
     "enlightenment.PiggyBackInventoryChangeTriggerMixin",

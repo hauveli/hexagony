@@ -89,7 +89,6 @@ object HexagonyAdvancements {
     private fun spellLocToAdvancementLoc(resourceKey: String): ResourceLocation {
         val advancementResLoc = SCROLL_ADVANCEMENT_PREFIX +
             resourceKey
-                .replace("hexcasting.action.", "")
                 .replace("/", "_")
                 .replace(":", "/")
         return ResourceLocation.parse(advancementResLoc)
@@ -102,6 +101,7 @@ object HexagonyAdvancements {
 
     @JvmStatic
     fun hasHeldScroll(serverPlayer: ServerPlayer, resourceKey: String): Boolean {
+        Hexagony.LOGGER.info("server: {}", resourceKey)
         return hasAdvancement(serverPlayer, spellLocToAdvancementLoc(resourceKey))
     }
 }

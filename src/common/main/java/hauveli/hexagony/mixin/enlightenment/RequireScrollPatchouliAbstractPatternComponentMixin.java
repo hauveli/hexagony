@@ -1,29 +1,23 @@
 package hauveli.hexagony.mixin.enlightenment;
 
-import at.petrak.hexcasting.api.HexAPI;
 import at.petrak.hexcasting.api.casting.math.HexPattern;
 import at.petrak.hexcasting.interop.patchouli.AbstractPatternComponent;
 import at.petrak.hexcasting.interop.patchouli.LookupPatternComponent;
-import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.config.HexagonyCommonConfig;
 import hauveli.hexagony.config.HexagonyConfigs;
 import hauveli.hexagony.features.enlightenment.ScrungledPatternSending;
 import hauveli.hexagony.registry.HexagonyAdvancements;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import vazkii.patchouli.api.IComponentRenderContext;
-import vazkii.patchouli.api.PatchouliAPI;
 
 import java.util.List;
 @Mixin(AbstractPatternComponent.class)
-public abstract class RequireScrollPatchouliAbstractLookupPatternComponentMixin {
+public abstract class RequireScrollPatchouliAbstractPatternComponentMixin {
 
     @Shadow
     private List<HexPattern> patterns;

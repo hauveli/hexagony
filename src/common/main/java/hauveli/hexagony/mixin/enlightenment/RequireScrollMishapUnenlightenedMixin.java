@@ -5,6 +5,7 @@ import at.petrak.hexcasting.api.casting.mishaps.Mishap;
 import at.petrak.hexcasting.api.casting.mishaps.MishapInvalidPattern;
 import at.petrak.hexcasting.api.casting.mishaps.MishapUnenlightened;
 import at.petrak.hexcasting.api.casting.iota.Iota;
+import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.config.HexagonyCommonConfig;
 import hauveli.hexagony.config.HexagonyConfigs;
 
@@ -36,6 +37,7 @@ public class RequireScrollMishapUnenlightenedMixin {
             List<Iota> iotaList, // if stack is empty and last iota is greater spell, then what? (I forget what I was yapping about but I think the concern is that this list may be empty somehow some way (not true?))
             CallbackInfo ci) {
         HexagonyCommonConfig conf = HexagonyConfigs.INSTANCE.getCOMMON_CONFIG();
+        Hexagony.LOGGER.info(iotaList);
         if (!conf.getRequireScrollForEnlightenment().get()) return;
         LivingEntity caster = env.getCastingEntity();
         if (caster.level().isClientSide) return;
@@ -53,12 +55,13 @@ public class RequireScrollMishapUnenlightenedMixin {
             caster.sendSystemMessage(mishap.errorMessageWithName(env, fakeContext));
         }
     }
-    
+
     @Unique
     private static boolean hexagony$hasHeldScroll(ServerPlayer player, Mishap.Context errorCtx) {
-        if (errorCtx.getName() == null) return true; // I don't fucking know
+        if (errorCtx.getName() == null) return true; // I don't fucking know what's going on, defer to Hex Casting, not my problem
         if (errorCtx.getName().getContents() instanceof TranslatableContents translatableIota) {
-            return HexagonyAdvancements.hasHeldScroll(translatableIota.toString());
+            return HexagonyAdvancements.hasHeldScroll(player,
+                    translatableIota.getKey().replace("hexcasting.action.", ""));
         }
         return false;
     }

@@ -14,17 +14,16 @@
       output: "",
       text: "hexagony.book.great_spells.craft"
     },
+    "hexagony.book.great_spells.craft.page.1",
+    "hexagony.book.great_spells.craft.page.2",
     {
-      type: "patchouli:text",
-      text: "hexagony.book.great_spells.craft.page.1",
-    },
-    {
-      type: "patchouli:text",
-      text: "hexagony.book.great_spells.craft.page.2",
-    },
-    {
-      type: "patchouli:text",
-      text: "hexagony.book.great_spells.craft.page.3",
+      "type": "patchouli:image",
+      "title": "hexagony.book.great_spells.craft.page.example",
+      images: [
+        "hexagony:textures/gui/patchouli/craft_example.png"
+      ],
+      "border": true,
+      "text": "hexagony.book.great_spells.craft.page.example.subtitle"
     }
-  ],
+  ]
 }

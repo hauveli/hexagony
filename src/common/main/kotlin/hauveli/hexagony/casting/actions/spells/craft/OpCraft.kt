@@ -38,14 +38,14 @@ object OpCraft : SpellAction  {
         //if (!env.isEntityInRange(entityList)) {
             //  JavaMishapThrower.throwMishap(MishapEntityTooFarAway(target))
         //}
-        val caster: Entity? = env.getCastingEntity()
+        val caster: Entity? = env.castingEntity
         if (caster !is ServerPlayer) {
             // JavaMishapThrower.throwMishap(MishapBadCaster())
         }
         val target = env.castingEntity!!
         return SpellAction.Result(
             Spell(entityList.toList(), orientation),
-            MediaConstants.DUST_UNIT / 10,
+            MediaConstants.DUST_UNIT * entityList.size(),
             listOf(burst(target.position().add(0.0, target.eyeHeight / 2.0, 0.0), 1.0, 10)),
             1
         )

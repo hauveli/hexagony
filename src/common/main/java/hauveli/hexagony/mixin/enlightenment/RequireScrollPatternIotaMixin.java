@@ -43,7 +43,7 @@ public class RequireScrollPatternIotaMixin {
         LivingEntity caster = castingVM.getEnv().getCastingEntity();
         if (caster.level().isClientSide) return;
         if (caster instanceof ServerPlayer player) {
-            if (HexagonyAdvancements.hasHeldScroll(player, key.toString())) return;
+            if (HexagonyAdvancements.hasHeldScroll(player, key.location().toString())) return;
             throw new MishapUnenlightened();
         }
     }
