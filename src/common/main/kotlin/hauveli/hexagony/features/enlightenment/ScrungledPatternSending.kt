@@ -32,26 +32,21 @@ object ScrungledPatternSending {
 
     @JvmStatic
     fun fromClient(resourceKey: String) {
-        Hexagony.LOGGER.info("ASsking for ab ungugnguling!!!")
         CHANNEL.clientHandle().send(PerWorldPatternPacketC2S(resourceKey))
         previousKeyRequest = resourceKey
     }
 
     fun doesThisPlayerHavePermission(resourceKey: String, serverPlayer: ServerPlayer) {
-        Hexagony.LOGGER.info("Scrungling!!!")
         if (hasHeldScroll(serverPlayer, resourceKey)) {
-            Hexagony.LOGGER.info("SOON THERE!!!")
             val perWorldPattern = ScrungledPatternsSave.open(serverPlayer.serverLevel()).lookupReverse(
                 HexActions.REGISTRY.getHolder(ResourceLocation.parse(resourceKey)).get().key()
             )
             if (perWorldPattern == null) return
-            Hexagony.LOGGER.info("TELLING CLIENT TO BUNGUNGLE!!!")
             clientRenderThisNow(resourceKey, perWorldPattern.first, perWorldPattern.second.canonicalStartDir().toString())
         }
     }
 
     fun clientRenderThisNow(resourceKey: String, angles: String, startDir: String) {
-        Hexagony.LOGGER.info("UNBUNGLING!!!")
         currentKey = resourceKey
         currentAngles = angles
         currentStartDir = HexDir.fromString(startDir)

@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "hexagony:craft"
+    "hexagony:craft",
+    "hexagony:dump"
   ]
 }

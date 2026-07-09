@@ -57,6 +57,11 @@ death:
     hidden: ''
     hidden.player: ''
 hexagony:
+  mishap:
+    bad_list_entry:
+      item: an item
+    empty_list:
+      item: a list of items
   hexagonycommonconfig:
     requireScrollForEnlightenment: Require scroll for enlightenment
   config:
@@ -64,11 +69,16 @@ hexagony:
       condition_not_met: "'Require Scroll For Enlightenment' must be enabled for this setting."
   book:
     great_spells:
-      craft:
-        title: Crafting Spells
-        .: Craft a list of thrown items. Costs about one $(l:items/amethyst)$(item)Amethyst Dust/$ per item, regardless of if it was used in the process.
+      dump_spiral:
+        title: Dump Spiral
+        .: Pushes every pattern on my casting grid onto the grid in a list. Costs about one $(l:items/amethyst)$(item)Charged Amethyst/$.
         page:
-          '1': Takes a list of dropped items and a vector to describe the orientation. When I cast this spell, the excess media lost clues me into what it was doing. The dense burst of particles is what Nature has deemed the center-most item, and the lines between each item seem to convey some type of network, or graph.
+          '1': This pattern seems to remember my past in great detail, recalling each pattern as I had drawn them, orientation and all. Even the patterns I drew incorrectly are included for some reason. Painfully loud thoughts pull on my mind, imagining what this simple pattern might do in a more advanced setting...
+      craft:
+        title: Craft Item
+        .: Craft a list of thrown items. Costs about one $(l:items/amethyst)$(item)Charged Amethyst/$ to cast and one additional $(l:items/amethyst)$(item)Amethyst Dust/$ per item evaluated, regardless of if it was used in the process.
+        page:
+          '1': Takes a list of dropped items and a vector to describe the orientation. When I cast this spell, the excess media lost clues me into what it was doing. The dense burst of particles is what Nature has deemed the center-most item, and the lines between each item seem to convey some type of network, or graph. Notably, does not mishap if no item could be crafted... I suppose Nature is charging me more for the display than for the assembly itself.
           '2': Each item, or node will tend to cling to its nearest neighbor, within some tolerance. The order of the items in any list and the direction of any individual item seem to have no bearing on the resulting connections. A consequence of these two points is that a graph's structure, how many groups or partitions it consists of, is within my control.
           example:
             .: Demonstration
@@ -122,7 +132,13 @@ hexagony:
           .: Summon Homunculus
           create: Bids the homunculus to the given location, for as many seconds as the integer I provide. Costs a charged amethyst, plus units of Amethyst Dust equal to the square of the duration in hours, starting from 1.
 hexcasting:
+  mishap:
+    hexagony:
+      bad_list_entry: needs %s at index %s of the list at index 0 of the stack but got %s.
+      empty_list: needs a list of at least size 1 but got an empty list.
+      needs_patterns: needs an image of a pattern but got none.
   action:
+    hexagony:dump: Dump Spiral
     hexagony:craft: Craft Item
     hexagony:mind_anchor/pos: Mind Anchor Location
     hexagony:mind_anchor/state: Mind Anchor State

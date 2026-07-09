@@ -21,8 +21,6 @@ class HasHeldPatternTriggerDatagen(
         output: HolderLookup.Provider,
         holder: Consumer<AdvancementHolder>) {
 
-        Hexagony.LOGGER.info("WOW TESTING!!!!")
-
         // lol! (i'm coping)
         val tagPath = Path.of(outputPath.parent.parent.parent.parent.toString(),
             "/src/common/main/resources/data/${Hexagony.MODID}/tags/")

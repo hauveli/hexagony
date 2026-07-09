@@ -19,8 +19,6 @@ public abstract class ApplyPenaltyAtHeadTrulyHurtMixin {
 
     @Inject(method = "trulyHurt", at = @At("HEAD"))
     private static void onTrulyHurt(LivingEntity entity, DamageSource source, float amount, CallbackInfo ci) {
-        if (entity.level().isClientSide) return;
-
         HexagonyCommonConfig conf = HexagonyConfigs.INSTANCE.getCOMMON_CONFIG();
         HexagonyCommonConfig.HealthcastingOption penalty = conf.getHealthcastingPenalty();
         HexagonyCommonConfig.HealthcastingOption damage = conf.getHealthcastingDamage();

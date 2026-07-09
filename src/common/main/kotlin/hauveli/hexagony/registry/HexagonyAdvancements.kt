@@ -101,7 +101,6 @@ object HexagonyAdvancements {
 
     @JvmStatic
     fun hasHeldScroll(serverPlayer: ServerPlayer, resourceKey: String): Boolean {
-        Hexagony.LOGGER.info("server: {}", resourceKey)
         return hasAdvancement(serverPlayer, spellLocToAdvancementLoc(resourceKey))
     }
 }

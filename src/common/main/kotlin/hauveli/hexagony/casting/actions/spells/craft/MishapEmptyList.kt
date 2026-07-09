@@ -1,0 +1,56 @@
+package hauveli.hexagony.casting.actions.spells.craft
+
+import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
+import at.petrak.hexcasting.api.casting.iota.GarbageIota
+import at.petrak.hexcasting.api.casting.iota.Iota
+import at.petrak.hexcasting.api.casting.mishaps.Mishap
+import at.petrak.hexcasting.api.pigment.FrozenPigment
+import at.petrak.hexcasting.api.utils.asTranslatedComponent
+import at.petrak.hexcasting.common.lib.hex.HexIotaTypes
+import hauveli.hexagony.Hexagony
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.DyeColor
+
+// todo
+// should likely use InvalidIota color (dark gray)
+
+
+
+
+class MishapEmptyList(
+    val perpetrator: Iota,
+    val reverseIdx: Int,
+    val expected: Component
+) : Mishap() {
+    override fun accentColor(ctx: CastingEnvironment, errorCtx: Context): FrozenPigment =
+        dyeColor(DyeColor.GRAY)
+
+    override fun execute(env: CastingEnvironment, errorCtx: Context, stack: MutableList<Iota>) {
+        stack[stack.size - 1 - reverseIdx] = GarbageIota();
+    }
+
+    override fun errorMessage(ctx: CastingEnvironment, errorCtx: Context): Component {
+        val perpKey = HexIotaTypes.REGISTRY.getKey(perpetrator.getType())
+
+        // this translation key is preferred because it includes the namespace
+        val perpDesc = Component.translatable("hexcasting.iota.${perpKey}.desc")
+
+        return error(
+            "invalid_value", expected, reverseIdx,
+            perpDesc, perpetrator.display()
+        )
+    }
+
+    companion object {
+        @JvmStatic
+        fun ofType(perpetrator: Iota, reverseIdx: Int, name: String): MishapEmptyList {
+            return of(perpetrator, reverseIdx, "class.$name")
+        }
+
+        @JvmStatic
+        fun of(perpetrator: Iota, reverseIdx: Int, name: String, vararg translations: Any): MishapEmptyList {
+            val key = "${Hexagony.MODID}.mishap.empty_list.$name"
+            return MishapEmptyList(perpetrator, reverseIdx, key.asTranslatedComponent(*translations))
+        }
+    }
+}

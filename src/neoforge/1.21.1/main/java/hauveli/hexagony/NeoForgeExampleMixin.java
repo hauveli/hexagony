@@ -21,6 +21,5 @@ abstract class NeoForgeExampleMixin extends ReentrantBlockableEventLoop<TickTask
     // common mixins will show errors in the IDE. see https://github.com/terrarium-earth/jvm-multiplatform/issues/10
     @Inject(method = "loadLevel", at = @At(value = "HEAD"))
     private void logOnWorldLoad(CallbackInfo ci) {
-        Hexagony.LOGGER.info("MinecraftServer$loadLevel has started! (Fabric)");
     }
 }

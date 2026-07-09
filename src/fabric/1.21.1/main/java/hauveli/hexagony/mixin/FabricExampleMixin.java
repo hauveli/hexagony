@@ -21,6 +21,5 @@ abstract class FabricExampleMixin extends ReentrantBlockableEventLoop<TickTask> 
     
     @Inject(method = "loadLevel", at = @At(value = "HEAD"))
     private void logOnWorldLoad(CallbackInfo ci) {
-        Hexagony.LOGGER.info("MinecraftServer$loadLevel has started! (Fabric)");
     }
 }

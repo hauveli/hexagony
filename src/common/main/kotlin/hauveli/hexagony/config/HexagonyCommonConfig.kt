@@ -50,4 +50,8 @@ class HexagonyCommonConfig : Config(Hexagony.id("common_config")) {
             requireScrollForEnlightenment,
             Component.translatable("hexagony.config.gated_spells.condition_not_met"),
             { false })
+
+    var greatSpellSettingsGroup = ConfigGroup("great_spells_settings_group")
+    @ConfigGroup.Pop
+    var dumpSpiralWorksInImpetus: ValidatedBoolean = ValidatedBoolean(true)
 }

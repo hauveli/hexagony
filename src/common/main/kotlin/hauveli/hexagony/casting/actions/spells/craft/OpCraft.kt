@@ -2,6 +2,7 @@ package hauveli.hexagony.casting.actions.spells.craft
 
 import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import at.petrak.hexcasting.api.casting.RenderedSpell
+import at.petrak.hexcasting.api.casting.asActionResult
 import at.petrak.hexcasting.api.casting.castables.SpellAction
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
@@ -9,11 +10,16 @@ import at.petrak.hexcasting.api.casting.getList
 import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.casting.iota.Iota
+import at.petrak.hexcasting.api.casting.mishaps.MishapBadEntity
+import at.petrak.hexcasting.api.casting.mishaps.MishapEntityTooFarAway
+import at.petrak.hexcasting.api.casting.mishaps.MishapInvalidIota
 import at.petrak.hexcasting.api.misc.MediaConstants
 import hauveli.hexagony.features.graph_crafting.GraphCrafting
 import hauveli.hexagony.features.graph_crafting.GraphCraftingFromNormalRecipes
 import hauveli.hexagony.registry.HexagonyAdvancements
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
@@ -35,17 +41,31 @@ object OpCraft : SpellAction  {
     ): SpellAction.Result {
         val entityList = args.getList(0, argc)
         val orientation = args.getVec3(1, argc)
-        //if (!env.isEntityInRange(entityList)) {
-            //  JavaMishapThrower.throwMishap(MishapEntityTooFarAway(target))
-        //}
+        val level = env.castingEntity?.level() as ServerLevel
+        if (entityList.size() == 0) {
+            // custom mishap here, possibly
+            throw MishapEmptyList.of(args[0], 0, "item")
+        }
+        // todo: do I need a custom Mishap for these two as well, maybe? garbage-ing the entire list might make sense for this spell...
+        for (subIota in entityList) {
+            if (subIota is EntityIota) {
+                val ent = subIota.getEntity(level)
+                if (ent !is ItemEntity) {
+                    throw MishapBadListEntry.of(args[0], entityList.indexOf(subIota), "item")
+                }
+                env.assertEntityInRange(ent)
+            } else {
+                throw MishapBadListEntry.of(args[0], entityList.indexOf(subIota), "item")
+            }
+        }
         val caster: Entity? = env.castingEntity
         if (caster !is ServerPlayer) {
-            // JavaMishapThrower.throwMishap(MishapBadCaster())
+            // do nothing I guess
         }
         val target = env.castingEntity!!
         return SpellAction.Result(
             Spell(entityList.toList(), orientation),
-            MediaConstants.DUST_UNIT * entityList.size(),
+            MediaConstants.CRYSTAL_UNIT + MediaConstants.DUST_UNIT * entityList.size(),
             listOf(burst(target.position().add(0.0, target.eyeHeight / 2.0, 0.0), 1.0, 10)),
             1
         )
@@ -66,35 +86,6 @@ object OpCraft : SpellAction  {
         throw IllegalStateException()
     }
 
-/*
-    fun spawnItemDisplay(
-        level: Level,
-        position: Vec3,
-        stack: ItemStack
-    ): ItemDisplay {
-        val ent = ItemDisplay(
-            EntityType.ITEM_DISPLAY,
-            level
-        )
-        ent.setPos(position)
-        ent.isInvisible = false
-        DisplayItemHelper.setDisplayItem(ent, stack)
-        DisplayItemHelper.setBillboardConstraints(ent, Display.BillboardConstraints.FIXED)
-        val scale = if (stack.item is BlockItem) 0.25f else 0.5f
-        val transformation = Transformation(
-            Vector3f(),
-            Quaternionf(),
-            Vector3f(scale,scale,scale),
-            Quaternionf(),
-        )
-        DisplayItemHelper.setInterpolationDelay(ent, 2)
-        DisplayItemHelper.setTransformation(ent, transformation)
-        level.addFreshEntity(ent)
-        return ent
-    }
-
- */
-
     fun theatrics(itemEntities: List<ItemEntity>, recipe: Recipe<*>, worldGraph: GraphCrafting.ItemNode) {
         val level = itemEntities[0].level() ?: return
         val toCreate = ItemEntity(
@@ -106,88 +97,8 @@ object OpCraft : SpellAction  {
         )
         GraphCrafting.subtract(worldGraph, recipe)
 
-        val sortedByDistance = itemEntities.sortedBy { it.distanceToSqr(worldGraph.entity) }
+        // val sortedByDistance = itemEntities.sortedBy { it.distanceToSqr(worldGraph.entity) }
 
-        val startDelay = 2
-        var delay = 0L
-        val totalDuration = startDelay + delay * ( sortedByDistance.count() + 1 ) // plus one so minimum lerpDur is greater than 0
-
-        /*
-        for (itemEntity in sortedByDistance) {
-            /*
-            val dummy = spawnItemDisplay(
-                itemEntity.level(),
-                itemEntity.position(),
-                itemEntity.item
-            )
-            val destination = dummy.position().subtract(worldGraph.pos).scale(0.99)
-            val transformation = Transformation(
-                // worldGraph.pos.subtract(dummy.position()).scale(0.99).toVector3f(),
-                destination.toVector3f(),
-                Quaternionf(),
-                //Vector3f(1f,1f,1f),
-                Vector3f(0.01f,0.01f,0.01f), // make it size 0?
-                Quaternionf(),
-            )
-
-             */
-
-            // TODO: Miyu said thusly in hexcord
-            /*
-                Just make it spawn a particle effect
-                That is what particle effects were made for
-                You can make a custom particle that renders as an item stack and then make it fly or do whatever you want, and particles automatically die as needed
-                Even the item pickup animation ( basically the same as what you are doing ) is a particle effect
-             */
-
-            // itemEntity.item.count--
-            // Hexes are instant
-            // I couldnt figure out another way...
-            /*
-            TickScheduler.schedule(
-                1,
-                {
-                    // crawl the rootNode to avoid deleting other items
-                    // pros: kind of cool
-                    // cons: ??
-                    //subtract(worldGraph)
-                }
-            )
-            */
-
-            // dummy.deltaMovement = worldGraph.pos.subtract(dummy.position()).scale(0.0275)
-            //dummy.lerpTo(worldGraph.pos.x, worldGraph.pos.y, worldGraph.pos.z, 0f, 0f, 2000, true)
-            /*
-            TickScheduler.schedule(
-                delay,
-                {
-                    DisplayItemHelper.setInterpolationDelay(dummy, 1)
-                    DisplayItemHelper.setInterpolationDuration(dummy, 10)
-                    DisplayItemHelper.setTransformation(dummy, transformation)
-
-                    // schedule removal inside the scheduler so it happens after it has moved
-                    TickScheduler.schedule(
-                        11,
-                        {
-                            burst(destination.add(
-                                0.5-Random.nextDouble(), 0.5-Random.nextDouble(), 0.5-Random.nextDouble()),
-                                1.0, 10).sprayParticles(
-                                level as ServerLevel,
-                                FrozenPigment.ANCIENT.get()
-                            )
-                            dummy.kill()
-                            dummy.remove(Entity.RemovalReason.DISCARDED)
-                            dummy.discard()
-                        }
-                    )
-                }
-            )
-             */
-            // Subtract after scheduling...
-            //dummy.lerpMotion(worldGraph.pos.x, worldGraph.pos.y, worldGraph.pos.z)
-            delay += 1L
-        }
-         */
         level.playSound(
             null, // all nearby players?
             worldGraph.entity.blockPosition(),
@@ -198,17 +109,6 @@ object OpCraft : SpellAction  {
         )
         toCreate.setPickUpDelay(10) // 10 is delay of naturally dropped items
         toCreate.level().addFreshEntity(toCreate)
-        // Hexes are instant
-        /*
-        // reveal the item
-        TickScheduler.schedule(
-            totalDuration + delay,
-            {
-                toCreate.setPickUpDelay(10) // 10 is delay of naturally dropped items
-                toCreate.level().addFreshEntity(toCreate)
-            }
-        )
-         */
 
     }
 

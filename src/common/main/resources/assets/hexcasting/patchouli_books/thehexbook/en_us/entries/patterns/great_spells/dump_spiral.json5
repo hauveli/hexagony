@@ -1,0 +1,19 @@
+{
+  name: "hexagony.book.great_spells.dump_spiral.title",
+  category: "hexcasting:patterns/great_spells",
+  icon: "minecraft:comparator",
+  advancement: "hexcasting:root",
+  "sortnum": 99,
+  "read_by_default": false,
+  pages: [
+    {
+      type: "hexcasting:pattern",
+      op_id: "hexagony:dump",
+      anchor: "hexagony:dump",
+      input: "many",
+      output: "list",
+      text: "hexagony.book.great_spells.dump_spiral"
+    },
+    "hexagony.book.great_spells.dump_spiral.page.1"
+  ]
+}
