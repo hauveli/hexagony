@@ -3,6 +3,7 @@ package hauveli.hexagony.mixin.enlightenment;
 import at.petrak.hexcasting.api.HexAPI;
 import at.petrak.hexcasting.api.casting.math.HexPattern;
 import at.petrak.hexcasting.interop.patchouli.LookupPatternComponent;
+import hauveli.hexagony.config.HexagonyClientConfig;
 import hauveli.hexagony.config.HexagonyCommonConfig;
 import hauveli.hexagony.config.HexagonyConfigs;
 import hauveli.hexagony.features.enlightenment.ScrungledPatternSending;
@@ -31,8 +32,8 @@ public class RequireScrollPatchouliLookupPatternComponentMixin {
     private void showTheStrokes(
             CallbackInfoReturnable<Boolean> cir
     ) {
-        HexagonyCommonConfig conf = HexagonyConfigs.INSTANCE.getCOMMON_CONFIG();
-        if (!conf.getRequireScrollForAllGatedSpells().get()) return;
+        HexagonyClientConfig conf = HexagonyConfigs.INSTANCE.getCLIENT_CONFIG();
+        if (!conf.getRevealGreatSpellsOnHeldInBook().get()) return;
         if (!HexagonyAdvancements.hasHeldScroll(opName.toString())) return;
         cir.setReturnValue(true);
         cir.cancel();

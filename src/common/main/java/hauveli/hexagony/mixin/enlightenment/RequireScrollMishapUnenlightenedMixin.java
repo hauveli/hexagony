@@ -37,10 +37,10 @@ public class RequireScrollMishapUnenlightenedMixin {
             List<Iota> iotaList, // if stack is empty and last iota is greater spell, then what? (I forget what I was yapping about but I think the concern is that this list may be empty somehow some way (not true?))
             CallbackInfo ci) {
         HexagonyCommonConfig conf = HexagonyConfigs.INSTANCE.getCOMMON_CONFIG();
-        Hexagony.LOGGER.info(iotaList);
+        // Hexagony.LOGGER.info(iotaList); // shows preceding iota (if any), but not the current one, which I need...
         if (!conf.getRequireScrollForEnlightenment().get()) return;
         LivingEntity caster = env.getCastingEntity();
-        if (caster.level().isClientSide) return;
+        // if (caster.level().isClientSide) return;
         try {
             if (caster instanceof ServerPlayer player) {
                 if (hexagony$hasHeldScroll(player, errorCtx)) return;
