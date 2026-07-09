@@ -77,7 +77,7 @@
       <ul class="nav navbar-nav navbar-right">
             <li>
     <a
-      href="https://github.com/hauveli/hexagony/tree/9dc039c247fc38b67e0a832f8e7cd1debe49e351"
+      href="https://github.com/hauveli/hexagony/tree/0b57a1171a9a0622ddacf395f9434bf1cc6eb439"
         target="_blank"
       class="navbar-link"
       role="button"
@@ -146,13 +146,20 @@
       class="item-texture  texture pixelated"
     > Great Spells</a></summary>
       <ul>
-          <li><a href="#patterns/great_spells/craft_spells" class="toc-elem "><img
+          <li><a href="#patterns/great_spells/craft" class="toc-elem "><img
       title="Crafting Table"
       alt="Crafting Table"
       src="https://hexdoc-dev.github.io/hexdoc-minecraft/v/1.20.1/1.0.dev1/assets/minecraft/textures/block/crafting_table.png"
       loading="lazy"
       class="item-texture  texture "
-    > Crafting Spells</a></li>
+    > Craft Item</a></li>
+          <li><a href="#patterns/great_spells/dump_spiral" class="toc-elem "><img
+      title="Redstone Comparator"
+      alt="Redstone Comparator"
+      src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/a14c64362abe4a12c2dfd87f8d1673af9d1b09f4/data/1.20.2/items/comparator.png"
+      loading="lazy"
+      class="item-texture  texture pixelated"
+    > Dump Spiral</a></li>
       </ul>
     </details>
 </nav>
@@ -175,7 +182,7 @@
     title="Permalink"
   ><i class="bi bi-link-45deg"></i></a></h2>
     <p>The spells catalogued here are purported to be of legendary difficulty and power. They seem to have been recorded only <a href="https://hexcasting.hexxy.media/v/0.11.3/1.0/en_us#items/scroll">sparsely</a> (for good reason, the texts claim). It&#39;s probably just the ramblings of extinct traditionalists, though -- a pattern&#39;s a pattern.</p><p>What could possibly go wrong?</p>
-<div id="patterns/great_spells/craft_spells" class="entry">
+<div id="patterns/great_spells/craft" class="entry">
     <h3 class="entry-title page-header">
     <img
       title="Crafting Table"
@@ -183,18 +190,18 @@
       src="https://hexdoc-dev.github.io/hexdoc-minecraft/v/1.20.1/1.0.dev1/assets/minecraft/textures/block/crafting_table.png"
       loading="lazy"
       class="item-texture  texture "
-    >Crafting Spells<a
+    >Craft Item<a
     href="#table-of-contents"
     class="permalink small"
     title="Jump to top"
   ><i class="bi bi-box-arrow-up"></i></a><a
-    href="#patterns/great_spells/craft_spells"
+    href="#patterns/great_spells/craft"
     class="permalink small"
     title="Permalink"
   ><i class="bi bi-link-45deg"></i></a></h3>
-  <div id="patterns/great_spells/craft_spells@hexagony:craft" class="">
-<h4 class="pattern-title">Craft Item (list, vec →)<a
-    href="#patterns/great_spells/craft_spells@hexagony:craft"
+  <div id="patterns/great_spells/craft@hexagony:craft" class="">
+<h4 class="pattern-title">Craft Item ([item], vec →)<a
+    href="#patterns/great_spells/craft@hexagony:craft"
     class="permalink small"
     title="Permalink"
   ><i class="bi bi-link-45deg"></i></a></h4>
@@ -245,10 +252,10 @@
         data-per-world="False"
       >Your browser does not support visualizing patterns. Pattern code: daqedeqadedaqedeqad</canvas>
   </details>
-      <p>Craft a list of thrown items. Costs about one <a href="https://hexcasting.hexxy.media/v/0.11.3/1.0/en_us#items/amethyst"><span style="color: #b0b">Amethyst Dust</span></a> per item, regardless of if it was used in the process.</p>
+      <p>Craft a list of thrown items. Costs about one <a href="https://hexcasting.hexxy.media/v/0.11.3/1.0/en_us#items/amethyst"><span style="color: #b0b">Charged Amethyst</span></a> to cast and one additional <a href="https://hexcasting.hexxy.media/v/0.11.3/1.0/en_us#items/amethyst"><span style="color: #b0b">Amethyst Dust</span></a> per item evaluated, regardless of if it was used in the process.</p>
   </div>
 <br />
-    <p>Takes a list of dropped items and a vector to describe the orientation. When I cast this spell, the excess media lost clues me into what it was doing. The dense burst of particles is what Nature has deemed the center-most item, and the lines between each item seem to convey some type of network, or graph.</p>
+    <p>Takes a list of dropped items and a vector to describe the orientation. When I cast this spell, the excess media lost clues me into what it was doing. The dense burst of particles is what Nature has deemed the center-most item, and the lines between each item seem to convey some type of network, or graph. Notably, does not mishap if no item could be crafted... I suppose Nature is charging me more for the display than for the assembly itself.</p>
 <br />
     <p>Each item, or node will tend to cling to its nearest neighbor, within some tolerance. The order of the items in any list and the direction of any individual item seem to have no bearing on the resulting connections. A consequence of these two points is that a graph&#39;s structure, how many groups or partitions it consists of, is within my control.</p>
 <br />
@@ -257,11 +264,87 @@
       <img
       title="Demonstration"
       alt="Demonstration"
-      src="https://raw.githubusercontent.com/hauveli/hexagony/9dc039c247fc38b67e0a832f8e7cd1debe49e351/src/common/main/resources/assets/hexagony/textures/gui/patchouli/craft_example.png"
+      src="https://raw.githubusercontent.com/hauveli/hexagony/0b57a1171a9a0622ddacf395f9434bf1cc6eb439/src/common/main/resources/assets/hexagony/textures/gui/patchouli/craft_example.png"
       class="texture pixelated"
     >
   </p>
       <p>By placing items in the configuration shown above, I can craft a diamond shovel.</p>
+<br />
+</div>
+<div id="patterns/great_spells/dump_spiral" class="entry">
+    <h3 class="entry-title page-header">
+    <img
+      title="Redstone Comparator"
+      alt="Redstone Comparator"
+      src="https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/a14c64362abe4a12c2dfd87f8d1673af9d1b09f4/data/1.20.2/items/comparator.png"
+      loading="lazy"
+      class="item-texture  texture pixelated"
+    >Dump Spiral<a
+    href="#table-of-contents"
+    class="permalink small"
+    title="Jump to top"
+  ><i class="bi bi-box-arrow-up"></i></a><a
+    href="#patterns/great_spells/dump_spiral"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h3>
+  <div id="patterns/great_spells/dump_spiral@hexagony:dump" class="">
+<h4 class="pattern-title">Dump Spiral (many → list)<a
+    href="#patterns/great_spells/dump_spiral@hexagony:dump"
+    class="permalink small"
+    title="Permalink"
+  ><i class="bi bi-link-45deg"></i></a></h4>
+  <details class="details-collapsible">
+    <summary class="collapse-details collapse-spell"></summary>
+    <div class="dropdown spell-settings-dropdown">
+      <span
+        href=""
+        class="dropdown-toggle spell-settings-toggle"
+        data-toggle="dropdown"
+        role="button"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <i class="bi bi-gear-fill"></i>
+      </span>
+      <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Renders</a>
+          <ul class="dropdown-menu dropdown-menu-left render-dropdowns"></ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a
+            href=""
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+            role="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >Palettes</a>
+          <ul class="dropdown-menu dropdown-menu-left palette-dropdowns"></ul>
+        </li>
+      </ul>
+    </div>
+      <canvas
+        class="spell-viz"
+        width="216"
+        height="216"
+        data-string="wewwwdwqwdwwwew"
+        data-start="south_west"
+        data-per-world="False"
+      >Your browser does not support visualizing patterns. Pattern code: wewwwdwqwdwwwew</canvas>
+  </details>
+      <p>Pushes every pattern on my casting grid onto the grid in a list. Costs about one <a href="https://hexcasting.hexxy.media/v/0.11.3/1.0/en_us#items/amethyst"><span style="color: #b0b">Charged Amethyst</span></a>.</p>
+  </div>
+<br />
+    <p>This pattern seems to remember my past in great detail, recalling each pattern as I had drawn them, orientation and all. Even the patterns I drew incorrectly are included for some reason. Painfully loud thoughts pull on my mind, imagining what this simple pattern might do in a more advanced setting...</p>
 <br />
 </div>
 </section>
