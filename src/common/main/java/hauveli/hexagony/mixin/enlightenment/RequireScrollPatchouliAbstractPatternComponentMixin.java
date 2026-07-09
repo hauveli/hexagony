@@ -22,8 +22,6 @@ public abstract class RequireScrollPatchouliAbstractPatternComponentMixin {
     @Shadow
     private List<HexPattern> patterns;
 
-    private boolean replaced = false;
-
     @Inject(
             method = "render",
             at = @At("HEAD")
