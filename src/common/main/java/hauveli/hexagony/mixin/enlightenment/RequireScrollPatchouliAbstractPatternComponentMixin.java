@@ -36,8 +36,8 @@ public abstract class RequireScrollPatchouliAbstractPatternComponentMixin {
     ) {
         if (!HexagonyConfigs.INSTANCE.getCLIENT_CONFIG().getRevealGreatSpellsOnHeldInBook().get()) return;
         if ((Object) this instanceof LookupPatternComponent lookupPatternComponent) {
-            HexagonyCommonConfig conf = HexagonyConfigs.INSTANCE.getCOMMON_CONFIG();
-            if (!conf.getRequireScrollForAllGatedSpells().get()) return;
+            // HexagonyCommonConfig conf = HexagonyConfigs.INSTANCE.getCOMMON_CONFIG();
+            // if (!conf.getRequireScrollForAllGatedSpells().get()) return; // what was I thinking? if I comment this out, the feature will work just fine anyway.
             String key = ScrungledPatternSending.storedPatterns.get(lookupPatternComponent);
             if (!HexagonyAdvancements.hasHeldScroll(key)) return;
             if (!key.equals(ScrungledPatternSending.currentKey)) {
