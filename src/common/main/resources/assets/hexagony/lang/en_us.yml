@@ -14,7 +14,7 @@ advancement:
   hexagony:
     graft_attempted:
       title: Trepidation
-      desc: Attempt to flay own mind...
+      desc: Attempt to flay your own mind...
     graft_succeeded:
       title: Trepanned
       desc: ... and succeed.
@@ -35,10 +35,10 @@ advancement:
       desc: Trap your mind in your body.
     crafted:
       title: Graphting
-      desc: Crafted an item using a graph-crafting spell.
+      desc: Craft an item using a graph-crafting spell.
     out_of_mana:
       title: Short-sighted
-      desc: Expelled your mind from your body, without a plan to get it back.
+      desc: Expel your mind from your body, without a plan to get it back.
     body_dead_mind_alive:
       title: Not the afterlife
       desc: Die without dying.

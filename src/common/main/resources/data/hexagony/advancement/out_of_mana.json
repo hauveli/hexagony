@@ -1,5 +1,5 @@
 {
-  "parent": "hexagony:graft_succeeded",
+  "parent": "hexagony:detached",
   "criteria": {
     "out_of_mana": {
       "trigger": "minecraft:impossible"
@@ -10,15 +10,15 @@
   },
   "display": {
     "announce_to_chat": true,
-    "bold": true,
-    "color": "light_purple",
     "description": {
-      "translate": "advancement.hexagony.out_of_mana.desc"
+      "translate": "advancement.hexagony.out_of_mana.desc",
+      "color": "light_purple",
+      "bold": true
     },
     "frame": "task",
     "hidden": true,
     "icon": {
-      "item": "hexcasting:battery"
+      "id": "hexcasting:battery"
     },
     "show_toast": true,
     "title": {

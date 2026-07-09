@@ -109,7 +109,6 @@ object OpCraft : SpellAction  {
         )
         toCreate.setPickUpDelay(10) // 10 is delay of naturally dropped items
         toCreate.level().addFreshEntity(toCreate)
-
     }
 
     private class Spell(private val entityList: List<Iota>, private val orientation: Vec3) : RenderedSpell {
@@ -133,6 +132,7 @@ object OpCraft : SpellAction  {
 
                 GraphCrafting.sprayAndPray(worldGraph)
                 theatrics(itemEntities, recipe, worldGraph)
+                HexagonyAdvancements.tryGrantingAdvancement(env.castingEntity as ServerPlayer, HexagonyAdvancements.GRAPHTING)
             } else {
                 GraphCrafting.sprayAndPray(worldGraph)
             }

@@ -6,7 +6,13 @@
   "client": [
     "enlightenment.ClientAdvancementsProgressAccessor",
     "enlightenment.RequireScrollPatchouliLookupPatternComponentMixin",
-    "enlightenment.RequireScrollPatchouliAbstractPatternComponentMixin"
+    "enlightenment.RequireScrollPatchouliAbstractPatternComponentMixin",
+    "dissociation.AntiSneakLocalPlayerMixin",
+    "dissociation.AntiTurnEntityMixin",
+    "dissociation.DisableIngameGuiMixin",
+    "dissociation.NoInputMinecraftMixin",
+    "dissociation.SelectedSlotInventoryMixin",
+    "dissociation.SetPositionCameraMixin"
   ],
   "mixins": [
     "enlightenment.PiggyBackInventoryChangeTriggerMixin",

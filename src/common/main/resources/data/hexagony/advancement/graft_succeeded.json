@@ -10,16 +10,17 @@
   },
   "display": {
     "announce_to_chat": false,
-    "bold": true,
-    "color": "light_purple",
     "description": {
-      "translate": "advancement.hexagony.graft_succeeded.desc"
+      "translate": "advancement.hexagony.graft_succeeded.desc",
+      "color": "light_purple"
     },
     "frame": "challenge",
     "hidden": true,
     "icon": {
-      "item": "minecraft:heart_of_the_sea",
-      "nbt": "{CustomModelData:270441}"
+      "id": "minecraft:heart_of_the_sea",
+      "components": {
+        "minecraft:custom_model_data": 270441
+      }
     },
     "show_toast": true,
     "title": {

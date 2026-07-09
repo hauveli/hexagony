@@ -13,7 +13,7 @@
     "frame": "task",
     "hidden": true,
     "icon": {
-      "item": "hexcasting:impetus/empty"
+      "id": "hexcasting:impetus/empty"
     },
     "show_toast": true,
     "title": {

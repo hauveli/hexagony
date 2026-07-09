@@ -1,0 +1,36 @@
+{
+  "parent": "hexagony:graft_succeeded",
+  "criteria": {
+    "trapped": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancement.hexagony.trapped.desc",
+      "color": "light_purple",
+      "bold": true
+    },
+    "frame": "task",
+    "hidden": true,
+    "icon": {
+      "id": "minecraft:player_head",
+      "components": {
+        "minecraft:profile": {
+          "properties": [{
+            "name": "textures",
+            "value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2E3NmI1NTMwMzg3NTk2MmFjOTRkZDBkYjQxMDU4MzMzY2MzOWM3MGNkNGU5MTViMGQ2ZDFlMDg1MzQ2ZjFlNCJ9fX0="
+          }]
+        }
+      }
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancement.hexagony.trapped.title"
+    }
+  }
+}

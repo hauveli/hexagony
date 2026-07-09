@@ -1,0 +1,35 @@
+{
+  "parent": "hexcasting:enlightenment",
+  "criteria": {
+    "crafted": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancement.hexagony.crafted.desc"
+    },
+    "frame": "task",
+    "icon": {
+      "id": "minecraft:player_head",
+      "components": {
+        "minecraft:profile": {
+          "properties": [{
+            "name": "textures",
+            "value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjdjZmJjOWI2MWJjYjJiZTQ0YzYxMTlkNjZlODI5NTVkM2Y2Y2ExMzNkY2QwZWMxMTExYTA1OWIzMTFiNWVhMyJ9fX0="
+          }]
+        }
+      }
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancement.hexagony.crafted.title",
+      "color": "light_purple",
+      "bold": true
+    }
+  }
+}
