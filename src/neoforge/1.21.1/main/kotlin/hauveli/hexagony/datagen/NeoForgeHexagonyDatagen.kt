@@ -9,7 +9,7 @@ object NeoForgeHexagonyDatagen {
     fun init(event: GatherDataEvent) {
         event.apply {
             addVanillaProvider(includeServer()) { HexagonyActionTags(it, lookupProvider) }
-            // how do I add datagen to neoforge what the hell fabric was so much simpler and easier
+            // oh that's how i do it, yiippeee!!
             addProvider(includeServer()) { HexagonyAdvancements(it, lookupProvider) }
         }
     }

@@ -65,12 +65,11 @@ object GraphCraftingFromNormalRecipes {
                 }
             }
         }
-        shapelessRecipes =  list
+        shapelessRecipes = list
     }
 
     // I'm hoping this will always load AFTER all other mods haha...
     fun init(level: ServerLevel) {
-        if (level.isClientSide) return
         getShapedRecipesAtRuntime(level)
         getShapelessRecipesAtRuntime(level)
         getGraphRecipesAtRuntime(level)
