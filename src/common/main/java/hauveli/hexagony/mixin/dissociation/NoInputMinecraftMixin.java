@@ -27,18 +27,19 @@ public abstract class NoInputMinecraftMixin {
                         MINECRAFT.options.keySocialInteractions,
                         MINECRAFT.options.keyScreenshot,
                         MINECRAFT.options.keySmoothCamera,
-                        MINECRAFT.options.keyPlayerList
+                        MINECRAFT.options.keyPlayerList,
+                        MINECRAFT.options.keyJump,
+                        MINECRAFT.options.keyShift,
+                        MINECRAFT.options.keyUp,
+                        MINECRAFT.options.keyDown,
+                        MINECRAFT.options.keyLeft,
+                        MINECRAFT.options.keyRight
                 );
             }
             if (disallowedKeys == null) {
                 disallowedKeys = List.of(
                         MINECRAFT.options.keyUse,
-                        MINECRAFT.options.keyAttack,
-                        MINECRAFT.options.keyJump,
-                        MINECRAFT.options.keyUp,
-                        MINECRAFT.options.keyDown,
-                        MINECRAFT.options.keyLeft,
-                        MINECRAFT.options.keyRight
+                        MINECRAFT.options.keyAttack
                 );
             }
             /*

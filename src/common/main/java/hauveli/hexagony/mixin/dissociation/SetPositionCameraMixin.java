@@ -40,6 +40,7 @@ abstract class SetPositionCameraMixin implements CameraExtension {
         FreeCameraEntity fce = FreeCameraEntity.Companion.getFreeCam();
         setPosition(fce.position());
         setRotation(fce.getYRot(), fce.getXRot());
+        FreeCameraEntity.Companion.updateFreeCam();
     }
 
     @Unique
