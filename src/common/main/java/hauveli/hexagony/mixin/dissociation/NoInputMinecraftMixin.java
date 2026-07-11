@@ -1,6 +1,6 @@
 package hauveli.hexagony.mixin.dissociation;
 
-import hauveli.hexagony.features.freecam.FreeCam;
+import hauveli.hexagony.features.freecam.FreeCameraEntity;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,38 +12,35 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Arrays;
 import java.util.List;
 
-import static hauveli.hexagony.features.freecam.FreeCam.ClientSideData.playerEntityInputsDisabled;
+import static hauveli.hexagony.Hexagony.MINECRAFT;
 
 @Mixin(Minecraft.class)
 public abstract class NoInputMinecraftMixin {
     @Inject(method = "handleKeybinds", at = @At("HEAD"), cancellable = true)
     private void hexagony$disableInputs(CallbackInfo ci) {
-        if (playerEntityInputsDisabled) {
-            /*
-            Minecraft mc = Minecraft.getInstance();
+        if (FreeCameraEntity.Companion.getActive()) {
+            assert MINECRAFT != null;
             if (allowedKeys == null) {
                 allowedKeys = List.of(
-                        mc.options.keyChat,
-                        mc.options.keyFullscreen,
-                        mc.options.keySocialInteractions,
-                        mc.options.keyScreenshot,
-                        mc.options.keySmoothCamera,
-                        mc.options.keyPlayerList
+                        MINECRAFT.options.keyChat,
+                        MINECRAFT.options.keyFullscreen,
+                        MINECRAFT.options.keySocialInteractions,
+                        MINECRAFT.options.keyScreenshot,
+                        MINECRAFT.options.keySmoothCamera,
+                        MINECRAFT.options.keyPlayerList
                 );
             }
-            /*
             if (disallowedKeys == null) {
                 disallowedKeys = List.of(
-                        mc.options.keyUse,
-                        mc.options.keyAttack,
-                        mc.options.keyJump,
-                        mc.options.keyUp,
-                        mc.options.keyDown,
-                        mc.options.keyLeft,
-                        mc.options.keyRight
+                        MINECRAFT.options.keyUse,
+                        MINECRAFT.options.keyAttack,
+                        MINECRAFT.options.keyJump,
+                        MINECRAFT.options.keyUp,
+                        MINECRAFT.options.keyDown,
+                        MINECRAFT.options.keyLeft,
+                        MINECRAFT.options.keyRight
                 );
             }
-             */
             /*
             Arrays.stream(mc.options.keyHotbarSlots).forEach(
                     keyMapping -> {
@@ -52,16 +49,16 @@ public abstract class NoInputMinecraftMixin {
                         }
                     }
             );
-            Arrays.stream(mc.options.keyMappings).forEach(
+             */
+            Arrays.stream(MINECRAFT.options.keyMappings).forEach(
                     keyMapping -> {
-                        FreeCam.ClientSideData.keyToMovement(keyMapping);
                         if (!allowedKeys.contains(keyMapping)) {
                             keyMapping.consumeClick();
                             keyMapping.setDown(false);
                         }
                     }
             );
-             */
+
         }
 
     }

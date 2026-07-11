@@ -1,8 +1,10 @@
 package hauveli.hexagony.mixin.dissociation;
 
 import hauveli.hexagony.features.freecam.CameraExtension;
-import hauveli.hexagony.features.freecam.FreeCam;
+import hauveli.hexagony.features.freecam.FreeCameraEntity;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.phys.Vec3;
@@ -13,8 +15,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import static hauveli.hexagony.features.freecam.FreeCam.ClientSideData.playerEntityInputsDisabled;
 
 
 @Mixin(Camera.class)
@@ -34,15 +34,12 @@ abstract class SetPositionCameraMixin implements CameraExtension {
             boolean thirdPersonReverse,
             float partialTick,
             CallbackInfo ci) {
-        if (!playerEntityInputsDisabled) {
+        if (!FreeCameraEntity.Companion.getActive()) {
             return;
         }
-
-        /*
-        setPosition(FreeCam.ClientSideData.position());
-        setRotation((float) FreeCam.ClientSideData.getYRot(), (float) FreeCam.ClientSideData.getXRot());
-
-         */
+        FreeCameraEntity fce = FreeCameraEntity.Companion.getFreeCam();
+        setPosition(fce.position());
+        setRotation(fce.getYRot(), fce.getXRot());
     }
 
     @Unique

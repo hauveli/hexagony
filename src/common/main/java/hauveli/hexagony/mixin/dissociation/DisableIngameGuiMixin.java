@@ -1,5 +1,6 @@
 package hauveli.hexagony.mixin.dissociation;
 
+import hauveli.hexagony.features.freecam.FreeCameraEntity;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
@@ -8,21 +9,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static hauveli.hexagony.features.freecam.FreeCam.ClientSideData.playerEntityInputsDisabled;
-
 @Mixin(Gui.class)
 public abstract class DisableIngameGuiMixin {
 
     @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
     private void hideHotbar(GuiGraphics par1, DeltaTracker par2, CallbackInfo ci) {
-        if (playerEntityInputsDisabled) {
+        if (FreeCameraEntity.Companion.getActive()) {
             ci.cancel(); // prevents vanilla hotbar from drawing
         }
     }
 
     @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
     private void hideXpBar(GuiGraphics guiGraphics, int x, CallbackInfo ci) {
-        if (playerEntityInputsDisabled) {
+        if (FreeCameraEntity.Companion.getActive()) {
             ci.cancel(); // prevents XP bar
         }
     }
@@ -45,7 +44,7 @@ public abstract class DisableIngameGuiMixin {
 
     @Inject(method = "renderPlayerHealth", at = @At("HEAD"), cancellable = true)
     private void hidePlayerHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (playerEntityInputsDisabled) {
+        if (FreeCameraEntity.Companion.getActive()) {
             ci.cancel(); // prevents hearts/armor
         }
     }

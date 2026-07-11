@@ -2,7 +2,7 @@ package hauveli.hexagony.mixin.dissociation;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import hauveli.hexagony.Hexagony;
-import hauveli.hexagony.features.freecam.FreeCam;
+import hauveli.hexagony.features.freecam.FreeCameraEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static hauveli.hexagony.features.freecam.FreeCam.ClientSideData.playerEntityInputsDisabled;
+import static hauveli.hexagony.Hexagony.MINECRAFT;
 
 @Mixin(LocalPlayer.class)
 public abstract class AntiSneakLocalPlayerMixin {
@@ -27,7 +27,7 @@ public abstract class AntiSneakLocalPlayerMixin {
 
     @Inject(method = "isShiftKeyDown", at = @At("HEAD"), cancellable = true)
     private void hexagony$disableSneak(CallbackInfoReturnable<Boolean> cir) {
-        if (playerEntityInputsDisabled) {
+        if (FreeCameraEntity.Companion.getActive()) {
             cir.cancel();
         }
     }
@@ -42,13 +42,17 @@ public abstract class AntiSneakLocalPlayerMixin {
 
     @ModifyExpressionValue(method = "sendPosition", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isControlledCamera()Z"))
     private boolean letServerKnowImHere(boolean previous) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.level.getGameTime() % 200 == 0) {
+        assert MINECRAFT != null;
+        if (MINECRAFT.level.getGameTime() % 200 == 0) {
             timedToggle = !timedToggle;
             Hexagony.LOGGER.info("Swapping: {}", timedToggle);
-            FreeCam.ClientSideData.playerEntityInputsDisabled = timedToggle;
+            if (timedToggle) {
+                FreeCameraEntity.Companion.detachCamera();
+            } else {
+                FreeCameraEntity.Companion.reattachCamera();
+            }
         }
-        if (playerEntityInputsDisabled) return true;
+        if (FreeCameraEntity.Companion.getActive()) return true;
         return previous;
     }
 
