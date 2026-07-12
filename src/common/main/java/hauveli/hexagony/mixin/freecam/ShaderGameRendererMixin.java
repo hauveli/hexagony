@@ -23,7 +23,8 @@ public class ShaderGameRendererMixin {
             Float dt = deltaTracker.getGameTimeDeltaTicks();
             ShaderRenderer.render(dt,
                     FreeCameraEntity.Companion.distanceToPlayer(),
-                    FreeCameraEntity.Companion.durationLeftRelativeToFiveSeconds(dt));
+                    FreeCameraEntity.Companion.durationLeftRelativeToFiveSeconds(dt),
+                    FreeCameraEntity.Companion.timeSinceStartedSmoothing(dt));
         }
     }
 }

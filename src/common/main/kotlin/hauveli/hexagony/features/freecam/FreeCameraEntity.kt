@@ -18,8 +18,6 @@ import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.Scoreboard
-import org.spongepowered.asm.mixin.Unique
-import java.lang.Math.clamp
 import java.util.*
 import kotlin.math.cos
 import kotlin.math.max
@@ -72,6 +70,11 @@ class FreeCameraEntity : AbstractClientPlayer (
         var lastMouseY = 0.0
         var backupInput: Input? = null
         var active = false
+
+        var smoothCameraSettingStorage: Boolean = false
+
+
+        // I use this stuff mostly so I can play a neat animation when it starts/expires
         @JvmField
         var returningAnimationActive: Boolean = false
         var returningFromEyePosDistance: Double? = null
@@ -208,6 +211,9 @@ class FreeCameraEntity : AbstractClientPlayer (
             freeCam = freeCamera
             active = true
 
+            smoothCameraSettingStorage = MINECRAFT.options.smoothCamera
+            MINECRAFT.options.smoothCamera = true
+
             ShaderRenderer.setEffect(FREECAM_SHADER)
 
 
@@ -225,11 +231,13 @@ class FreeCameraEntity : AbstractClientPlayer (
             val freeCamera = freeCam ?: return
             val input = input ?: return
 
+
+            // todo: can I just put this in detach instead?
             // Usually I would like to just overwrite this value but I do not know if doing so calls extra bogus each time...
             if (MINECRAFT!!.options.cameraType != CameraType.THIRD_PERSON_BACK)
                 MINECRAFT.options.cameraType = CameraType.THIRD_PERSON_BACK
 
-            val speed = 0.1 * dt
+            val speed = 0.01 * dt // todo: also tweak this value if modifying how floaty the movement is
 
             var upDown = 0.0
             var forward = 0.0
@@ -255,6 +263,9 @@ class FreeCameraEntity : AbstractClientPlayer (
             if (input.jumping) upDown += 1
             if (input.shiftKeyDown) upDown -= 1
 
+
+            val normalizedInputPlusDelta = Vec3(forward, upDown, strafe).normalize() // .add(freeCamera.deltaMovement)
+
             val yaw = freeCamera.yRot
             val pitch = (freeCamera.xRot.toDouble()).coerceIn(-90.0, 90.0)
             val yawRad = Math.toRadians(yaw.toDouble())
@@ -267,13 +278,17 @@ class FreeCameraEntity : AbstractClientPlayer (
             )
             */
 
-            val dx = (-sin(yawRad) * cos(pitchRad)) * forward * speed + cos(yawRad) * strafe * speed
-            val dy = (-sin(pitchRad)) * forward * speed + upDown * speed
-            val dz = (cos(yawRad) * cos(pitchRad)) * forward * speed + sin(yawRad) * strafe * speed
-
+            val dx = (-sin(yawRad) * cos(pitchRad)) * normalizedInputPlusDelta.x * speed +
+                    cos(yawRad) * normalizedInputPlusDelta.z * speed
+            val dy = (-sin(pitchRad)) * normalizedInputPlusDelta.x * speed +
+                    normalizedInputPlusDelta.y * speed
+            val dz = (cos(yawRad) * cos(pitchRad)) * normalizedInputPlusDelta.x * speed +
+                    sin(yawRad) * normalizedInputPlusDelta.z * speed
 
             freeCamera.setOldPosAndRot()
-            freeCamera.setDeltaMovement(dx, dy, dz)
+            val newDM = Vec3(dx, dy, dz)
+            //freeCamera.setDeltaMovement(dx, dy, dz)
+            freeCamera.deltaMovement =  newDM.add(freeCamera.deltaMovement.scale(0.99)) // todo: note to self: this makes it more or less floaty, change this for the mind graft
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
 
             // hmm.....
@@ -303,6 +318,7 @@ class FreeCameraEntity : AbstractClientPlayer (
                 throw Error("${Hexagony.MODID}: Player existed but had no input field!") // I sort of doubt this can happen but I am keeping this check here just in case so I can figure out how it can happen
             }
             MINECRAFT.options.cameraType = CameraType.FIRST_PERSON
+            MINECRAFT.options.smoothCamera = smoothCameraSettingStorage
 
             // client.options.hideGui = false
             freeCam?.discard()
@@ -317,20 +333,32 @@ class FreeCameraEntity : AbstractClientPlayer (
         // just in case in the future I realize I need to do extra stuff, I've got this in its own method.
         fun onLeave() {
             reattachCamera()
+            // set shader for some reason doesn't work ? hmm...
+            ShaderRenderer.setEffect(null)
         }
 
         fun distanceToPlayer(): Float {
             // return min(distanceToPlayerRelativeToAmbit, 1f) // .length() > 0 => distanceToPlayerRelativeToAmbit >= 0.1f
-            return distanceToPlayerRelativeToAmbit / 2 // bounded between 0.05 and 0.55 at most
+            return distanceToPlayerRelativeToAmbit / 2 // bounded between 0.05 and 0.55 at most, this value is also already dependent on dt so no need to pass dt
         }
 
         fun durationLeftRelativeToFiveSeconds(dt: Float): Float {
-            val dissociated = originalPlayer!!.getEffect(HexagonyMobEffects.FREECAM.holder()) ?: return 0f
+            val dissociated = originalPlayer!!.getEffect(HexagonyMobEffects.FREECAM.holder()) ?: return 0.5f // max it out if duration expired
             val durationLeft = dissociated.duration
-            val sixSeconds = 6 * 20
+            val sixSeconds = 6 * 20f
             if (durationLeft > sixSeconds) return 0f
             // sine wave to make it oscillate once timer is about to run out
-            return max(sin(1 - (durationLeft - dt) / sixSeconds), 0f)
+            // no, I don't want the square, I want something else... shift it up by 1, divide by two=
+            // sin(1 * 2pi) = 0 so it should start from zero?
+            val sinVal = 1 + sin((1 - (durationLeft - dt) / sixSeconds) * Mth.TWO_PI) // I need to square this I think? I'm unsure how I want it to flash...
+            return sinVal / 4 // less intense should be fine.
+        }
+
+        fun timeSinceStartedSmoothing(dt: Float): Float {
+            // the player might be silly so I want to get the remaining duration and return if it has expired (or is about to expire?)
+            val dissociated = originalPlayer!!.getEffect(HexagonyMobEffects.FREECAM.holder()) ?: return 0.0f // max it out if duration expired
+            val deltaTickCount = freeCam!!.tickCount + dt
+            return min(deltaTickCount / 30f, 1f) // smooth across 1.5 seconds
         }
     }
 }

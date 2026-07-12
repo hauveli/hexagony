@@ -16,16 +16,21 @@ object ShaderRenderer {
 
     @JvmStatic
     fun render(dt: Float) {
-        render(dt, null, null)
+        render(dt, null, null, null)
     }
 
     @JvmStatic
     fun render(dt: Float, arg1: Float?) {
-        render(dt, arg1, null)
+        render(dt, arg1, null, null)
     }
 
     @JvmStatic
-    fun render(deltaTick: Float, arg1: Float?, arg2: Float?) {
+    fun render(dt: Float, arg1: Float?, arg2: Float?) {
+        render(dt, arg1, arg2, null)
+    }
+
+    @JvmStatic
+    fun render(deltaTick: Float, arg1: Float?, arg2: Float?, arg3: Float?) {
         if (activeShader == null)
             return
 
@@ -36,11 +41,15 @@ object ShaderRenderer {
         }
 
         updateEffectSize(activeShader!!)
+        // todo: something more sensible than this...?
         if (arg1 != null) {
             activeShader!!.setUniform("FirstArgumentAmount", arg1)
         }
         if (arg2 != null) {
             activeShader!!.setUniform("SecondArgumentAmount", arg2)
+        }
+        if (arg3 != null) {
+            activeShader!!.setUniform("ThirdArgumentAmount", arg3)
         }
         activeShader!!.process(deltaTick)
         MINECRAFT!!.mainRenderTarget.bindWrite(false)

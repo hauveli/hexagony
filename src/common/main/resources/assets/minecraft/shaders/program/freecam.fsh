@@ -3,6 +3,7 @@
 uniform sampler2D DiffuseSampler;
 uniform float FirstArgumentAmount; // 0.0 = normal, 1.0 = greyscale
 uniform float SecondArgumentAmount; // 0.0 = normal, 1.0 = red
+uniform float ThirdArgumentAmount; // 0.0 = normal, 1.0 = max tint blending
 
 in vec2 texCoord;
 out vec4 fragColor;
@@ -17,8 +18,9 @@ void main() {
     // this is probably terribly bad in a few waysa but whatever, it works
     float amountgray = smoothstep(0.2, 1.0, FirstArgumentAmount);
     vec3 resultgray = mix(color.rgb, vec3(gray), amountgray);
-    vec3 resultblue = mix(resultgray.rgb, blue, 0.1);
+    vec3 resultblue = mix(resultgray.rgb, blue, 0.1 + (0.55 - FirstArgumentAmount) / 4); // 0.55 is max value of FirstArgumentAmount. 0.1 and 4 are arbitrary and feel-based so whatever
 
-    vec3 resultfinal = mix(resultblue.rgb, red, SecondArgumentAmount);
+    vec3 resultred = mix(resultblue.rgb, red, SecondArgumentAmount);
+    vec3 resultfinal = mix(resultred.rgb, vec3(0), ThirdArgumentAmount); // make it do nothing if not enough time to get started?
     fragColor = vec4(resultfinal.rgb, color.a);
 }
