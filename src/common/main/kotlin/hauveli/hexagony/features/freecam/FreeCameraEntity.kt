@@ -19,6 +19,7 @@ import net.minecraft.world.entity.Pose
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.Scoreboard
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
@@ -119,7 +120,7 @@ class FreeCameraEntity : AbstractClientPlayer (
             //if (diffSqr < sentAmbit) return
             val mult = (1 - ambit / target.lengthSqr()) * dt
             // todo: this determines how hard the player bounces off of ambit (be really gentle...)
-            freeCamera.deltaMovement = target.scale(mult + min(freeCamera.deltaMovement.lengthSqr(), 0.01))  // bounce back as hard as I ran into it
+            freeCamera.deltaMovement = target.scale(mult + min(freeCamera.deltaMovement.lengthSqr(), 0.0025))  // bounce back as hard as I ran into it
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
         }
 
@@ -135,13 +136,13 @@ class FreeCameraEntity : AbstractClientPlayer (
             freeCamera.noPhysics = true
             // this is just to get it to move to the player at a decent speed, not so that it always takes the same amount of time.
             val diffPlayer = player.eyePosition.subtract(freeCamera.position())
-            val mult = dt * 0.1 // take 10 times longer than otherwise (still very fast)
+            val diffPlayerLength = diffPlayer.length()
+            val dist = abs((diffPlayerLength - dt) / returningFromEyePosDistance!!)
+            val mult = 0.05 * abs(1 - dist) // take 10 times longer than otherwise (still very fast)
             freeCamera.setDeltaMovement(diffPlayer.x * mult, diffPlayer.y * mult, diffPlayer.z * mult)
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
 
             // the rotation of the camera scales to distance, which is controlled entirely via position
-            val diffPlayerLength = diffPlayer.length()
-            val dist = diffPlayerLength / returningFromEyePosDistance!!
 
             // hmm I think I need ot use a vector or it'll look like shit to interpolate without some headachey conditions
             // freeCamera.xRot = player.xRot * (1 - ambitLerp) + freeCamera.xRot * ambitLerp
@@ -157,7 +158,7 @@ class FreeCameraEntity : AbstractClientPlayer (
                 player.eyePosition.add(player.lookAngle).scale(1 - dist)
             )
             freeCamera.lookAt(EntityAnchorArgument.Anchor.FEET, lerpedLookTarget)
-            if (diffPlayerLength <= 0.2) {
+            if (diffPlayerLength <= 0.05) {
                 reattachCamera()
                 returningAnimationActive = false
                 returningFromEyePosDistance = null
@@ -342,7 +343,7 @@ class FreeCameraEntity : AbstractClientPlayer (
 
         fun distanceToPlayer(): Float {
             // return min(distanceToPlayerRelativeToAmbit, 1f) // .length() > 0 => distanceToPlayerRelativeToAmbit >= 0.1f
-            return distanceToPlayerRelativeToAmbit / 2 // bounded between 0.05 and 0.55 at most, this value is also already dependent on dt so no need to pass dt
+            return distanceToPlayerRelativeToAmbit / 1.5f // if divisor is 2, bounded between 0.05 and 0.55 at most, this value is also already dependent on dt so no need to pass dt
         }
 
         fun durationLeftRelativeToFiveSeconds(dt: Float): Float {
@@ -354,8 +355,8 @@ class FreeCameraEntity : AbstractClientPlayer (
             // no, I don't want the square, I want something else... shift it up by 1, divide by two=
             // sin(1 * 2pi) = 0 so it should start from zero?
             // sin(1.5 pi) = -1, 1-1 = 0
-            val sinVal = 1 + sin((1 - (durationLeft - dt) / ( sixSeconds * 2 )) * Mth.TWO_PI - Mth.HALF_PI) // I need to square this I think? I'm unsure how I want it to flash...
-            return sinVal / 6 // less intense should be fine.
+            val sinVal = 1 + sin((1 - (durationLeft - dt) / ( sixSeconds )) * Mth.TWO_PI - Mth.HALF_PI) // I need to square this I think? I'm unsure how I want it to flash...
+            return sinVal / 8 // less intense should be fine.
         }
 
         fun timeSinceStartedSmoothing(dt: Float): Float {
