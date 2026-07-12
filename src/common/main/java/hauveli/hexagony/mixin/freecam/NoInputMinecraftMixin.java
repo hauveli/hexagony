@@ -1,4 +1,4 @@
-package hauveli.hexagony.mixin.dissociation;
+package hauveli.hexagony.mixin.freecam;
 
 import hauveli.hexagony.features.freecam.FreeCameraEntity;
 import net.minecraft.client.KeyMapping;
@@ -62,6 +62,12 @@ public abstract class NoInputMinecraftMixin {
 
         }
 
+    }
+
+
+    @Inject(method = "disconnect()V", at = @At("HEAD"))
+    private void hexagony$fixCameraOnLeave(CallbackInfo ci) {
+        FreeCameraEntity.Companion.onLeave();
     }
 
     @Unique

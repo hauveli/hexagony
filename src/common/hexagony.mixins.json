@@ -7,12 +7,13 @@
     "enlightenment.ClientAdvancementsProgressAccessor",
     "enlightenment.RequireScrollPatchouliLookupPatternComponentMixin",
     "enlightenment.RequireScrollPatchouliAbstractPatternComponentMixin",
-    "dissociation.AntiSneakLocalPlayerMixin",
-    "dissociation.AntiTurnEntityMixin",
-    "dissociation.DisableIngameGuiMixin",
-    "dissociation.NoInputMinecraftMixin",
-    "dissociation.SelectedSlotInventoryMixin",
-    "dissociation.SetPositionCameraMixin"
+    "freecam.AntiSneakLocalPlayerMixin",
+    "freecam.AntiTurnEntityMixin",
+    "freecam.DisableIngameGuiMixin",
+    "freecam.NoInputMinecraftMixin",
+    "freecam.OnRemovedEffectLivingEntityMixin",
+    "freecam.SelectedSlotInventoryMixin",
+    "freecam.SetPositionCameraMixin"
   ],
   "mixins": [
     "enlightenment.PiggyBackInventoryChangeTriggerMixin",

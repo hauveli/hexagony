@@ -1,10 +1,7 @@
-package hauveli.hexagony.mixin.dissociation;
+package hauveli.hexagony.mixin.freecam;
 
-import hauveli.hexagony.features.freecam.CameraExtension;
 import hauveli.hexagony.features.freecam.FreeCameraEntity;
 import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.phys.Vec3;
@@ -18,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
 @Mixin(Camera.class)
-abstract class SetPositionCameraMixin implements CameraExtension {
+abstract class SetPositionCameraMixin {
 
     @Shadow
     protected abstract void setPosition(Vec3 pos);
@@ -40,16 +37,6 @@ abstract class SetPositionCameraMixin implements CameraExtension {
         FreeCameraEntity fce = FreeCameraEntity.Companion.getFreeCam();
         setPosition(fce.position());
         setRotation(fce.getYRot(), fce.getXRot());
-        FreeCameraEntity.Companion.updateFreeCam();
-    }
-
-    @Unique
-    public void hexagony$bilocationSetCameraPosition(@NotNull Vec3 position) {
-        setPosition(position);
-    }
-
-    @Unique
-    public void hexagony$bilocationSetCameraRotation(float rotY, float rotX) {
-        setRotation(rotY, rotX);
+        FreeCameraEntity.Companion.updateFreeCam(partialTick);
     }
 }

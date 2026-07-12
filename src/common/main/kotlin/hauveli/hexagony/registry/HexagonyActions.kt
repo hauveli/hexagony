@@ -6,8 +6,8 @@ import at.petrak.hexcasting.api.casting.math.HexDir
 import at.petrak.hexcasting.api.casting.math.HexPattern
 import at.petrak.hexcasting.common.lib.HexRegistries
 import at.petrak.hexcasting.common.lib.hex.HexActions
-import hauveli.hexagony.casting.actions.spells.OpCongratulate
 import hauveli.hexagony.casting.actions.spells.craft.OpCraft
+import hauveli.hexagony.casting.actions.spells.freecam.OpFreecam
 import hauveli.hexagony.casting.actions.spells.dump.OpDump
 
 object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
@@ -18,6 +18,8 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     val CRAFT = make("craft", HexDir.NORTH_WEST, "daqedeqadedaqedeqad", OpCraft)
     // cool!!!!!
     val DUMP = make("dump", HexDir.SOUTH_WEST, "wewwwdwqwdwwwew", OpDump)
+    // cool!!!!!
+    val FREECAM = make("freecam", HexDir.SOUTH_WEST, "ewwawwqwwawwaeaqaaww", OpFreecam)
 
     // val CONGRATULATE = make("congratulate", HexDir.WEST, "eed", OpCongratulate)
 

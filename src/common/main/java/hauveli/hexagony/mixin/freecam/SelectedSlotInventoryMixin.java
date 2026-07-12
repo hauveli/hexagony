@@ -1,4 +1,4 @@
-package hauveli.hexagony.mixin.dissociation;
+package hauveli.hexagony.mixin.freecam;
 
 import hauveli.hexagony.features.freecam.FreeCameraEntity;
 import net.minecraft.world.entity.player.Inventory;

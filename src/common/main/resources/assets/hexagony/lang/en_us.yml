@@ -69,6 +69,11 @@ hexagony:
       condition_not_met: "'Require Scroll For Enlightenment' must be enabled for this setting."
   book:
     great_spells:
+      freecam:
+        title: Dissociate
+        .: Disconnects my mind from my body. Costs about one $(l:items/amethyst)$(item)Amethyst Dust/$ per twentieth of a second.
+        page:
+          '1': A spell to remove my conscious self from my body, leaving it vulnerable. I should secure my body in a safe place, motionless, lest my body slips and falls while it is out of my control.
       dump_spiral:
         title: Dump Spiral
         .: Pushes every pattern on my casting grid onto the grid in a list. Costs about one $(l:items/amethyst)$(item)Charged Amethyst/$.
@@ -138,6 +143,7 @@ hexcasting:
       empty_list: needs a list of at least size 1 but got an empty list.
       needs_patterns: needs an image of a pattern but got none.
   action:
+    hexagony:freecam: Dissociate
     hexagony:dump: Dump Spiral
     hexagony:craft: Craft Item
     hexagony:mind_anchor/pos: Mind Anchor Location

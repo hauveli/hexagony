@@ -30,6 +30,7 @@ object Hexagony {
             HexagonyBlocks,
             HexagonyBlockEntities,
             HexagonyItems,
+            HexagonyMobEffects,
             HexagonyRecipeTypes,
             HexagonyRecipeSerializers
         )
