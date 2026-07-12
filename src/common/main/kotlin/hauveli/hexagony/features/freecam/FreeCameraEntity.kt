@@ -17,8 +17,11 @@ import net.minecraft.world.entity.Pose
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.Scoreboard
 import org.spongepowered.asm.mixin.Unique
+import java.lang.Math.clamp
 import java.util.*
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 
 
@@ -70,6 +73,8 @@ class FreeCameraEntity : AbstractClientPlayer (
         @JvmField
         var returningAnimationActive: Boolean = false
         var returningFromEyePosDistance: Double? = null
+        var distanceToPlayer: Double = 0.0 // this can be whatever because it only affects the shader
+        var distanceToPlayerRelativeToAmbit: Float = 0f // this can be whatever between 0 and 1 because it only affects the shader
 
         // todo: make a simpler version of this so that it is easy to extend
         // ex: whatever(attribute, positionGetter, cameraPosition) -> null if in ambit, relative vector position if not (which I can then just normalize
@@ -269,6 +274,15 @@ class FreeCameraEntity : AbstractClientPlayer (
             freeCamera.setDeltaMovement(dx, dy, dz)
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
 
+            // hmm.....
+            distanceToPlayer = originalPlayer!!.eyePosition.subtract(freeCamera.eyePosition).length()
+
+            val ambitAttr = originalPlayer!!.getAttribute(HexAttributes.AMBIT_RADIUS)!!
+            //val ambitSentAttr = player.getAttribute(HexAttributes.SENTINEL_RADIUS) ?: return
+            val ambit = ambitAttr.value
+            distanceToPlayerRelativeToAmbit = (distanceToPlayer / ambit).toFloat() + 0.1f
+            // Hexagony.LOGGER.info("ambit thing: {}", distanceToPlayerRelativeToAmbit)
+
             moveTowardsAmbitIfNeeded(dt)
             moveTowardsPlayer(dt)
             //val camera = mc.gameRenderer.mainCamera as CameraExtension
@@ -301,6 +315,10 @@ class FreeCameraEntity : AbstractClientPlayer (
         // just in case in the future I realize I need to do extra stuff, I've got this in its own method.
         fun onLeave() {
             reattachCamera()
+        }
+
+        fun distanceToPlayer(): Float {
+            return min(distanceToPlayerRelativeToAmbit, 1f) // .length() > 0 => distanceToPlayerRelativeToAmbit >= 0.1f
         }
     }
 }

@@ -1,5 +1,6 @@
 package hauveli.hexagony.features.freecam
 
+import hauveli.hexagony.Hexagony
 import hauveli.hexagony.Hexagony.MINECRAFT
 import net.minecraft.client.renderer.PostChain
 import net.minecraft.resources.ResourceLocation
@@ -14,7 +15,7 @@ object ShaderRenderer {
     private var lastHeight = 0
 
     @JvmStatic
-    fun render(deltaTick: Float) {
+    fun render(deltaTick: Float, trans: Float?) {
         if (activeShader == null)
             return
 
@@ -25,6 +26,9 @@ object ShaderRenderer {
         }
 
         updateEffectSize(activeShader!!)
+        if (trans != null) {
+            activeShader!!.setUniform("GreyscaleAmount", trans)
+        }
         activeShader!!.process(deltaTick)
         MINECRAFT!!.mainRenderTarget.bindWrite(false)
     }
