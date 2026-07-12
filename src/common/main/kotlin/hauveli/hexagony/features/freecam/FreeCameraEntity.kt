@@ -25,6 +25,7 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
 import kotlin.math.sin
 
 
@@ -174,6 +175,9 @@ class FreeCameraEntity : AbstractClientPlayer (
             if (lerpingFromLookTarget == null) {
                 lerpingFromLookTarget = freeCamera.eyePosition.add(freeCamera.lookAngle)
             }
+            if (fovMultiplier == null) {
+                fovMultiplier = 1.0
+            }
             // ensure noclip is active!!!!!!!!!!!! oops!!!!
             freeCamera.noPhysics = true
 
@@ -190,7 +194,7 @@ class FreeCameraEntity : AbstractClientPlayer (
             // I just don't know where to begin for that....
 
             // increase zoom, and fov at the same time
-            fovMultiplier = (1 + lookCompletion * 2)
+            fovMultiplier = min(fovMultiplier!! + 0.02 * lookCompletion, 5.0)
 
             if (lookCompletion < 1.0) {
                 // I wanna line up the camera angle first (todo: lock player control or just keep coercing it?)
@@ -206,7 +210,7 @@ class FreeCameraEntity : AbstractClientPlayer (
                     player.eyePosition.scale(lookCompletion)
                 )
                 freeCamera.lookAt(EntityAnchorArgument.Anchor.FEET, cameraLookAtLerp)
-                if (lookCompletion < 0.8) {
+                if (lookCompletion < 0.9) {
                     return true
                 }
             }
@@ -239,12 +243,13 @@ class FreeCameraEntity : AbstractClientPlayer (
                 ).add(
                     player.eyePosition.add(player.lookAngle).scale(min(1.1 - dist, 1.0))
                 )
-                freeCamera.lookAt(EntityAnchorArgument.Anchor.FEET, lerpedLookTarget)
+                // freeCamera.lookAt(EntityAnchorArgument.Anchor.FEET, lerpedLookTarget)
             }
             if (diffPlayerLength <= 0.05) {
                 reattachCamera()
                 returningAnimationActive = false
                 returningFromEyePosDistance = null
+                returningStartingTickCount = null
                 lerpingFromLookTarget =  null
                 fovMultiplier = null
             }
