@@ -96,10 +96,11 @@ class FreeCameraEntity : AbstractClientPlayer (
         var active = false
 
         var smoothCameraSettingStorage: Boolean = false
-        var fovSettingStorage: Int = 90
 
 
         // I use this stuff mostly so I can play a neat animation when it starts/expires
+        @JvmField
+        var fovMultiplier: Double? = null
         @JvmField
         var returningAnimationActive: Boolean = false
         var returningStartingTickCount: Int? = null
@@ -180,7 +181,8 @@ class FreeCameraEntity : AbstractClientPlayer (
             val ticksBeforeLookCompletes = 30
 
 
-            val lookCompletion = min(((player.tickCount - returningStartingTickCount!!) + dt)  / ticksBeforeLookCompletes, 1f).toDouble()
+            val lookCompletion =
+                min(((player.tickCount - returningStartingTickCount!!) + dt) / ticksBeforeLookCompletes, 1f).toDouble()
 
             // fuck it try doing fov before look is even completed?
             // should I use speed to do the distrotion?
@@ -188,9 +190,9 @@ class FreeCameraEntity : AbstractClientPlayer (
             // I just don't know where to begin for that....
 
             // increase zoom, and fov at the same time
-            MINECRAFT!!.options.fov().set((MINECRAFT.options.fov().get() + 1))
+            fovMultiplier = (1 + lookCompletion * 2)
 
-            if (lookCompletion <= 1.0) {
+            if (lookCompletion < 1.0) {
                 // I wanna line up the camera angle first (todo: lock player control or just keep coercing it?)
                 // Ok so to get the camera lookangle lined up first I want to project it and see what the difference is to the current lookangle?
                 // val vectorFromCameraToPlayer = lerpingFromLookTarget!!.subtract(player.eyePosition)
@@ -204,6 +206,9 @@ class FreeCameraEntity : AbstractClientPlayer (
                     player.eyePosition.scale(lookCompletion)
                 )
                 freeCamera.lookAt(EntityAnchorArgument.Anchor.FEET, cameraLookAtLerp)
+                if (lookCompletion < 0.8) {
+                    return true
+                }
             }
 
 
@@ -211,7 +216,7 @@ class FreeCameraEntity : AbstractClientPlayer (
             val diffPlayer = player.eyePosition.subtract(freeCamera.eyePosition)
             val diffPlayerLength = diffPlayer.length()
             val dist = abs((diffPlayerLength + dt) / returningFromEyePosDistance!!)
-            val mult = 0.1 * abs(1 - dist) // take 10 times longer than otherwise (still very fast)
+            val mult = 0.1 * abs(1 - dist) // take 10 times longer than otherwise (still very fast) (I should decide on a better way to handle the speed)
             // freeCamera.setDeltaMovement(diffPlayer.x * mult, diffPlayer.y * mult, diffPlayer.z * mult)
             freeCamera.deltaMovement = diffPlayer.scale(mult)
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
@@ -228,18 +233,20 @@ class FreeCameraEntity : AbstractClientPlayer (
             // so I want to lerp between uhhh... current eye position + current lookdir and player eye pos and player lookdir?
 
 
-
-            val lerpedLookTarget = Vec3.ZERO.add(
-                lerpingFromLookTarget!!.scale(max(dist - 0.1, 0.0))
-            ).add(
-                player.eyePosition.add(player.lookAngle).scale(min(1.1 - dist, 1.0))
-            )
-            // freeCamera.lookAt(EntityAnchorArgument.Anchor.FEET, lerpedLookTarget)
+            if (lookCompletion >= 1) {
+                val lerpedLookTarget = Vec3.ZERO.add(
+                    lerpingFromLookTarget!!.scale(max(dist - 0.1, 0.0))
+                ).add(
+                    player.eyePosition.add(player.lookAngle).scale(min(1.1 - dist, 1.0))
+                )
+                freeCamera.lookAt(EntityAnchorArgument.Anchor.FEET, lerpedLookTarget)
+            }
             if (diffPlayerLength <= 0.05) {
                 reattachCamera()
                 returningAnimationActive = false
                 returningFromEyePosDistance = null
                 lerpingFromLookTarget =  null
+                fovMultiplier = null
             }
             return true
         }
@@ -298,7 +305,6 @@ class FreeCameraEntity : AbstractClientPlayer (
 
             smoothCameraSettingStorage = MINECRAFT.options.smoothCamera
             MINECRAFT.options.smoothCamera = true
-            fovSettingStorage = MINECRAFT.options.fov().get() // I don't like doing this, I should probably mixin or something and set it temporarily...
 
             ShaderRenderer.setEffect(FREECAM_SHADER)
 
@@ -407,8 +413,6 @@ class FreeCameraEntity : AbstractClientPlayer (
             }
             MINECRAFT.options.cameraType = CameraType.FIRST_PERSON
             MINECRAFT.options.smoothCamera = smoothCameraSettingStorage
-            MINECRAFT.options.fov().set(fovSettingStorage)
-
             // client.options.hideGui = false
             freeCam?.discard()
             freeCam = null
