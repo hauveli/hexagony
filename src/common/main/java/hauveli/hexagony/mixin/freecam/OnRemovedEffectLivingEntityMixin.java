@@ -17,7 +17,9 @@ public abstract class OnRemovedEffectLivingEntityMixin {
     private void hexagony$removeFreeCam(Holder<MobEffect> effect, CallbackInfoReturnable<MobEffectInstance> cir) {
         LivingEntity le = (LivingEntity) (Object) this;
         if (effect.value().equals(HexagonyMobEffects.FREECAM.getValue()) && le.level().isClientSide) {
-            FreeCameraEntity.Companion.reattachCamera();
+            // FreeCameraEntity.Companion.reattachCamera();
+            // zooooom!
+            FreeCameraEntity.returningAnimationActive = true;
         }
     }
 }
