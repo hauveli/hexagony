@@ -56,6 +56,9 @@ death:
     brainsweep.player: '%1$s was consumed by forbidden energy from %2$s'
     hidden: ''
     hidden.player: ''
+effect:
+  hexagony:
+    freecam: Dissociation
 hexagony:
   mishap:
     bad_list_entry:

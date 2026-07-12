@@ -4,6 +4,7 @@ import at.petrak.hexcasting.common.lib.HexAttributes
 import com.mojang.authlib.GameProfile
 import hauveli.hexagony.Hexagony
 import hauveli.hexagony.Hexagony.MINECRAFT
+import hauveli.hexagony.Hexagony.id
 import net.minecraft.client.CameraType
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.player.Input
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.Scoreboard
+import org.spongepowered.asm.mixin.Unique
 import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
@@ -24,7 +26,7 @@ import kotlin.math.sin
 // Thank you very kindly to all the people who have worked on MinecraftFreecam, your project has been a tremendous help, would not
 // have given AbstractClientPlayer a try if I didn't see it used here. LocalPLayer was so much worse to try to use.
 // https://github.com/MinecraftFreecam/Freecam/blob/main/common/src/main/java/net/xolt/freecam/util/FreeCamera.java#L30
-class FreeCameraEntity() : AbstractClientPlayer (
+class FreeCameraEntity : AbstractClientPlayer (
     MINECRAFT!!.level, GameProfile(UUID.randomUUID(), "FreeCamera")
 ) {
 
@@ -48,11 +50,16 @@ class FreeCameraEntity() : AbstractClientPlayer (
         return false
     }
 
+    // note to self: yes i do need this to prevent it from fucking up
     // override fun defineSynchedData() {}
     override fun readAdditionalSaveData(pCompound: CompoundTag) {}
     override fun addAdditionalSaveData(pCompound: CompoundTag) {}
 
+
     companion object {
+        private val FREECAM_SHADER = id("shaders/post/freecam.json")
+
+
         var input: Input? = null
         var originalPlayer: LocalPlayer? = null
         var freeCam: FreeCameraEntity? = null
@@ -194,6 +201,8 @@ class FreeCameraEntity() : AbstractClientPlayer (
             freeCam = freeCamera
             active = true
 
+            ShaderRenderer.setEffect(FREECAM_SHADER)
+
 
             // todo: play /playsound minecraft:ambient.basalt_deltas.loop
         }
@@ -285,6 +294,7 @@ class FreeCameraEntity() : AbstractClientPlayer (
             active = false
 
 
+            ShaderRenderer.setEffect(null)
             // todo: STOP /playsound minecraft:ambient.basalt_deltas.loop
         }
 

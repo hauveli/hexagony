@@ -1,6 +1,7 @@
 package hauveli.hexagony.registry
 
 import hauveli.hexagony.Hexagony
+import net.minecraft.core.Holder
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
@@ -54,9 +55,12 @@ abstract class HexagonyRegistrar<T : Any>(
         val value by lazyValue
 
         override fun equals(other: Any?) = when (other) {
-            is HexagonyRegistrar<*>.Entry<*> -> key.registry().equals(other.key.registry()) && id.equals(other.id)
+            is HexagonyRegistrar<*>.Entry<*> -> key.registry().equals(other.key.registry()) && id == other.id
             else -> false
         }
+
+
+        fun holder(): Holder<T> = registry.wrapAsHolder(value)
 
         override fun hashCode() = 31 * key.registry().hashCode() + id.hashCode()
     }

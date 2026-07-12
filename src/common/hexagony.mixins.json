@@ -13,7 +13,8 @@
     "freecam.NoInputMinecraftMixin",
     "freecam.OnRemovedEffectLivingEntityMixin",
     "freecam.SelectedSlotInventoryMixin",
-    "freecam.SetPositionCameraMixin"
+    "freecam.SetPositionCameraMixin",
+    "freecam.ShaderGameRendererMixin"
   ],
   "mixins": [
     "enlightenment.PiggyBackInventoryChangeTriggerMixin",

@@ -57,9 +57,9 @@ object OpFreecam : SpellAction  {
                 // based on currently remaining media?
 
                 // I have no fucking idea how to make my registration thing return a holder but I'll figure that out later :clueless:
-                val holderThing: Holder<MobEffect> = Holder.direct(HexagonyMobEffects.FREECAM.value)
+                HexagonyMobEffects.FREECAM.value
                 val instance = MobEffectInstance(
-                    holderThing,
+                    HexagonyMobEffects.FREECAM.holder(),
                     duration.toInt(),
                     0, // amplifier, I guess I could use strength 1 if mind anchor for jank checks? that seems silly though, but it would work...
                     false,  // ambient effect?

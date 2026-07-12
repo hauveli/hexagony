@@ -26,6 +26,7 @@ object HexagonyMobEffects : HexagonyRegistrar<MobEffect>(
         FreeCameraMobEffect(MobEffectCategory.NEUTRAL, 0)
             .addAttributeModifier(HexAttributes.FEEBLE_MIND,
                 Hexagony.id("effect.freecam"), 2.0, AttributeModifier.Operation.ADD_VALUE)
+            // .withSoundOnAdded()
 
     }
 
