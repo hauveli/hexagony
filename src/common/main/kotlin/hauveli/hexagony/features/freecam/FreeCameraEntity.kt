@@ -14,14 +14,15 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.commands.arguments.EntityAnchorArgument
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.Mth
+import net.minecraft.world.entity.EntityDimensions
 import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.Scoreboard
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.cos
-import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
@@ -40,6 +41,25 @@ class FreeCameraEntity : AbstractClientPlayer (
         pose = Pose.SWIMMING
         abilities.flying = true
         input = KeyboardInput(MINECRAFT!!.options)
+    }
+
+    override fun getDefaultDimensions(p0: Pose): EntityDimensions {
+        return EntityDimensions.fixed(0.49f, 0.49f) // some margin
+    }
+
+    protected override fun makeBoundingBox(): AABB {
+        val dims = this.getDimensions(this.pose)
+
+        val yOffset = 0.25
+
+        return AABB(
+            x - dims.width() / 2.0,
+            y - yOffset,
+            z - dims.width() / 2.0,
+            x + dims.width() / 2.0,
+            y - yOffset + dims.height(),
+            z + dims.width() / 2.0
+        )
     }
 
     override fun getScoreboard(): Scoreboard? {
@@ -81,6 +101,7 @@ class FreeCameraEntity : AbstractClientPlayer (
         var returningFromEyePosDistance: Double? = null
         var distanceToPlayer: Double = 0.0 // this can be whatever because it only affects the shader
         var distanceToPlayerRelativeToAmbit: Float = 0f // this can be whatever between 0 and 1 because it only affects the shader
+        var lerpingFromLookTarget: Vec3? = null
 
         // todo: make a simpler version of this so that it is easy to extend
         // ex: whatever(attribute, positionGetter, cameraPosition) -> null if in ambit, relative vector position if not (which I can then just normalize
@@ -120,7 +141,7 @@ class FreeCameraEntity : AbstractClientPlayer (
             //if (diffSqr < sentAmbit) return
             val mult = (1 - ambit / target.lengthSqr()) * dt
             // todo: this determines how hard the player bounces off of ambit (be really gentle...)
-            freeCamera.deltaMovement = target.scale(mult + min(freeCamera.deltaMovement.lengthSqr(), 0.0025))  // bounce back as hard as I ran into it
+            freeCamera.deltaMovement = target.scale(mult + min(freeCamera.deltaMovement.lengthSqr(), 0.002))  // bounce back as hard as I ran into it
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
         }
 
@@ -137,9 +158,10 @@ class FreeCameraEntity : AbstractClientPlayer (
             // this is just to get it to move to the player at a decent speed, not so that it always takes the same amount of time.
             val diffPlayer = player.eyePosition.subtract(freeCamera.position())
             val diffPlayerLength = diffPlayer.length()
-            val dist = abs((diffPlayerLength - dt) / returningFromEyePosDistance!!)
+            val dist = abs((diffPlayerLength + dt) / returningFromEyePosDistance!!)
             val mult = 0.05 * abs(1 - dist) // take 10 times longer than otherwise (still very fast)
-            freeCamera.setDeltaMovement(diffPlayer.x * mult, diffPlayer.y * mult, diffPlayer.z * mult)
+            // freeCamera.setDeltaMovement(diffPlayer.x * mult, diffPlayer.y * mult, diffPlayer.z * mult)
+            freeCamera.deltaMovement = diffPlayer.scale(mult)
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
 
             // the rotation of the camera scales to distance, which is controlled entirely via position
@@ -152,8 +174,11 @@ class FreeCameraEntity : AbstractClientPlayer (
             // todo: loosen it to be not exactly 1 strength but more like a lerp from 0 to 1 based on distance?
             // I think that would look good...
             // so I want to lerp between uhhh... current eye position + current lookdir and player eye pos and player lookdir?
+            //if (lerpingFromLookTarget == null)
+                lerpingFromLookTarget = freeCamera.eyePosition.add(freeCamera.lookAngle)
+
             val lerpedLookTarget = Vec3.ZERO.add(
-                freeCamera.eyePosition.add(freeCamera.lookAngle).scale(dist)
+                lerpingFromLookTarget!!.scale(dist)
             ).add(
                 player.eyePosition.add(player.lookAngle).scale(1 - dist)
             )
@@ -162,6 +187,7 @@ class FreeCameraEntity : AbstractClientPlayer (
                 reattachCamera()
                 returningAnimationActive = false
                 returningFromEyePosDistance = null
+                lerpingFromLookTarget =  null
             }
         }
 
@@ -175,6 +201,8 @@ class FreeCameraEntity : AbstractClientPlayer (
             freeCamera.xRot = player.xRot
             freeCamera.yRot = player.yRot
             freeCamera.setPos(player.eyePosition)
+            freeCamera.boundingBox = freeCamera.boundingBox.inflate(0.3)
+            freeCamera.boundingBox = freeCamera.boundingBox.move(Vec3.ZERO.add(0.0,0.5,0.0))
 
             // set the freecam keybinds to be the keyboard inputs
             //freeCamera.input = KeyboardInput(client.options)
@@ -347,7 +375,7 @@ class FreeCameraEntity : AbstractClientPlayer (
         }
 
         fun durationLeftRelativeToFiveSeconds(dt: Float): Float {
-            val dissociated = originalPlayer!!.getEffect(HexagonyMobEffects.FREECAM.holder()) ?: return 0.5f // max it out if duration expired
+            val dissociated = originalPlayer!!.getEffect(HexagonyMobEffects.FREECAM.holder()) ?: return 0.25f // max it out if duration expired
             val durationLeft = dissociated.duration
             val sixSeconds = 6 * 20f
             if (durationLeft > sixSeconds) return 0f
@@ -355,7 +383,9 @@ class FreeCameraEntity : AbstractClientPlayer (
             // no, I don't want the square, I want something else... shift it up by 1, divide by two=
             // sin(1 * 2pi) = 0 so it should start from zero?
             // sin(1.5 pi) = -1, 1-1 = 0
-            val sinVal = 1 + sin((1 - (durationLeft - dt) / ( sixSeconds )) * Mth.TWO_PI - Mth.HALF_PI) // I need to square this I think? I'm unsure how I want it to flash...
+            // sin(-0.5 pi) = -1
+            // sin(-1.5 pi) = 1 // ok?
+            val sinVal = 1 + sin((1 - (durationLeft - dt) / ( sixSeconds / 2 )) * Mth.TWO_PI - Mth.HALF_PI) // I need to square this I think? I'm unsure how I want it to flash...
             return sinVal / 8 // less intense should be fine.
         }
 
@@ -363,7 +393,7 @@ class FreeCameraEntity : AbstractClientPlayer (
             // the player might be silly so I want to get the remaining duration and return if it has expired (or is about to expire?)
             val dissociated = originalPlayer!!.getEffect(HexagonyMobEffects.FREECAM.holder()) ?: return 0.0f // max it out if duration expired
             val deltaTickCount = freeCam!!.tickCount + dt
-            return min(deltaTickCount / 30f, 1f) // smooth across 1.5 seconds
+            return 1 - min(deltaTickCount / 30f, 1f) // smooth across 1.5 seconds
         }
     }
 }
