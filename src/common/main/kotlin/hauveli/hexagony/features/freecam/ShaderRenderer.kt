@@ -15,7 +15,17 @@ object ShaderRenderer {
     private var lastHeight = 0
 
     @JvmStatic
-    fun render(deltaTick: Float, trans: Float?) {
+    fun render(dt: Float) {
+        render(dt, null, null)
+    }
+
+    @JvmStatic
+    fun render(dt: Float, arg1: Float?) {
+        render(dt, arg1, null)
+    }
+
+    @JvmStatic
+    fun render(deltaTick: Float, arg1: Float?, arg2: Float?) {
         if (activeShader == null)
             return
 
@@ -26,8 +36,11 @@ object ShaderRenderer {
         }
 
         updateEffectSize(activeShader!!)
-        if (trans != null) {
-            activeShader!!.setUniform("GreyscaleAmount", trans)
+        if (arg1 != null) {
+            activeShader!!.setUniform("FirstArgumentAmount", arg1)
+        }
+        if (arg2 != null) {
+            activeShader!!.setUniform("SecondArgumentAmount", arg2)
         }
         activeShader!!.process(deltaTick)
         MINECRAFT!!.mainRenderTarget.bindWrite(false)

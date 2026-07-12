@@ -20,7 +20,10 @@ public class ShaderGameRendererMixin {
     public void renderShader(DeltaTracker deltaTracker, boolean tickSomehowIDK, CallbackInfo ci) {
         // idk which deltaTicks to use.... deltaTracker has several options...
         if (FreeCameraEntity.Companion.getActive()) {
-            ShaderRenderer.render(deltaTracker.getGameTimeDeltaTicks(), FreeCameraEntity.Companion.distanceToPlayer());
+            Float dt = deltaTracker.getGameTimeDeltaTicks();
+            ShaderRenderer.render(dt,
+                    FreeCameraEntity.Companion.distanceToPlayer(),
+                    FreeCameraEntity.Companion.durationLeftRelativeToFiveSeconds(dt));
         }
     }
 }

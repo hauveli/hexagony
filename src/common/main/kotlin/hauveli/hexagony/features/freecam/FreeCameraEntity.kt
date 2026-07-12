@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile
 import hauveli.hexagony.Hexagony
 import hauveli.hexagony.Hexagony.MINECRAFT
 import hauveli.hexagony.Hexagony.id
+import hauveli.hexagony.registry.HexagonyMobEffects
 import net.minecraft.client.CameraType
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.player.Input
@@ -12,6 +13,7 @@ import net.minecraft.client.player.KeyboardInput
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.commands.arguments.EntityAnchorArgument
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.util.Mth
 import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.phys.Vec3
@@ -318,7 +320,17 @@ class FreeCameraEntity : AbstractClientPlayer (
         }
 
         fun distanceToPlayer(): Float {
-            return min(distanceToPlayerRelativeToAmbit, 1f) // .length() > 0 => distanceToPlayerRelativeToAmbit >= 0.1f
+            // return min(distanceToPlayerRelativeToAmbit, 1f) // .length() > 0 => distanceToPlayerRelativeToAmbit >= 0.1f
+            return distanceToPlayerRelativeToAmbit / 2 // bounded between 0.05 and 0.55 at most
+        }
+
+        fun durationLeftRelativeToFiveSeconds(dt: Float): Float {
+            val dissociated = originalPlayer!!.getEffect(HexagonyMobEffects.FREECAM.holder()) ?: return 0f
+            val durationLeft = dissociated.duration
+            val sixSeconds = 6 * 20
+            if (durationLeft > sixSeconds) return 0f
+            // sine wave to make it oscillate once timer is about to run out
+            return max(sin(1 - (durationLeft - dt) / sixSeconds), 0f)
         }
     }
 }
