@@ -91,7 +91,7 @@ class FreeCameraEntity : AbstractClientPlayer (
         fun moveTowardsAmbitIfNeeded(dt: Float) {
             val freeCamera = freeCam ?: return
             val player = originalPlayer ?: return
-            val diffPlayer = player.position().subtract(freeCamera.position())
+            val diffPlayer = player.eyePosition.subtract(freeCamera.position())
             val anchor: Vec3? = null // MindAnchorManager.localPos
             val diffAnchor: Vec3
             if (anchor != null) {
@@ -118,7 +118,8 @@ class FreeCameraEntity : AbstractClientPlayer (
             if (target.lengthSqr() < ambit) return // within that ambit
             //if (diffSqr < sentAmbit) return
             val mult = (1 - ambit / target.lengthSqr()) * dt
-            freeCamera.setDeltaMovement(target.x * mult, target.y * mult, target.z * mult)
+            // todo: this determines how hard the player bounces off of ambit (be really gentle...)
+            freeCamera.deltaMovement = target.scale(mult + min(freeCamera.deltaMovement.lengthSqr(), 0.01))  // bounce back as hard as I ran into it
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
         }
 
@@ -130,6 +131,8 @@ class FreeCameraEntity : AbstractClientPlayer (
             if (returningFromEyePosDistance == null) {
                 returningFromEyePosDistance = freeCamera.eyePosition.subtract(player.eyePosition).length()
             }
+            // ensure noclip is active!!!!!!!!!!!! oops!!!!
+            freeCamera.noPhysics = true
             // this is just to get it to move to the player at a decent speed, not so that it always takes the same amount of time.
             val diffPlayer = player.eyePosition.subtract(freeCamera.position())
             val mult = dt * 0.1 // take 10 times longer than otherwise (still very fast)
@@ -350,8 +353,9 @@ class FreeCameraEntity : AbstractClientPlayer (
             // sine wave to make it oscillate once timer is about to run out
             // no, I don't want the square, I want something else... shift it up by 1, divide by two=
             // sin(1 * 2pi) = 0 so it should start from zero?
-            val sinVal = 1 + sin((1 - (durationLeft - dt) / sixSeconds) * Mth.TWO_PI) // I need to square this I think? I'm unsure how I want it to flash...
-            return sinVal / 4 // less intense should be fine.
+            // sin(1.5 pi) = -1, 1-1 = 0
+            val sinVal = 1 + sin((1 - (durationLeft - dt) / ( sixSeconds * 2 )) * Mth.TWO_PI - Mth.HALF_PI) // I need to square this I think? I'm unsure how I want it to flash...
+            return sinVal / 6 // less intense should be fine.
         }
 
         fun timeSinceStartedSmoothing(dt: Float): Float {
