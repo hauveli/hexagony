@@ -6,6 +6,7 @@ import hauveli.hexagony.Hexagony
 import hauveli.hexagony.Hexagony.MINECRAFT
 import hauveli.hexagony.Hexagony.id
 import hauveli.hexagony.registry.HexagonyMobEffects
+import hauveli.hexagony.registry.HexagonySounds
 import net.minecraft.client.CameraType
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.player.Input
@@ -13,6 +14,7 @@ import net.minecraft.client.player.KeyboardInput
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.commands.arguments.EntityAnchorArgument
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.EntityDimensions
 import net.minecraft.world.entity.MoverType
@@ -84,6 +86,9 @@ class FreeCameraEntity : AbstractClientPlayer (
 
     // todo: respect paused game
     // todo: rewrite this shit to be more readable.
+    // todo: sounds
+    // todo: menuing spell
+    // todo: tell server where I am, and where I'm looking, once every tick (mediaworks reference!!! apparently..)
     companion object {
         private val FREECAM_SHADER = id("shaders/post/freecam.json")
 
@@ -145,6 +150,13 @@ class FreeCameraEntity : AbstractClientPlayer (
             val ambit = ambitAttr.value * ambitAttr.value
             //val sentAmbit = ambitSentAttr.value * ambitSentAttr.value
             if (target.lengthSqr() < ambit) return // within that ambit
+            // play BOIOIOIOING sound if we are outside ambit
+            player.level().playSound(
+                player,
+                freeCamera.position().x, freeCamera.position().y, freeCamera.position().z,
+                HexagonySounds.FREECAM_BOUNCE.value, SoundSource.PLAYERS,
+                1.0f, 1.0f - 0.2f + player.random.nextFloat() * 0.4f
+            )
             //if (diffSqr < sentAmbit) return
             val mult = (1 - ambit / target.lengthSqr()) * dt
             // todo: this determines how hard the player bounces off of ambit (be really gentle...)

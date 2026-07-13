@@ -1,0 +1,11 @@
+{
+  "freecam.bounce": {
+    "subtitle": "hexagony.subtitles.freecam.bounce",
+    "sounds": [
+      {
+        "name": "hexagony:freecam/bounce",
+        "stream": true
+      }
+    ]
+  }
+}

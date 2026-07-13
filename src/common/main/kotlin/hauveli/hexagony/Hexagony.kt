@@ -32,7 +32,8 @@ object Hexagony {
             HexagonyItems,
             HexagonyMobEffects,
             HexagonyRecipeTypes,
-            HexagonyRecipeSerializers
+            HexagonyRecipeSerializers,
+            HexagonySounds
         )
         HexagonyNetworking.init()
         HexagonyConfigs.init()
