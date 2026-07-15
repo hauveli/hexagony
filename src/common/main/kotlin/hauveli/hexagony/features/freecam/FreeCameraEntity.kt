@@ -112,6 +112,7 @@ class FreeCameraEntity : AbstractClientPlayer (
         @JvmField
         var returningAnimationActive: Boolean = false
         var returningStartingTickCount: Int? = null
+        var boioioingedStartingTickCount: Int? = null
         var returningFromEyePosDistance: Double? = null
         var distanceToPlayer: Double = 0.0 // this can be whatever because it only affects the shader
         var distanceToPlayerRelativeToAmbit: Float = 0f // this can be whatever between 0 and 1 because it only affects the shader
@@ -127,7 +128,7 @@ class FreeCameraEntity : AbstractClientPlayer (
         fun startAmbiance() {
             val soundManager = MINECRAFT!!.soundManager
             stopAmbiance()
-            val player = MINECRAFT.player
+            val player = freeCam
             if (player != null) {
                 soundManager.play(GridSoundInstance(player))
             }
@@ -140,9 +141,15 @@ class FreeCameraEntity : AbstractClientPlayer (
         // bonus points if I make note of whichever evaluated to null most recently, then evaluate that one first on the next check
         // also todo: maybe get ambit attributes in a smarter way somehow, I could just store them somewhere most of the time...
         // I only really need to be mindful of if they update...
+        val someHugeFuckingNumberThatWouldObliterateMyEarsIfItEvenWorked = 100 * 100
         fun moveTowardsAmbitIfNeeded(dt: Float) {
             val freeCamera = freeCam ?: return
             val player = originalPlayer ?: return
+
+            if (boioioingedStartingTickCount == null) {
+                boioioingedStartingTickCount = player.tickCount
+            }
+
             val diffPlayer = player.eyePosition.subtract(freeCamera.position())
             val anchor: Vec3? = null // MindAnchorManager.localPos
             val diffAnchor: Vec3
@@ -177,6 +184,7 @@ class FreeCameraEntity : AbstractClientPlayer (
             )
             //if (diffSqr < sentAmbit) return
             val mult = (1 - ambit / target.lengthSqr()) * dt
+            if (target.lengthSqr() > someHugeFuckingNumberThatWouldObliterateMyEarsIfItEvenWorked) return
             // todo: this (0.002) determines how hard the player bounces off of ambit (be really gentle...)
             freeCamera.deltaMovement = target.scale(mult + min(freeCamera.deltaMovement.lengthSqr(), 0.002))  // bounce back as hard as I ran into it
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
@@ -207,6 +215,9 @@ class FreeCameraEntity : AbstractClientPlayer (
             }
             if (fovMultiplier == null) {
                 fovMultiplier = 1.0
+            }
+            if (boioioingedStartingTickCount == null) {
+                boioioingedStartingTickCount = player.tickCount
             }
             // ensure noclip is active!!!!!!!!!!!! oops!!!!
             freeCamera.noPhysics = true

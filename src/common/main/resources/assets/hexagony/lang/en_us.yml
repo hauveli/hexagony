@@ -62,7 +62,7 @@ effect:
 hexagony:
   subtitles:
     freecam:
-      boumce: Ambit Boundary boioioings
+      bounce: Ambit Boundary boioioings
       ambiance: Ambit Boundary hums todo actually make this sound atm its not working
   mishap:
     bad_list_entry:
@@ -154,8 +154,8 @@ hexcasting:
       not_freecam: needs a player with an fleeting mind.
   action:
     hexagony:freecam: Dissociate
-    hexagony:freecam/pos: Dissociated Compass' Purification
-    hexagony:freecam/look: Dissociated Alidade's Purification
+    hexagony:freecam/pos: Compass' Dis. Purif.
+    hexagony:freecam/look: Alidade's Dis. Purif.
     hexagony:dump: Dump Spiral
     hexagony:craft: Craft Item
     hexagony:mind_anchor/pos: Mind Anchor Location

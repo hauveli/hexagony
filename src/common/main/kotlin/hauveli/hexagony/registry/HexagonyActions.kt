@@ -22,8 +22,8 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     val DUMP = make("dump", HexDir.SOUTH_WEST, "wewwwdwqwdwwwew", OpDump)
     // cool!!!!!
     val FREECAM = make("freecam", HexDir.SOUTH_WEST, "ewwawwqwwawwaeaqaaww", OpFreecam)
-    val FREECAM_POS = make("freecam/pos", HexDir.WEST, "wwawwqwwawwawa", OpFreecamPos)
-    val FREECAM_LOOK = make("freecam/look", HexDir.WEST, "wwawwqwwawwawaa", OpFreecamLookdir)
+    val FREECAM_POS = make("freecam/pos", HexDir.WEST, "wwawwqwwawwawaa", OpFreecamPos)
+    val FREECAM_LOOK = make("freecam/look", HexDir.WEST, "wwawwqwwawwawa", OpFreecamLookdir)
 
     // val CONGRATULATE = make("congratulate", HexDir.WEST, "eed", OpCongratulate)
 
