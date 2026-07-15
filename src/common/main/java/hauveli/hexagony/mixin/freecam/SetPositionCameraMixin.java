@@ -13,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static hauveli.hexagony.Hexagony.MINECRAFT;
+
 
 @Mixin(Camera.class)
 abstract class SetPositionCameraMixin {
@@ -31,10 +33,11 @@ abstract class SetPositionCameraMixin {
             boolean thirdPersonReverse,
             float partialTick,
             CallbackInfo ci) {
-        if (!FreeCameraEntity.Companion.getActive()) {
-            return;
-        }
+        if (!FreeCameraEntity.Companion.getActive()) return;
+        assert MINECRAFT != null;
+        if (MINECRAFT.isPaused()) return;
         FreeCameraEntity fce = FreeCameraEntity.Companion.getFreeCam();
+        assert fce != null;
         setPosition(fce.position());
         setRotation(fce.getYRot(), fce.getXRot());
         FreeCameraEntity.Companion.updateFreeCam(partialTick);

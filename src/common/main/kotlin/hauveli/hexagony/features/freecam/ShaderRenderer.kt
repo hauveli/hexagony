@@ -30,7 +30,12 @@ object ShaderRenderer {
     }
 
     @JvmStatic
-    fun render(deltaTick: Float, arg1: Float?, arg2: Float?, arg3: Float?) {
+    fun render(dt: Float, arg1: Float?, arg2: Float?, arg3: Float?) {
+        render(dt, arg1, arg2, arg3, null)
+    }
+
+    @JvmStatic
+    fun render(deltaTick: Float, arg1: Float?, arg2: Float?, arg3: Float?, arg4: Float?) {
         if (activeShader == null)
             return
 
@@ -50,6 +55,9 @@ object ShaderRenderer {
         }
         if (arg3 != null) {
             activeShader!!.setUniform("ThirdArgumentAmount", arg3)
+        }
+        if (arg4 != null) {
+            activeShader!!.setUniform("FourthArgumentAmount", arg4)
         }
         activeShader!!.process(deltaTick)
         MINECRAFT!!.mainRenderTarget.bindWrite(false)

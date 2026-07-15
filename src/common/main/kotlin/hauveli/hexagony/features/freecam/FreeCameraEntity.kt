@@ -112,7 +112,7 @@ class FreeCameraEntity : AbstractClientPlayer (
         @JvmField
         var returningAnimationActive: Boolean = false
         var returningStartingTickCount: Int? = null
-        var boioioingedStartingTickCount: Int? = null
+        var boioioingedStartingTickCount: Int = 0 // I can just have this be 0 so it's fine
         var returningFromEyePosDistance: Double? = null
         var distanceToPlayer: Double = 0.0 // this can be whatever because it only affects the shader
         var distanceToPlayerRelativeToAmbit: Float = 0f // this can be whatever between 0 and 1 because it only affects the shader
@@ -146,10 +146,6 @@ class FreeCameraEntity : AbstractClientPlayer (
             val freeCamera = freeCam ?: return
             val player = originalPlayer ?: return
 
-            if (boioioingedStartingTickCount == null) {
-                boioioingedStartingTickCount = player.tickCount
-            }
-
             val diffPlayer = player.eyePosition.subtract(freeCamera.position())
             val anchor: Vec3? = null // MindAnchorManager.localPos
             val diffAnchor: Vec3
@@ -175,6 +171,7 @@ class FreeCameraEntity : AbstractClientPlayer (
             val ambit = ambitAttr.value * ambitAttr.value
             //val sentAmbit = ambitSentAttr.value * ambitSentAttr.value
             if (target.lengthSqr() < ambit) return // within that ambit
+            boioioingedStartingTickCount = player.tickCount
             // play BOIOIOIOING sound if we are outside ambit
             player.level().playSound(
                 player,
@@ -184,9 +181,15 @@ class FreeCameraEntity : AbstractClientPlayer (
             )
             //if (diffSqr < sentAmbit) return
             val mult = (1 - ambit / target.lengthSqr()) * dt
-            if (target.lengthSqr() > someHugeFuckingNumberThatWouldObliterateMyEarsIfItEvenWorked) return
             // todo: this (0.002) determines how hard the player bounces off of ambit (be really gentle...)
             freeCamera.deltaMovement = target.scale(mult + min(freeCamera.deltaMovement.lengthSqr(), 0.002))  // bounce back as hard as I ran into it
+
+            // If I don't do this it hangs for several seconds, at minimum.
+            if (target.lengthSqr() > someHugeFuckingNumberThatWouldObliterateMyEarsIfItEvenWorked) {
+                freeCamera.setPos(player.position())
+                // freeCamera.move(MoverType.SELF, freeCamera.deltaMovement.scale(-1.0))
+                return
+            }
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
         }
 
@@ -215,9 +218,6 @@ class FreeCameraEntity : AbstractClientPlayer (
             }
             if (fovMultiplier == null) {
                 fovMultiplier = 1.0
-            }
-            if (boioioingedStartingTickCount == null) {
-                boioioingedStartingTickCount = player.tickCount
             }
             // ensure noclip is active!!!!!!!!!!!! oops!!!!
             freeCamera.noPhysics = true
@@ -503,6 +503,12 @@ class FreeCameraEntity : AbstractClientPlayer (
             val dissociated = originalPlayer!!.getEffect(HexagonyMobEffects.FREECAM.holder()) ?: return 0.0f // max it out if duration expired
             val deltaTickCount = freeCam!!.tickCount + dt
             return 1 - min(deltaTickCount / 30f, 1f) // smooth across 1.5 seconds
+        }
+
+        fun boioioingImpact(dt: Float): Float {
+            // smooth across like, uhh... half a second?
+            if (originalPlayer!!.tickCount - boioioingedStartingTickCount > 10) return 0f
+            return (1f - (originalPlayer!!.tickCount - boioioingedStartingTickCount + dt) / 10f) * 0.5f
         }
     }
 }

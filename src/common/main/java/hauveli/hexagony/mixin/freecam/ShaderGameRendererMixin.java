@@ -2,6 +2,7 @@ package hauveli.hexagony.mixin.freecam;
 
 
 import hauveli.hexagony.Hexagony;
+import hauveli.hexagony.features.freecam.FreeCameraClientData;
 import hauveli.hexagony.features.freecam.FreeCameraEntity;
 import hauveli.hexagony.features.freecam.ShaderRenderer;
 import net.minecraft.client.Camera;
@@ -26,7 +27,8 @@ public class ShaderGameRendererMixin {
             ShaderRenderer.render(dt,
                     FreeCameraEntity.Companion.distanceToPlayer(),
                     FreeCameraEntity.Companion.durationLeftRelativeToFiveSeconds(dt),
-                    FreeCameraEntity.Companion.timeSinceStartedSmoothing(dt));
+                    FreeCameraEntity.Companion.timeSinceStartedSmoothing(dt),
+                    FreeCameraEntity.Companion.boioioingImpact(dt));
         }
     }
 
