@@ -13,7 +13,7 @@ void main() {
     vec4 color = texture(DiffuseSampler, texCoord);
     // fiddle with this to make it look good I guess
     vec3 bluecolor = vec3(0.2, 0.3, 0.7);
-    vec3 endingcolor = vec3(0.8, 0.7, 0.7);
+    vec3 endingcolor = vec3(0.8, 0.3, 0.7);
     vec3 boingcolor = vec3(0.3, 0.05, 0.3);
     // mix all the simple colors by their proportions first
     // vec3 mixedcolor = normalize((bluecolor * (0.05 + (0.55 - FirstArgumentAmount) / 4) + endingcolor * SecondArgumentAmount + boingcolor * FourthArgumentAmount) * 0.33 * (ThirdArgumentAmount + 0.001));
