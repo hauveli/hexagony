@@ -85,7 +85,7 @@ hexagony:
         look: Transforms the player on the stack into the direction that player's mind is looking to.
       dump_spiral:
         title: Dump Spiral
-        .: Pushes every pattern on my casting grid onto the grid in a list. Costs about one $(l:items/amethyst)$(item)Charged Amethyst/$.
+        .: Pushes every pattern on my casting grid onto the stack in a list. Costs about one $(l:items/amethyst)$(item)Charged Amethyst/$.
         page:
           '1': This pattern seems to remember my past in great detail, recalling each pattern as I had drawn them, orientation and all. Even the patterns I drew incorrectly are included for some reason. Painfully loud thoughts pull on my mind, imagining what this simple pattern might do in a more advanced setting...
       craft:

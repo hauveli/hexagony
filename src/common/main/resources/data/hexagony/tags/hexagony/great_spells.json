@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "hexagony:craft",
-    "hexagony:dump"
+    "hexagony:dump",
+    "hexagony:freecam"
   ]
 }
