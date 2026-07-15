@@ -111,6 +111,7 @@ class FreeCameraEntity : AbstractClientPlayer (
         var fovMultiplier: Double? = null
         @JvmField
         var returningAnimationActive: Boolean = false
+        var timeSinceStartedFreecam: Int? = null
         var returningStartingTickCount: Int? = null
         var boioioingedStartingTickCount: Int = 0 // I can just have this be 0 so it's fine
         var returningFromEyePosDistance: Double? = null
@@ -349,6 +350,8 @@ class FreeCameraEntity : AbstractClientPlayer (
             freeCam = freeCamera
             active = true
 
+            timeSinceStartedFreecam = player.tickCount
+
             smoothCameraSettingStorage = MINECRAFT.options.smoothCamera
             MINECRAFT.options.smoothCamera = true
 
@@ -465,6 +468,8 @@ class FreeCameraEntity : AbstractClientPlayer (
             freeCam = null
             active = false
 
+            timeSinceStartedFreecam = null
+
 
             ShaderRenderer.setEffect(null)
             stopAmbiance()
@@ -501,8 +506,8 @@ class FreeCameraEntity : AbstractClientPlayer (
         fun timeSinceStartedSmoothing(dt: Float): Float {
             // the player might be silly so I want to get the remaining duration and return if it has expired (or is about to expire?)
             val dissociated = originalPlayer!!.getEffect(HexagonyMobEffects.FREECAM.holder()) ?: return 0.0f // max it out if duration expired
-            val deltaTickCount = freeCam!!.tickCount + dt
-            return 1 - min(deltaTickCount / 30f, 1f) // smooth across 1.5 seconds
+            val timeSinceStartedDelta = (originalPlayer!!.tickCount - timeSinceStartedFreecam!!) + dt
+            return 1 - min(timeSinceStartedDelta / 30f, 1f) // smooth across 1.5 seconds
         }
 
         fun boioioingImpact(dt: Float): Float {
