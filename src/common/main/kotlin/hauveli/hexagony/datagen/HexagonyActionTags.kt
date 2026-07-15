@@ -19,6 +19,7 @@ class HexagonyActionTags(
         for (entry in arrayOf(
             HexagonyActions.CRAFT,
             HexagonyActions.DUMP,
+            HexagonyActions.FREECAM,
         )) {
             tag(HexTags.Actions.CAN_START_ENLIGHTEN).add(entry.key)
             tag(HexTags.Actions.PER_WORLD_PATTERN).add(entry.key)

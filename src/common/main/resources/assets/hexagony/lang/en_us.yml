@@ -78,7 +78,7 @@ hexagony:
     great_spells:
       freecam:
         title: Dissociate
-        .: Disconnects my mind from my body. Costs about one $(l:items/amethyst)$(item)Amethyst Dust/$ per twentieth of a second.
+        .: Disconnects my mind from my body. Costs about one $(l:items/amethyst)$(item)Amethyst Shard/$ to cast, plus $(l:items/amethyst)$(item)Amethyst Dust/$ equal to the square of the duration in twentieths of a second.
         page:
           '1': A spell to remove my conscious self from my body, leaving it vulnerable. I should secure my body in a safe place, motionless, lest my body slips and falls while it is out of my control.
         pos: Transforms the player on the stack into the position that player's mind is at.
