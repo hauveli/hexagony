@@ -1,7 +1,6 @@
 package hauveli.hexagony.casting.actions.spells.craft
 
 import at.petrak.hexcasting.api.casting.ParticleSpray
-import at.petrak.hexcasting.api.casting.SpellList
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.iota.GarbageIota
 import at.petrak.hexcasting.api.casting.iota.Iota
@@ -52,11 +51,11 @@ class MishapBadListEntry(
 
          */
 
-        (badList as ListIota).list.minusElement(badList.list.getAt(perpetratorIndex))
+        (badList as ListIota).list.minusElement(badList.list[perpetratorIndex])
     }
 
     override fun errorMessage(ctx: CastingEnvironment, errorCtx: Context): Component {
-        val perp = (badList as ListIota).list.getAt(perpetratorIndex).display()
+        val perp = (badList as ListIota).list[perpetratorIndex].display()
 
         return error(
             "${Hexagony.MODID}.bad_list_entry", expected, perpetratorIndex,

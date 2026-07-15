@@ -401,7 +401,7 @@ object GraphCraftingFromNormalRecipes {
         override fun quickMoveStack(
             player: Player,
             index: Int
-        ): ItemStack? {
+        ): ItemStack {
             TODO("Report to developer if this line is reached") // this is never called, can't be either because no menu is presented to player
         }
 

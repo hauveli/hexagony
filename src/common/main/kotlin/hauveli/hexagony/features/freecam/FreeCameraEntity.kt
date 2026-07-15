@@ -68,8 +68,8 @@ class FreeCameraEntity : AbstractClientPlayer (
         )
     }
 
-    override fun getScoreboard(): Scoreboard? {
-        return null
+    override fun getScoreboard(): Scoreboard {
+        return Scoreboard() // uhhh....
     }
 
     override fun isSpectator(): Boolean {
@@ -457,7 +457,7 @@ class FreeCameraEntity : AbstractClientPlayer (
             freeCam!!.pose = player.pose
             MINECRAFT!!.setCameraEntity(player)
             if (backupInput != null) {
-                player.input = backupInput
+                player.input = backupInput!!
             } else {
                 throw Error("${Hexagony.MODID}: Player existed but had no input field!") // I sort of doubt this can happen but I am keeping this check here just in case so I can figure out how it can happen
             }

@@ -10,10 +10,8 @@ import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.casting.mishaps.MishapBadCaster
 import at.petrak.hexcasting.api.misc.MediaConstants
 import hauveli.hexagony.registry.HexagonyMobEffects
-import net.minecraft.core.Holder
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
 
 
@@ -25,7 +23,7 @@ object OpFreecam : SpellAction  {
     override fun executeWithUserdata(
         args: List<Iota>,
         env: CastingEnvironment,
-        tags: CompoundTag
+        userData: CompoundTag
     ): SpellAction.Result {
         val duration = args.getPositiveDouble(0, argc)
         if (env !is StaffCastEnv)
@@ -42,7 +40,7 @@ object OpFreecam : SpellAction  {
 
     override fun execute(
         args: List<Iota>,
-        castingEnvironment: CastingEnvironment
+        env: CastingEnvironment
     ): SpellAction.Result {
         throw IllegalStateException()
     }

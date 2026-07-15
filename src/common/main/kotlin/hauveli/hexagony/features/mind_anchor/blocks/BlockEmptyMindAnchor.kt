@@ -50,7 +50,7 @@ class BlockEmptyMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_
         bs: BlockState,
         world: ServerLevel?
     ): Boolean {
-        return enterDir != bs.getValue<Direction?>(FACING).opposite
+        return enterDir != bs.getValue(FACING).opposite
     }
 
     override fun possibleExitDirections(pos: BlockPos?, bs: BlockState, world: Level?): EnumSet<Direction?> {
@@ -58,7 +58,7 @@ class BlockEmptyMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_
     }
 
     override fun normalDir(pos: BlockPos, bs: BlockState, world: Level?, recursionLeft: Int): Direction? {
-        return normalDirOfOther(pos.relative(bs.getValue<Direction?>(FACING)), world, recursionLeft)
+        return normalDirOfOther(pos.relative(bs.getValue(FACING)), world, recursionLeft)
     }
 
     override fun particleHeight(pos: BlockPos?, bs: BlockState?, world: Level?): Float {
@@ -75,11 +75,11 @@ class BlockEmptyMindAnchor(p_49795_: Properties) : BlockCircleComponent(p_49795_
     }
 
     override fun rotate(pState: BlockState, pRot: Rotation): BlockState {
-        return pState.setValue<Direction?, Direction?>(FACING, pRot.rotate(pState.getValue<Direction?>(FACING)))
+        return pState.setValue(FACING, pRot.rotate(pState.getValue(FACING)))
     }
 
     override fun mirror(pState: BlockState, pMirror: Mirror): BlockState {
-        return pState.rotate(pMirror.getRotation(pState.getValue<Direction?>(FACING)))
+        return pState.rotate(pMirror.getRotation(pState.getValue(FACING)))
     }
 
     companion object {

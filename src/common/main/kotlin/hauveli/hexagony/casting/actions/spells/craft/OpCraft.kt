@@ -2,7 +2,6 @@ package hauveli.hexagony.casting.actions.spells.craft
 
 import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import at.petrak.hexcasting.api.casting.RenderedSpell
-import at.petrak.hexcasting.api.casting.asActionResult
 import at.petrak.hexcasting.api.casting.castables.SpellAction
 import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.casting.eval.vm.CastingImage
@@ -10,15 +9,11 @@ import at.petrak.hexcasting.api.casting.getList
 import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.casting.iota.Iota
-import at.petrak.hexcasting.api.casting.mishaps.MishapBadEntity
-import at.petrak.hexcasting.api.casting.mishaps.MishapEntityTooFarAway
-import at.petrak.hexcasting.api.casting.mishaps.MishapInvalidIota
 import at.petrak.hexcasting.api.misc.MediaConstants
 import hauveli.hexagony.features.graph_crafting.GraphCrafting
 import hauveli.hexagony.features.graph_crafting.GraphCraftingFromNormalRecipes
 import hauveli.hexagony.registry.HexagonyAdvancements
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvents
@@ -37,12 +32,12 @@ object OpCraft : SpellAction  {
     override fun executeWithUserdata(
         args: List<Iota>,
         env: CastingEnvironment,
-        tags: CompoundTag
+        userData: CompoundTag
     ): SpellAction.Result {
         val entityList = args.getList(0, argc)
         val orientation = args.getVec3(1, argc)
         val level = env.castingEntity?.level() as ServerLevel
-        if (entityList.size() == 0) {
+        if (entityList.length() == 0) {
             // custom mishap here, possibly
             throw MishapEmptyList.of(args[0], 0, "item")
         }
@@ -65,7 +60,7 @@ object OpCraft : SpellAction  {
         val target = env.castingEntity!!
         return SpellAction.Result(
             Spell(entityList.toList(), orientation),
-            MediaConstants.CRYSTAL_UNIT + MediaConstants.DUST_UNIT * entityList.size(),
+            MediaConstants.CRYSTAL_UNIT + MediaConstants.DUST_UNIT * entityList.length(),
             listOf(burst(target.position().add(0.0, target.eyeHeight / 2.0, 0.0), 1.0, 10)),
             1
         )
@@ -81,7 +76,7 @@ object OpCraft : SpellAction  {
 
     override fun execute(
         args: List<Iota>,
-        castingEnvironment: CastingEnvironment
+        env: CastingEnvironment
     ): SpellAction.Result {
         throw IllegalStateException()
     }
@@ -139,9 +134,9 @@ object OpCraft : SpellAction  {
 
         }
 
-        override fun cast(env: CastingEnvironment, castingImage: CastingImage): CastingImage? {
+        override fun cast(env: CastingEnvironment, image: CastingImage): CastingImage? {
             cast(env)
-            return castingImage
+            return image
         }
     }
 }
