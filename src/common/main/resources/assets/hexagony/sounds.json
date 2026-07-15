@@ -4,7 +4,8 @@
     "sounds": [
       {
         "name": "hexagony:freecam/bounce",
-        "stream": true
+        "stream": true,
+        "attenuation_distance": 64
       }
     ]
   }

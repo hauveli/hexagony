@@ -3,6 +3,7 @@ package hauveli.hexagony.features.freecam
 import at.petrak.hexcasting.common.lib.HexAttributes
 import hauveli.hexagony.Hexagony
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.entity.Entity
@@ -23,6 +24,15 @@ class FreeCameraMobEffect(category: MobEffectCategory, color: Int) : MobEffect(c
         if (livingEntity.level().isClientSide) {
             if (FreeCameraEntity.active) {
                 FreeCameraEntity.reattachCamera()
+            }
+        } else {
+            // I might as well be nice to people who apply this to non-players by not erroring....
+            // I do this so I can have consistent behavior on the first few frames if the client is lagging,
+            // but I really don't like what I'm doing anyway.
+            // I understand there's not much I can do to control latency related issues but this is the best I could think of
+            // with the knowledge and effort I put in.
+            if (livingEntity is ServerPlayer) {
+                FreeCameraServerData.clearData(livingEntity)
             }
         }
     }

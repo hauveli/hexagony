@@ -1,6 +1,8 @@
 package hauveli.hexagony.features.freecam
 
+import at.petrak.hexcasting.client.sound.GridSoundInstance
 import at.petrak.hexcasting.common.lib.HexAttributes
+import at.petrak.hexcasting.common.lib.HexSounds
 import com.mojang.authlib.GameProfile
 import hauveli.hexagony.Hexagony
 import hauveli.hexagony.Hexagony.MINECRAFT
@@ -115,6 +117,22 @@ class FreeCameraEntity : AbstractClientPlayer (
         var distanceToPlayerRelativeToAmbit: Float = 0f // this can be whatever between 0 and 1 because it only affects the shader
         var lerpingFromLookTarget: Vec3? = null
 
+
+        // from hexmod
+        fun stopAmbiance() {
+            val soundManager = MINECRAFT!!.soundManager
+            soundManager.stop(HexSounds.CASTING_AMBIANCE.location, null)
+        }
+
+        fun startAmbiance() {
+            val soundManager = MINECRAFT!!.soundManager
+            stopAmbiance()
+            val player = MINECRAFT.player
+            if (player != null) {
+                soundManager.play(GridSoundInstance(player))
+            }
+        }
+
         // todo: make a simpler version of this so that it is easy to extend
         // ex: whatever(attribute, positionGetter, cameraPosition) -> null if in ambit, relative vector position if not (which I can then just normalize
         // this would let me just compare the lengths of each, pick the lowest and be done
@@ -155,11 +173,11 @@ class FreeCameraEntity : AbstractClientPlayer (
                 player,
                 freeCamera.position().x, freeCamera.position().y, freeCamera.position().z,
                 HexagonySounds.FREECAM_BOUNCE.value, SoundSource.PLAYERS,
-                1.0f, 1.0f - 0.2f + player.random.nextFloat() * 0.4f
+                abs(target.lengthSqr() / ambit - 0.5f).toFloat(), 1.0f - 0.2f + player.random.nextFloat() * 0.4f
             )
             //if (diffSqr < sentAmbit) return
             val mult = (1 - ambit / target.lengthSqr()) * dt
-            // todo: this determines how hard the player bounces off of ambit (be really gentle...)
+            // todo: this (0.002) determines how hard the player bounces off of ambit (be really gentle...)
             freeCamera.deltaMovement = target.scale(mult + min(freeCamera.deltaMovement.lengthSqr(), 0.002))  // bounce back as hard as I ran into it
             freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
         }
@@ -324,6 +342,7 @@ class FreeCameraEntity : AbstractClientPlayer (
             MINECRAFT.options.smoothCamera = true
 
             ShaderRenderer.setEffect(FREECAM_SHADER)
+            startAmbiance()
 
 
             // todo: play /playsound minecraft:ambient.basalt_deltas.loop
@@ -437,6 +456,7 @@ class FreeCameraEntity : AbstractClientPlayer (
 
 
             ShaderRenderer.setEffect(null)
+            stopAmbiance()
             // todo: STOP /playsound minecraft:ambient.basalt_deltas.loop
         }
 

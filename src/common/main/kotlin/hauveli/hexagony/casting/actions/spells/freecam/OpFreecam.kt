@@ -29,7 +29,7 @@ object OpFreecam : SpellAction  {
     ): SpellAction.Result {
         val duration = args.getPositiveDouble(0, argc)
         if (env !is StaffCastEnv)
-            throw MishapBadCaster() // it would be possible to trap a player indefinitely if this does not mishap....
+            throw MishapBadCaster() // it would be possible to trap a player indefinitely if this does not mishap.... I think?
         val caster = env.castingEntity as ServerPlayer
         val cost = MediaConstants.CRYSTAL_UNIT + MediaConstants.DUST_UNIT * duration * duration
         return SpellAction.Result(

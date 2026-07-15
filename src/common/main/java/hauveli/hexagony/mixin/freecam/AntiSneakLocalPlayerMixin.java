@@ -1,6 +1,7 @@
 package hauveli.hexagony.mixin.freecam;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import hauveli.hexagony.features.freecam.FreeCameraClientData;
 import hauveli.hexagony.features.freecam.FreeCameraEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -35,7 +36,10 @@ public abstract class AntiSneakLocalPlayerMixin {
 
     @ModifyExpressionValue(method = "sendPosition", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isControlledCamera()Z"))
     private boolean letServerKnowImHere(boolean previous) {
-        if (FreeCameraEntity.Companion.getActive()) return true;
+        if (FreeCameraEntity.Companion.getActive()) {
+            FreeCameraClientData.INSTANCE.sync(); // piggybacking hehehehehe.... I hope I won't forget this in the future...!
+            return true;
+        }
         return previous;
     }
 

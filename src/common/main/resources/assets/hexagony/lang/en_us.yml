@@ -60,6 +60,10 @@ effect:
   hexagony:
     freecam: Dissociation
 hexagony:
+  subtitles:
+    freecam:
+      boumce: Ambit Boundary boioioings
+      ambiance: Ambit Boundary hums todo actually make this sound atm its not working
   mishap:
     bad_list_entry:
       item: an item
@@ -77,6 +81,8 @@ hexagony:
         .: Disconnects my mind from my body. Costs about one $(l:items/amethyst)$(item)Amethyst Dust/$ per twentieth of a second.
         page:
           '1': A spell to remove my conscious self from my body, leaving it vulnerable. I should secure my body in a safe place, motionless, lest my body slips and falls while it is out of my control.
+        pos: Transforms the player on the stack into the position that player's mind is at.
+        look: Transforms the player on the stack into the direction that player's mind is looking to.
       dump_spiral:
         title: Dump Spiral
         .: Pushes every pattern on my casting grid onto the grid in a list. Costs about one $(l:items/amethyst)$(item)Charged Amethyst/$.
@@ -145,8 +151,11 @@ hexcasting:
       bad_list_entry: needs %s at index %s of the list at index 0 of the stack but got %s.
       empty_list: needs a list of at least size 1 but got an empty list.
       needs_patterns: needs an image of a pattern but got none.
+      not_freecam: needs a player with an fleeting mind.
   action:
     hexagony:freecam: Dissociate
+    hexagony:freecam/pos: Dissociated Compass' Purification
+    hexagony:freecam/look: Dissociated Alidade's Purification
     hexagony:dump: Dump Spiral
     hexagony:craft: Craft Item
     hexagony:mind_anchor/pos: Mind Anchor Location
