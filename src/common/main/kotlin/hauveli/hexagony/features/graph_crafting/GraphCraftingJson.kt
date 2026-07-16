@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import hauveli.hexagony.Hexagony
 import hauveli.hexagony.features.graph_crafting.GraphCraftingFromNormalRecipes.ItemNodeVanilla
 import hauveli.hexagony.features.graph_crafting.GraphCraftingFromNormalRecipes.connectBidirectional
 import hauveli.hexagony.features.graph_crafting.GraphCraftingFromNormalRecipes.makePartitions
@@ -107,6 +108,7 @@ object GraphCraftingJson {
         .create()
 
     fun parse(json: JsonObject): Root {
+        Hexagony.LOGGER.debug("CRAFT THING PARSED: {}", json)
         return gson.fromJson(json, Root::class.java)
     }
 
@@ -140,7 +142,7 @@ object GraphCraftingJson {
 
         val partitions = jsonRoot.partitions
         val resultId = ResourceLocation.parse(jsonRoot.result.item)
-        val remainingItems = jsonRoot.remaining // not supported now, unsure if I want to support it?
+        val remainingItems = jsonRoot.remaining // not supported now, unsure if I want to support it? would be good for milk bucket recipes and such...
 
         val nodes = mutableListOf<ItemNodeVanilla>()
 

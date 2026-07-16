@@ -147,8 +147,8 @@ object GraphCrafting {
 
         makePartitions(centerNode)
 
-        println(centerNode.neighbors.size)
-        println(centerNode.stack.displayName.toString())
+        // println(centerNode.neighbors.size)
+        // println(centerNode.stack.displayName.toString())
 
         return centerNode
     }
@@ -225,7 +225,7 @@ object GraphCrafting {
     fun subtractShaped(worldItemNode: ItemNode) {
         val level = worldItemNode.entity.level()
         for (matchingPartition in worldItemNode.matchingPartitions) {
-            println("Subtracting!")
+            // println("Subtracting!")
             subtractThisSetsItems(matchingPartition, level)
         }
     }

@@ -385,7 +385,7 @@ object GraphCraftingFromNormalRecipes {
     ): Boolean {
 
         val equal = neighborhoodIsEqual(worldRoot, recipeRoot)
-        println("Eq:${equal}")
+        // println("Eq:${equal}")
         if (equal) {
             val partitionsEqualToo = atLeastMatchesRecipe(worldRoot, recipeRoot)
             return partitionsEqualToo
