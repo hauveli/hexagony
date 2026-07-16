@@ -16,17 +16,17 @@ object ShaderRenderer {
 
     @JvmStatic
     fun render(dt: Float) {
-        render(dt, null, null, null)
+        render(dt, null, null, null, null)
     }
 
     @JvmStatic
     fun render(dt: Float, arg1: Float?) {
-        render(dt, arg1, null, null)
+        render(dt, arg1, null, null, null)
     }
 
     @JvmStatic
     fun render(dt: Float, arg1: Float?, arg2: Float?) {
-        render(dt, arg1, arg2, null)
+        render(dt, arg1, arg2, null, null)
     }
 
     @JvmStatic

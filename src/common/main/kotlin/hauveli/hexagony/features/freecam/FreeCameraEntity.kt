@@ -161,37 +161,44 @@ class FreeCameraEntity : AbstractClientPlayer (
             val diffPlayerSqr = diffPlayer.lengthSqr()
             val diffAnchorSqr = diffAnchor.lengthSqr()
             val target: Vec3
+            val targetLengthSqr: Double
             if (diffAnchorSqr <= diffPlayerSqr) {
                 target = diffAnchor
+                targetLengthSqr = diffAnchorSqr
             } else {
                 target = diffPlayer
+                targetLengthSqr = diffAnchorSqr
             }
 
             val ambitAttr = player.getAttribute(HexAttributes.AMBIT_RADIUS) ?: return
+
             //val ambitSentAttr = player.getAttribute(HexAttributes.SENTINEL_RADIUS) ?: return
             val ambit = ambitAttr.value * ambitAttr.value
             //val sentAmbit = ambitSentAttr.value * ambitSentAttr.value
-            if (target.lengthSqr() < ambit) return // within that ambit
+            if (targetLengthSqr < ambit) return // within that ambit
             boioioingedStartingTickCount = player.tickCount
             // play BOIOIOIOING sound if we are outside ambit
             player.level().playSound(
                 player,
                 freeCamera.position().x, freeCamera.position().y, freeCamera.position().z,
                 HexagonySounds.FREECAM_BOUNCE.value, SoundSource.PLAYERS,
-                abs(target.lengthSqr() / ambit - 0.5f).toFloat(), 1.0f - 0.2f + player.random.nextFloat() * 0.4f
+                min(abs(targetLengthSqr / ambit - 0.5f).toFloat(), 1f), 1.0f - 0.2f + player.random.nextFloat() * 0.4f
             )
             //if (diffSqr < sentAmbit) return
-            val mult = (1 - ambit / target.lengthSqr()) * dt
+            val mult = (1 - ambit / ( targetLengthSqr + dt ))
             // todo: this (0.002) determines how hard the player bounces off of ambit (be really gentle...)
             freeCamera.deltaMovement = target.scale(mult + min(freeCamera.deltaMovement.lengthSqr(), 0.002))  // bounce back as hard as I ran into it
 
             // If I don't do this it hangs for several seconds, at minimum.
-            if (target.lengthSqr() > someHugeFuckingNumberThatWouldObliterateMyEarsIfItEvenWorked) {
+            if (targetLengthSqr > someHugeFuckingNumberThatWouldObliterateMyEarsIfItEvenWorked) {
+                Hexagony.LOGGER.info("yep we are too far away now {}", targetLengthSqr)
+                freeCamera.teleportTo(player.position().x, player.position().y, player.position().z)
                 freeCamera.setPos(player.position())
                 // freeCamera.move(MoverType.SELF, freeCamera.deltaMovement.scale(-1.0))
-                return
+                freeCamera.move(MoverType.SELF, Vec3.ZERO)
+            } else {
+                freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
             }
-            freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
         }
 
 
@@ -228,7 +235,18 @@ class FreeCameraEntity : AbstractClientPlayer (
 
 
             val lookCompletion =
-                min(((player.tickCount - returningStartingTickCount!!) + dt) / ticksBeforeLookCompletes, 1f).toDouble()
+                (((player.tickCount - returningStartingTickCount!!) + dt) / ticksBeforeLookCompletes).toDouble()
+
+            // panic exit
+            if (lookCompletion > 2.0) {
+                reattachCamera()
+                returningAnimationActive = false
+                returningFromEyePosDistance = null
+                returningStartingTickCount = null
+                lerpingFromLookTarget =  null
+                fovMultiplier = null
+                return true
+            }
 
             // fuck it try doing fov before look is even completed?
             // should I use speed to do the distrotion?
@@ -251,7 +269,7 @@ class FreeCameraEntity : AbstractClientPlayer (
                 ).add(
                     player.eyePosition.scale(lookCompletion)
                 )
-                freeCamera.lookAt(EntityAnchorArgument.Anchor.FEET, cameraLookAtLerp)
+                freeCamera.lookAt(EntityAnchorArgument.Anchor.EYES, cameraLookAtLerp)
                 if (lookCompletion < 0.9) {
                     return true
                 }
@@ -373,6 +391,7 @@ class FreeCameraEntity : AbstractClientPlayer (
             val freeCamera = freeCam ?: return
             val input = input ?: return
 
+            moveTowardsAmbitIfNeeded(dt)
             if (moveTowardsPlayer(dt)) {
                 return
             }
@@ -444,8 +463,6 @@ class FreeCameraEntity : AbstractClientPlayer (
             val ambit = ambitAttr.value
             distanceToPlayerRelativeToAmbit = (distanceToPlayer / ambit).toFloat() + 0.1f
             // Hexagony.LOGGER.info("ambit thing: {}", distanceToPlayerRelativeToAmbit)
-
-            moveTowardsAmbitIfNeeded(dt)
             //val camera = mc.gameRenderer.mainCamera as CameraExtension
             //camera.`hexagony$bilocationSetCameraPosition`(freeCamera.position())
         }
@@ -485,7 +502,7 @@ class FreeCameraEntity : AbstractClientPlayer (
 
         fun distanceToPlayer(): Float {
             // return min(distanceToPlayerRelativeToAmbit, 1f) // .length() > 0 => distanceToPlayerRelativeToAmbit >= 0.1f
-            return distanceToPlayerRelativeToAmbit / 1.5f // if divisor is 2, bounded between 0.05 and 0.55 at most, this value is also already dependent on dt so no need to pass dt
+            return min(distanceToPlayerRelativeToAmbit / 1.5f, 1f) // if divisor is 2, bounded between 0.05 and 0.55 at most, this value is also already dependent on dt so no need to pass dt
         }
 
         fun durationLeftRelativeToFiveSeconds(dt: Float): Float {
