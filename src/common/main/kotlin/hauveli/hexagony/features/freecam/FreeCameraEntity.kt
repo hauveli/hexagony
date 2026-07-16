@@ -191,11 +191,8 @@ class FreeCameraEntity : AbstractClientPlayer (
 
             // If I don't do this it hangs for several seconds, at minimum.
             if (targetLengthSqr > someHugeFuckingNumberThatWouldObliterateMyEarsIfItEvenWorked) {
-                Hexagony.LOGGER.info("yep we are too far away now {}", targetLengthSqr)
-                freeCamera.teleportTo(player.position().x, player.position().y, player.position().z)
                 freeCamera.setPos(player.position())
-                // freeCamera.move(MoverType.SELF, freeCamera.deltaMovement.scale(-1.0))
-                freeCamera.move(MoverType.SELF, Vec3.ZERO)
+                freeCamera.deltaMovement = freeCamera.deltaMovement.normalize().scale(-1.0)
             } else {
                 freeCamera.move(MoverType.SELF, freeCamera.deltaMovement)
             }
