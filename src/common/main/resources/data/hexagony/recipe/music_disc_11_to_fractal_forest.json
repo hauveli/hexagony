@@ -1,0 +1,106 @@
+{
+  "type": "hexagony:graph_crafting",
+  "graph": {
+    "partitions": {
+      "music_disc_11_loop": {
+        "1": {
+          "center": true,
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["2"]
+        },
+        "2": {
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["3"]
+        },
+        "3": {
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["4"]
+        },
+        "4": {
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["5"]
+        },
+        "5": {
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["6"]
+        },
+        "6": {
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["7"]
+        },
+        "7": {
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["8"]
+        },
+        "8": {
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["9"]
+        },
+        "9": {
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["10"]
+        },
+        "10": {
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["11"]
+        },
+        "11": {
+          "validIngredients": ["minecraft:music_disc_11"],
+          "relations": ["1"]
+        }
+      }
+    },
+    "result": {
+      "item": "hexagony:music_disc/selulance/night_coding",
+      "count": 1
+    },
+    "remainingItems": {
+      "music_disc_11_loop": {
+        "1": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/C4",
+          "count": 1
+        },
+        "2": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/c4",
+          "count": 1
+        },
+        "3": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/descention",
+          "count": 1
+        },
+        "4": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/eko",
+          "count": 1
+        },
+        "5": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/north",
+          "count": 1
+        },
+        "6": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/very_eight",
+          "count": 1
+        },
+        "7": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/step_down",
+          "count": 1
+        },
+        "8": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/fractal_forest_part_2",
+          "count": 1
+        },
+        "9": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/sender",
+          "count": 1
+        },
+        "10": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/safehouse",
+          "count": 1
+        },
+        "11": {
+          "item": "hexagony:music_disc/selulance/fractal_forest/seven",
+          "count": 1
+        }
+      }
+    }
+  }
+}

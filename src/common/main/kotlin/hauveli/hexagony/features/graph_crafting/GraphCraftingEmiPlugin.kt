@@ -7,30 +7,39 @@ import dev.emi.emi.api.stack.EmiIngredient
 import dev.emi.emi.api.stack.EmiStack
 import dev.emi.emi.api.widget.WidgetHolder
 import hauveli.hexagony.interop.HexagonyEMIPlugin
+import hauveli.hexagony.interop.TheCoolerSlotWidget
 import net.minecraft.resources.ResourceLocation
-import java.util.List
 
-
-class EmiGraphCraftingRecipe(
-    blockInput: EmiIngredient?,
-    villagerInput: EmiIngredient?,
-    output: EmiStack?,
-    id: ResourceLocation?
+class GraphCraftingEmiPlugin(
+    val itemInputs: List<EmiIngredient>,
+    val inputEntities: List<GraphCraftingEmiStack>,
+    val itemOuput: EmiStack,
+    val recipeId: ResourceLocation
 ) : EmiRecipe {
-    val category: EmiRecipeCategory
-        get() = HexagonyEMIPlugin.CRAFT
 
-    val inputs: MutableList<EmiIngredient>
-        get() = List.of<EmiIngredient?>(blockInput, villagerInput)
+    override fun getCategory(): EmiRecipeCategory {
+        return HexagonyEMIPlugin.CRAFT
+    }
 
-    val outputs: MutableList<EmiStack>
-        get() = List.of<EmiStack?>(output)
+    override fun getId(): ResourceLocation {
+        return recipeId
+    }
 
-    val displayWidth: Int
-        get() = 118
+    override fun getInputs(): List<EmiIngredient?> {
+        return itemInputs
+    }
 
-    val displayHeight: Int
-        get() = 85
+    override fun getOutputs(): List<EmiStack?> {
+        return listOf(itemOuput)
+    }
+
+    override fun getDisplayWidth(): Int {
+        return 118
+    }
+
+    override fun getDisplayHeight(): Int {
+        return 85
+    }
 
     public override fun addWidgets(widgets: WidgetHolder) {
         widgets.addTexture(
@@ -40,26 +49,41 @@ class EmiGraphCraftingRecipe(
             this.displayWidth,
             this.displayHeight, 128, 128
         )
-        widgets.addSlot(blockInput, 11, 34).drawBack(false).customBackground(null, 0, 0, 19, 19)
 
-        widgets.add(TheCoolerSlotWidget(villagerInput, 37, 19, 2.75f).useOffset(false).customShift(-8.5f, 2.485f))
-            .drawBack(false).customBackground(null, 0, 0, 27, 49)
+        // arbitrary placeholders based on code from hexmod, I'm not sure how to best approach the issue here
+        // because I have no clue how to use emi
+        /*
+        inputs.forEachIndexed { index, ingredient ->
+            val x = 11 + (index % 3) * 20
+            val y = 34 + (index / 3) * 20
 
-        widgets.addSlot(output, 86, 34).drawBack(false).large(true).recipeContext(this)
+            widgets.addSlot(ingredient, x, y)
+                .drawBack(false)
+                .customBackground(null, 0, 0, 19, 19)
+        }
+        */
+
+        val centerX = 69
+        val centerY = 69
+        val radius = 69f
+
+        inputEntities.forEachIndexed { index, entity ->
+            val angle = (Math.PI * 2 * index / inputEntities.size) - Math.PI / 2
+
+            val x = centerX + (kotlin.math.cos(angle) * radius).toInt()
+            val y = centerY + (kotlin.math.sin(angle) * radius).toInt()
+
+            widgets.add(
+                TheCoolerSlotWidget(entity, x, y, 2.5f)
+                    .useOffset(false)
+                    .customShift(-2.5f, 2.5f)
+            )
+                .drawBack(false)
+                .customBackground(null, 0, 0, 69, 69)
+        }
+
+        widgets.addSlot(itemOuput, 86, 34).drawBack(false).large(true).recipeContext(this)
             .customBackground(null, 0, 0, 19, 19)
-    }
-
-    val blockInput: EmiIngredient?
-    val villagerInput: EmiIngredient?
-    val output: EmiStack?
-
-    val id: ResourceLocation?
-
-    init {
-        this.blockInput = blockInput
-        this.villagerInput = villagerInput
-        this.output = output
-        this.id = id
     }
 
     companion object {

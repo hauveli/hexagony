@@ -1,0 +1,8 @@
+{
+  "comparator_output": 6,
+  "description": {
+    "translate": "jukebox_song.hexagony.selulance.night_coding"
+  },
+  "length_in_seconds": 220,
+  "sound_event": "hexagony:music_disc/selulance/night_coding"
+}

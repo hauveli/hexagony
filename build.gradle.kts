@@ -158,6 +158,10 @@ cloche {
                 value = "hauveli.hexagony.datagen.FabricHexagonyDatagen"
                 adapter = "kotlin"
             }
+            entrypoint("emi") {
+                value = "hauveli.hexagony.interop.HexagonyEMIPlugin"
+                adapter = "kotlin"
+            }
             dependencies {
                 dependency {
                     modId = "owo"
@@ -215,6 +219,8 @@ cloche {
                 }
             }
         }
+
+
 
         runs {
             client() // { jvmArguments.add("-XX:+AllowEnhancedClassRedefinition") }

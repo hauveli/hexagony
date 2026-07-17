@@ -8,5 +8,13 @@
         "attenuation_distance": 64
       }
     ]
+  },
+  "music_disc/selulance/night_coding": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/night_coding",
+        "stream": true
+      }
+    ]
   }
 }

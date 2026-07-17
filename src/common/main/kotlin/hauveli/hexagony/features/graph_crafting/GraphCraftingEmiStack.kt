@@ -5,23 +5,33 @@ import at.petrak.hexcasting.client.ClientTickCounter
 import at.petrak.hexcasting.client.render.renderEntity
 import at.petrak.hexcasting.common.recipe.ingredient.brainsweep.BrainsweepeeIngredient
 import com.mojang.blaze3d.systems.RenderSystem
+import dev.emi.emi.api.stack.EmiIngredient
 import dev.emi.emi.api.stack.EmiStack
+import hauveli.hexagony.Hexagony
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.core.Registry
+import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.item.ItemEntity
 import java.util.stream.Collectors
 
-class GraphCraftingEmiStack(val ingredient: BrainsweepeeIngredient) : EmiStack() {
+class GraphCraftingEmiStack(
+    val ingredient: GraphCraftingRecipeStuff.ItemNodeVanilla
+) : EmiStack() {
     private val id: ResourceLocation?
 
     init {
-        val bareId = this.ingredient.getSomeKindOfReasonableIDForEmi()
+        val bareId = this.ingredient.validIngredients.first().descriptionId
         this.id = HexAPI.modLoc(bareId)
     }
 
@@ -31,6 +41,10 @@ class GraphCraftingEmiStack(val ingredient: BrainsweepeeIngredient) : EmiStack()
 
     override fun isEmpty(): Boolean {
         return false
+    }
+
+    override fun getComponentChanges(): DataComponentPatch? {
+        TODO("Not yet implemented")
     }
 
     val nbt: CompoundTag?
@@ -44,22 +58,24 @@ class GraphCraftingEmiStack(val ingredient: BrainsweepeeIngredient) : EmiStack()
         return id
     }
 
-    override fun getTooltipText(): MutableList<Component?>? {
+    override fun getTooltipText(): MutableList<Component?> {
         val mc = Minecraft.getInstance()
         val advanced = mc.options.advancedItemTooltips
 
-        return ingredient.getTooltip(advanced)
+        // return ingredient.getTooltip(advanced)
+        return mutableListOf(ingredient.validIngredients.first().displayName)
     }
+
 
     override fun getTooltip(): MutableList<ClientTooltipComponent?> {
         return getTooltipText()!!.stream()
-            .map<FormattedCharSequence?> { obj: Component? -> obj!!.getVisualOrderText() }
-            .map<ClientTooltipComponent?> { `$$0`: FormattedCharSequence? -> ClientTooltipComponent.create(`$$0`) }
+            .map{ obj: Component? -> obj!!.visualOrderText }
+            .map{ fcs: FormattedCharSequence -> ClientTooltipComponent.create(fcs) }
             .collect(Collectors.toList())
     }
 
-    override fun getName(): Component? {
-        return ingredient.getName()
+    override fun getName(): Component {
+        return ingredient.validIngredients.first().displayName
     }
 
     override fun render(graphics: GuiGraphics?, x: Int, y: Int, delta: Float, flags: Int) {
@@ -67,13 +83,23 @@ class GraphCraftingEmiStack(val ingredient: BrainsweepeeIngredient) : EmiStack()
             val mc = Minecraft.getInstance()
             val level = mc.level
             if (level != null) {
-                val examples = this.ingredient.exampleEntities(level)
-                var example: Entity? = null
+
+                // can cycle validIngredients by re-using this approach, I think?
+                val examples = ingredient.validIngredients
+                var example: Entity? = BuiltInRegistries.ENTITY_TYPE.get(Registries.ITEM.registry()).create(level)
                 if (!examples.isEmpty()) {
                     val seconds = System.currentTimeMillis() / 1000
-                    example = examples.get((seconds % examples.size).toInt())
+                    if (example is ItemEntity) {
+                        example.item = examples[(seconds % examples.size).toInt()]
+                        Hexagony.LOGGER.info("wo: {}", example)
+                    } else {
+                        Hexagony.LOGGER.info("not an item entity?")
+                    }
                 }
 
+                Hexagony.LOGGER.info("dang: {}", example)
+                if (example is ItemEntity)
+                    Hexagony.LOGGER.info("dang2222: {}", example.item)
                 RenderSystem.enableBlend()
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
                 renderEntity(
