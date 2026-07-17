@@ -10,8 +10,8 @@ import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
-import hauveli.hexagony.features.graph_crafting.GraphCrafting
-import hauveli.hexagony.features.graph_crafting.GraphCraftingFromNormalRecipes
+import hauveli.hexagony.features.graph_crafting.GraphCraftingInTheWorld
+import hauveli.hexagony.features.graph_crafting.GraphCraftingRecipeStuff
 import hauveli.hexagony.registry.HexagonyAdvancements
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
@@ -81,7 +81,7 @@ object OpCraft : SpellAction  {
         throw IllegalStateException()
     }
 
-    fun theatrics(itemEntities: List<ItemEntity>, recipe: Recipe<*>, worldGraph: GraphCrafting.ItemNode) {
+    fun theatrics(itemEntities: List<ItemEntity>, recipe: Recipe<*>, worldGraph: GraphCraftingInTheWorld.ItemNode) {
         val level = itemEntities[0].level() ?: return
         val toCreate = ItemEntity(
             level,
@@ -90,7 +90,7 @@ object OpCraft : SpellAction  {
             worldGraph.pos.z,
             recipe.getResultItem(level.registryAccess())
         )
-        GraphCrafting.subtract(worldGraph, recipe)
+        GraphCraftingInTheWorld.subtract(worldGraph, recipe)
 
         // val sortedByDistance = itemEntities.sortedBy { it.distanceToSqr(worldGraph.entity) }
 
@@ -113,7 +113,7 @@ object OpCraft : SpellAction  {
                 entity as? ItemEntity
             }
 
-            val match = GraphCraftingFromNormalRecipes.matchRecipe(itemEntities, orientation)
+            val match = GraphCraftingRecipeStuff.matchRecipe(itemEntities, orientation)
             val recipe = match.first
             val worldGraph = match.second
             val casterMaybePlayer = env.castingEntity
@@ -125,11 +125,11 @@ object OpCraft : SpellAction  {
                     casterMaybePlayer,
                     HexagonyAdvancements.GRAPHTING)
 
-                GraphCrafting.sprayAndPray(worldGraph)
+                GraphCraftingInTheWorld.sprayAndPray(worldGraph)
                 theatrics(itemEntities, recipe, worldGraph)
                 HexagonyAdvancements.tryGrantingAdvancement(env.castingEntity as ServerPlayer, HexagonyAdvancements.GRAPHTING)
             } else {
-                GraphCrafting.sprayAndPray(worldGraph)
+                GraphCraftingInTheWorld.sprayAndPray(worldGraph)
             }
 
         }

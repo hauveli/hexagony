@@ -2,12 +2,10 @@ package hauveli.hexagony
 
 import hauveli.hexagony.client.NeoForgeHexagonyClient
 import hauveli.hexagony.datagen.NeoForgeHexagonyDatagen
-import hauveli.hexagony.features.graph_crafting.GraphCraftingFromNormalRecipes
+import hauveli.hexagony.features.graph_crafting.GraphCraftingRecipeStuff
 import net.neoforged.bus.api.IEventBus
-import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.ModContainer
 import net.neoforged.fml.ModList
-import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.common.NeoForge
 import net.neoforged.neoforge.event.server.ServerStartedEvent
@@ -26,7 +24,7 @@ class NeoForgeHexagony(modBus: IEventBus, container: ModContainer) {
     }
 
     fun onServerStarted(event: ServerStartedEvent) {
-        GraphCraftingFromNormalRecipes.init(event.server.allLevels.first())
+        GraphCraftingRecipeStuff.init(event.server.allLevels.first())
     }
 
 

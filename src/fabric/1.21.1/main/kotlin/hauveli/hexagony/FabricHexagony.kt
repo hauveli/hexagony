@@ -1,6 +1,6 @@
 package hauveli.hexagony
 
-import hauveli.hexagony.features.graph_crafting.GraphCraftingFromNormalRecipes
+import hauveli.hexagony.features.graph_crafting.GraphCraftingRecipeStuff
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.server.MinecraftServer
@@ -15,7 +15,7 @@ object FabricHexagony : ModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(
             ServerLifecycleEvents.ServerStarted {
                 server: MinecraftServer ->
-                GraphCraftingFromNormalRecipes.init(server.allLevels.first())
+                GraphCraftingRecipeStuff.init(server.allLevels.first())
             }
         )
     }

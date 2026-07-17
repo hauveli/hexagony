@@ -13,6 +13,6 @@ object HexagonyRecipeSerializers : HexagonyRegistrar<RecipeSerializer<*>>(
     { BuiltInRegistries.RECIPE_SERIALIZER },
 ) {
     val GRAPH_SERIALIZER = register(GRAPH_CRAFTING) {
-        GraphRecipe.Serializer()
+        GraphRecipe.Serializer
     }
 }

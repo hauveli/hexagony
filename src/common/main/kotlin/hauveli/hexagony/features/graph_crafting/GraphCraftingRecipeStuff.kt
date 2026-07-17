@@ -1,6 +1,6 @@
 package hauveli.hexagony.features.graph_crafting
 
-import hauveli.hexagony.features.graph_crafting.GraphCrafting.ItemNode
+import hauveli.hexagony.features.graph_crafting.GraphCraftingInTheWorld.ItemNode
 import hauveli.hexagony.registry.HexagonyRecipeTypes
 import net.minecraft.world.item.ItemStack
 import net.minecraft.server.level.ServerLevel
@@ -21,7 +21,7 @@ import kotlin.math.pow
     instead, I think just using distance-based nodes is easier to code, so I'm doing that.
     Bonus feature: it's also easily made n-dimensional, if minecraft ever adds higher dimensions!
  */
-object GraphCraftingFromNormalRecipes {
+object GraphCraftingRecipeStuff {
     // recipes here is what matters, and init
     lateinit var graphRecipes: MutableList<Pair<Recipe<*>, ItemNodeVanilla>>
     lateinit var shapedRecipes: MutableList<Pair<Recipe<*>, ItemNodeVanilla>>
@@ -425,7 +425,7 @@ object GraphCraftingFromNormalRecipes {
     }
 
     fun matchRecipe(entities: List<ItemEntity>, orientation: Vec3): Pair<Recipe<*>?,ItemNode> {
-        val worldGraph = GraphCrafting.buildGraph(entities)
+        val worldGraph = GraphCraftingInTheWorld.buildGraph(entities)
         var minimumDistance = Double.MAX_VALUE
         var bestMatch: Recipe<*>? = null
         // if the shapeless recipe matches, don't need to check the shaped one?

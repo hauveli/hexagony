@@ -18,7 +18,7 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 
-object GraphCrafting {
+object GraphCraftingInTheWorld {
 
     class ItemNode(
         val entity: ItemEntity,
