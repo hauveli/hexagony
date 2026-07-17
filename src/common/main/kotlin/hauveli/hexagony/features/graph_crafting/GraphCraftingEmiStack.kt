@@ -19,6 +19,7 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.EntityTypeTags
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
@@ -86,20 +87,13 @@ class GraphCraftingEmiStack(
 
                 // can cycle validIngredients by re-using this approach, I think?
                 val examples = ingredient.validIngredients
-                var example: Entity? = BuiltInRegistries.ENTITY_TYPE.get(Registries.ITEM.registry()).create(level)
+                var example: Entity? = EntityType.ITEM.create(level)
                 if (!examples.isEmpty()) {
                     val seconds = System.currentTimeMillis() / 1000
                     if (example is ItemEntity) {
                         example.item = examples[(seconds % examples.size).toInt()]
-                        Hexagony.LOGGER.info("wo: {}", example)
-                    } else {
-                        Hexagony.LOGGER.info("not an item entity?")
                     }
                 }
-
-                Hexagony.LOGGER.info("dang: {}", example)
-                if (example is ItemEntity)
-                    Hexagony.LOGGER.info("dang2222: {}", example.item)
                 RenderSystem.enableBlend()
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f)
                 renderEntity(
