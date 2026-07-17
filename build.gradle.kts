@@ -47,6 +47,8 @@ repositories {
 
     // Mod Menu
     maven("https://maven.terraformersmc.com/releases")
+    // temporarily switched to this because of also experiencing intermittent failure, (thank you hexmod!)
+    // maven("https://maven.gnomecraft.net/releases")
 
     // Forgified Fabric Api
     maven("https://maven.su5ed.dev/releases")

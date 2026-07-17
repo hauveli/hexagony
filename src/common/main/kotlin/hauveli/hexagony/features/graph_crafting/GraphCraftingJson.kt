@@ -229,6 +229,7 @@ object GraphCraftingJson {
         makePartitions(centerNode)
         // this is such a bad solution....
 
+        // the resourceLocation is unused but if I put this here maybe one day I will remember to figure it out
         return GraphRecipe(
             id = Hexagony.id("graph_temp_".plus(jsonRoot.hashCode()).plus(resultId.path)),
             centerNode = centerNode,
