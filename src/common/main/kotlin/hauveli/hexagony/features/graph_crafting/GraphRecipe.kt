@@ -126,7 +126,9 @@ class GraphRecipe(
             centerNode = GraphCraftingRecipeStuff.ItemNodeVanilla(
                 arrayOf(),
                 Vec3.ZERO,
-                shaped = false),
+                shaped = false,
+                replacedBy = null
+            ),
             result = ItemStack.EMPTY,
             resultInner = ItemStack.EMPTY
         )

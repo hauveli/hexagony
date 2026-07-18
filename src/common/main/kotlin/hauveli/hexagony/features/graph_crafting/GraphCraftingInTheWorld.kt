@@ -1,13 +1,14 @@
 package hauveli.hexagony.features.graph_crafting
 
+import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.pigment.FrozenPigment
 import at.petrak.hexcasting.client.ClientTickCounter
 import at.petrak.hexcasting.common.particles.ConjureParticleOptions
-import at.petrak.hexcasting.xplat.IXplatAbstractions
-import net.minecraft.core.particles.ParticleOptions
-import net.minecraft.core.particles.ParticleType
-import net.minecraft.core.particles.ParticleTypes
+import hauveli.hexagony.registry.HexagonyAdvancements
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.BucketItem
 import net.minecraft.world.item.ItemStack
@@ -34,6 +35,7 @@ object GraphCraftingInTheWorld {
         val nodeList: MutableList<ItemNode> = mutableListOf(),
         val partitions: MutableList<Set<ItemNode>> = mutableListOf(),
         val matchingPartitions: MutableList<Set<ItemNode>> = mutableListOf(),
+        var replacedBy: ItemStack? = null
     )
 
     fun distanceSquared(a: Vec3, b: Vec3): Double {
@@ -177,6 +179,8 @@ object GraphCraftingInTheWorld {
                 item == Items.DRAGON_BREATH
     }
 
+    // remove this once I implement replaceBy?
+    // should only apply to default recipes though, which are shaped/shapeless... so maybe not?
     fun getEmptyFluidContainer(itemStack: ItemStack): ItemStack {
         val item = itemStack.item
         when (item) {
@@ -240,10 +244,8 @@ object GraphCraftingInTheWorld {
         subtractThisSetsItems(worldItemNode.nodeList.toSet(), level)
     }
 
+    // todo: make this only run client-side?
     fun sprayAndPray(node: ItemNode, frozenPigment: FrozenPigment) {
-        val out = frozenPigment.colorProvider.getColor(
-            ClientTickCounter.getTotal() / 2f,
-            node.pos)
         val level = node.entity.level() as ServerLevel
         drawBall(level, node.pos, 0.5, frozenPigment)
         for (node in node.nodeList) {
@@ -330,6 +332,76 @@ object GraphCraftingInTheWorld {
                 0.0  // speed
             );
         }
+    }
+
+    fun summonItemEntityAtItemEntity(itemEntity: ItemEntity,
+                                     recipe: Recipe<*>) {
+        val level = itemEntity.level() ?: return
+        val toCreate = ItemEntity(
+            level,
+            itemEntity.position().x,
+            itemEntity.position().y,
+            itemEntity.position().z,
+            recipe.getResultItem(level.registryAccess())
+        )
+        toCreate.setPickUpDelay(10) // 10 is delay of naturally dropped items
+        toCreate.level().addFreshEntity(toCreate)
+    }
+
+    fun createReplacements(worldItemNode: ItemNode, recipe: Recipe<*>) {
+        if (recipe is GraphRecipe) {
+            for (itemNode in worldItemNode.nodeList) {
+                if (itemNode.replacedBy != null) {
+                    summonItemEntityAtItemEntity(itemNode.entity, recipe)
+                }
+            }
+        }
+    }
+
+    fun playChimeOnCenterItem(targetedCenterItemEntity: ItemEntity) {
+        val level = targetedCenterItemEntity.level() ?: return
+
+        level.playSound(
+            null, // all nearby players?
+            targetedCenterItemEntity.blockPosition(),
+            SoundEvents.AMETHYST_BLOCK_CHIME,
+            SoundSource.BLOCKS,
+            1.0f,
+            1.0f
+        )
+    }
+
+    fun craftTheGraphForReal(
+        worldGraph: ItemNode,
+        recipe: Recipe<*>
+    ) {
+        summonItemEntityAtItemEntity(worldGraph.entity, recipe) // summon the main result item
+        createReplacements(worldGraph, recipe)
+        subtract(worldGraph, recipe)
+    }
+
+    fun attemptToCraftTheGraph(
+        itemEntities: List<ItemEntity>, orientation: Vec3,
+        env: CastingEnvironment,
+        playSoundOnSuccess: Boolean
+    ): Boolean {
+        val match = GraphCraftingRecipeStuff.matchRecipe(itemEntities, orientation)
+        val recipe = match.first
+        val worldGraph = match.second
+        val casterMaybePlayer = env.castingEntity
+        if (recipe != null) {
+            if (casterMaybePlayer is ServerPlayer)
+                HexagonyAdvancements.tryGrantingAdvancement(
+                casterMaybePlayer,
+                HexagonyAdvancements.GRAPHTING)
+
+            craftTheGraphForReal(worldGraph, recipe)
+            if (playSoundOnSuccess)
+                playChimeOnCenterItem(worldGraph.entity)
+            return true
+        }
+        sprayAndPray(worldGraph, env.pigment)
+        return false
     }
 
     /*

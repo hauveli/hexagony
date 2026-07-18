@@ -10,11 +10,7 @@ import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
-import at.petrak.hexcasting.client.ClientTickCounter
-import at.petrak.hexcasting.xplat.IXplatAbstractions
-import hauveli.hexagony.features.graph_crafting.GraphCraftingInTheWorld
-import hauveli.hexagony.features.graph_crafting.GraphCraftingRecipeStuff
-import hauveli.hexagony.registry.HexagonyAdvancements
+import hauveli.hexagony.features.graph_crafting.GraphCraftingInTheWorld.attemptToCraftTheGraph
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -22,8 +18,6 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.item.ItemEntity
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.phys.Vec3
 
 // todo: decide if I'm satisfied with the visuals or not and remove comments if I am satisfied
@@ -83,57 +77,14 @@ object OpCraft : SpellAction  {
         throw IllegalStateException()
     }
 
-    fun theatrics(itemEntities: List<ItemEntity>, recipe: Recipe<*>, worldGraph: GraphCraftingInTheWorld.ItemNode) {
-        val level = itemEntities[0].level() ?: return
-        val toCreate = ItemEntity(
-            level,
-            worldGraph.pos.x,
-            worldGraph.pos.y,
-            worldGraph.pos.z,
-            recipe.getResultItem(level.registryAccess())
-        )
-        GraphCraftingInTheWorld.subtract(worldGraph, recipe)
-
-        // val sortedByDistance = itemEntities.sortedBy { it.distanceToSqr(worldGraph.entity) }
-
-        level.playSound(
-            null, // all nearby players?
-            worldGraph.entity.blockPosition(),
-            SoundEvents.AMETHYST_BLOCK_CHIME,
-            SoundSource.BLOCKS,
-            1.0f,
-            1.0f
-        )
-        toCreate.setPickUpDelay(10) // 10 is delay of naturally dropped items
-        toCreate.level().addFreshEntity(toCreate)
-    }
-
     private class Spell(private val entityList: List<Iota>, private val orientation: Vec3) : RenderedSpell {
         override fun cast(env: CastingEnvironment) {
             val itemEntities = entityList.mapNotNull { iota ->
                 val entity = (iota as? EntityIota)?.getEntity(env.world)
                 entity as? ItemEntity
             }
-
-            val match = GraphCraftingRecipeStuff.matchRecipe(itemEntities, orientation)
-            val recipe = match.first
-            val worldGraph = match.second
-            val casterMaybePlayer = env.castingEntity
-            if (recipe != null
-                && casterMaybePlayer is Player
-                && casterMaybePlayer is ServerPlayer) {
-                // it checks anyway so whatever
-                HexagonyAdvancements.tryGrantingAdvancement(
-                    casterMaybePlayer,
-                    HexagonyAdvancements.GRAPHTING)
-
-                GraphCraftingInTheWorld.sprayAndPray(worldGraph, env.pigment)
-                theatrics(itemEntities, recipe, worldGraph)
-                HexagonyAdvancements.tryGrantingAdvancement(env.castingEntity as ServerPlayer, HexagonyAdvancements.GRAPHTING)
-            } else {
-                GraphCraftingInTheWorld.sprayAndPray(worldGraph, env.pigment)
-            }
-
+            val playSoundOnSuccess = true
+            val craftSuccess = attemptToCraftTheGraph(itemEntities, orientation, env, playSoundOnSuccess)
         }
 
         override fun cast(env: CastingEnvironment, image: CastingImage): CastingImage? {

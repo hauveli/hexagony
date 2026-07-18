@@ -82,10 +82,9 @@ object GraphCraftingRecipeStuff {
         val nodeList: MutableList<ItemNodeVanilla> = mutableListOf(),
         val partitions: MutableList<Set<ItemNodeVanilla>> = mutableListOf(),
         var orientation: Vec3 = Vec3.ZERO,
-        val shaped: Boolean // I forget why I had this but I think I can remove it?
-    ) {
-
-    }
+        val shaped: Boolean, // I forget why I had this but I think I can remove it?
+        val replacedBy: ItemStack?
+    )
 
     fun differenceInOrientation(desiredOrientation: Vec3, recipeOrientation: Vec3): Double {
         return distanceSquared(desiredOrientation.normalize(), recipeOrientation.normalize())
@@ -208,7 +207,7 @@ object GraphCraftingRecipeStuff {
             // all valid ingredients
             val matchStack = ingredient.items
             val pos = Vec3(x.toDouble(), 0.0, 0.0) // I'm unsure if I prefer x 0 y or x y 0
-            nodes.add(ItemNodeVanilla(matchStack, pos, shaped=false))
+            nodes.add(ItemNodeVanilla(matchStack, pos, shaped=false, replacedBy = null))
         }
 
         // Now make the graph as before
@@ -250,7 +249,7 @@ object GraphCraftingRecipeStuff {
                 // all valid ingredients
                 val matchStack = ingredient.items
                 val pos = Vec3(x.toDouble(), y.toDouble(), 0.0) // I'm unsure if I prefer x 0 y or x y 0
-                nodes.add(ItemNodeVanilla(matchStack, pos, shaped=true))
+                nodes.add(ItemNodeVanilla(matchStack, pos, shaped=true, replacedBy = null))
             }
         }
 
@@ -338,6 +337,7 @@ object GraphCraftingRecipeStuff {
                 val nodeB: ItemNodeVanilla = iterator.next()
 
                 if (nodesAreEqual(nodeA, nodeB)) {
+                    nodeA.replacedBy = nodeB.replacedBy
                     iterator.remove()
                     matched = true
                     break

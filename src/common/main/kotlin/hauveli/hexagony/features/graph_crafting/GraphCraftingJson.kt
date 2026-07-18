@@ -78,6 +78,7 @@ object GraphCraftingJson {
         val center: Boolean? = null,
         val validIngredients: List<String>,
         val count: Int? = 1,
+        val replacedBy: String?,
         val relations: List<String>? = emptyList()
     ) {
         companion object {
@@ -93,14 +94,19 @@ object GraphCraftingJson {
                     Codec.INT.optionalFieldOf("count")
                         .forGetter { Optional.ofNullable(it.count) },
 
+                    Codec.STRING
+                        .optionalFieldOf("replacedBy")
+                        .forGetter{Optional.ofNullable(it.replacedBy)},
+
                     Codec.STRING.listOf()
                         .optionalFieldOf("relations")
                         .forGetter { Optional.ofNullable(it.relations) }
-                ).apply(instance) { center, ingredients, count, relations ->
+                ).apply(instance) { center, ingredients, count, replacedBy, relations ->
                     Node(
                         center.orElse(null),
                         ingredients,
                         count.orElse(null),
+                        replacedBy.orElse(null),
                         relations.orElse(null)
                     )
                 }
@@ -158,6 +164,11 @@ object GraphCraftingJson {
         return toStack(stack.item, stack.count ?: 1)
     }
 
+    fun replacedByFromNode(jsonNode: Node): ItemStack? {
+        if (jsonNode.replacedBy == null) return null
+        return toStack(jsonNode.replacedBy, 1) // i'm lazy but todo: add count to remainder?
+    }
+
     fun ingredientsFromNode(jsonNode: Node): Array<ItemStack> {
         val count = jsonNode.count ?: 1
         return jsonNode.validIngredients
@@ -169,7 +180,8 @@ object GraphCraftingJson {
         return ItemNodeVanilla(
             validIngredients = ingredientsFromNode(jsonNode),
             pos = Vec3.ZERO,
-            shaped = true
+            shaped = true,
+            replacedBy = replacedByFromNode(jsonNode)
         )
     }
 
@@ -225,6 +237,8 @@ object GraphCraftingJson {
         // I don't even need to read partitions this way...
         makePartitions(centerNode)
         // this is such a bad solution....
+
+        // todo: map each replaceBy item into an ItemNodeVanilla
 
         // the resourceLocation is unused but if I put this here maybe one day I will remember to figure it out
         return GraphRecipe(
