@@ -22,9 +22,6 @@ import kotlin.collections.iterator
 // todo: revisit this and for realsies implement a proper codec instead of the hackjob I chose
 // wip but also todo: properly implement CODEC so I can make an awesome JEI/EMI plugin that shows the crafts
 object GraphCraftingJson {
-
-
-
     data class Root(
         val graph: Graph
     ) {

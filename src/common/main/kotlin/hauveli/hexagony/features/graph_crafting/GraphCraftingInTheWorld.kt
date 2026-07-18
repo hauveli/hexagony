@@ -1,6 +1,11 @@
 package hauveli.hexagony.features.graph_crafting
 
+import at.petrak.hexcasting.api.pigment.FrozenPigment
+import at.petrak.hexcasting.client.ClientTickCounter
+import at.petrak.hexcasting.common.particles.ConjureParticleOptions
+import at.petrak.hexcasting.xplat.IXplatAbstractions
 import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.item.ItemEntity
@@ -235,14 +240,17 @@ object GraphCraftingInTheWorld {
         subtractThisSetsItems(worldItemNode.nodeList.toSet(), level)
     }
 
-    fun sprayAndPray(node: ItemNode) {
+    fun sprayAndPray(node: ItemNode, frozenPigment: FrozenPigment) {
+        val out = frozenPigment.colorProvider.getColor(
+            ClientTickCounter.getTotal() / 2f,
+            node.pos)
         val level = node.entity.level() as ServerLevel
-        drawBall(level, node.pos, 0.5)
+        drawBall(level, node.pos, 0.5, frozenPigment)
         for (node in node.nodeList) {
             for (neighbor in node.neighbors) {
                 // Actually? just blast it, if I draw a line between every possible neighbor, it won't miss any
                 // It should also respect partitioning because it partitions by neighborhood
-                drawLine(level, node.pos, neighbor.pos, ParticleTypes.END_ROD)
+                drawLine(level, node.pos, neighbor.pos, frozenPigment)
             }
         }
     }
@@ -256,7 +264,7 @@ object GraphCraftingInTheWorld {
             // Ok, I think the issue was here?
             val arbitraryOrigin = partition.first()
             for (node in arbitraryOrigin.neighbors) {
-                drawLine(level, arbitraryOrigin.pos, node.pos, ParticleTypes.END_ROD)
+                //drawLine(level, arbitraryOrigin.pos, node.pos, ParticleTypes.END_ROD)
             }
         }
     }
@@ -275,20 +283,24 @@ object GraphCraftingInTheWorld {
             val arbitraryOrigin = partition.first().pos
             for (node in partition) {
                 if (matched) {
-                    drawLine(level, arbitraryOrigin, node.pos, ParticleTypes.FLAME)
+                    //drawLine(level, arbitraryOrigin, node.pos, ParticleTypes.FLAME)
                 } else {
-                    drawLine(level, arbitraryOrigin, node.pos, ParticleTypes.END_ROD)
+                    //drawLine(level, arbitraryOrigin, node.pos, ConjureParticleOptions(1))
                 }
             }
         }
     }
 
-    fun drawBall(level: ServerLevel, origin: Vec3, radius: Double) {
+    // todo: replace with the hex builtin one?
+    fun drawBall(level: ServerLevel, origin: Vec3, radius: Double, frozenPigment: FrozenPigment) {
         val density = (10 * radius).toInt()
         for (i in 0..density) {
             val randomDirection = Vec3.directionFromRotation(Random.nextFloat(), Random.nextFloat()).scale(radius)
+            val out = frozenPigment.colorProvider.getColor(
+                ClientTickCounter.getTotal() / 2f,
+                randomDirection)
             level.sendParticles(
-                ParticleTypes.SOUL_FIRE_FLAME,
+                ConjureParticleOptions(out),
                 origin.x, origin.y, origin.z,
                 3,   // count
                 randomDirection.x, randomDirection.y, randomDirection.z,
@@ -297,7 +309,7 @@ object GraphCraftingInTheWorld {
         }
     }
 
-    fun drawLine(level: ServerLevel, start: Vec3, end: Vec3, particleType: ParticleOptions) {
+    fun drawLine(level: ServerLevel, start: Vec3, end: Vec3, frozenPigment: FrozenPigment) {
         val steps = (start.distanceTo(end) * 3).roundToInt()
 
         for (i in 0..steps) {
@@ -307,8 +319,11 @@ object GraphCraftingInTheWorld {
             val y = start.y + (end.y - start.y) * t
             val z = start.z + (end.z - start.z) * t
 
+            val out = frozenPigment.colorProvider.getColor(
+                ClientTickCounter.getTotal() / 2f,
+                Vec3(x,y,z))
             level.sendParticles(
-                particleType,
+                ConjureParticleOptions(out),
                 x, y, z,
                 1,   // count
                 (0.5-Random.nextDouble())*0.1, (0.5-Random.nextDouble())*0.1, (0.5-Random.nextDouble())*0.1,

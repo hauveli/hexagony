@@ -10,6 +10,10 @@ macros:
   $(orders): bids
   $(Order): Bid
   $(Orders): Bids
+emi:
+  category:
+    hexagony:
+      craft: Graph Crafting
 advancement:
   hexagony:
     graft_attempted:

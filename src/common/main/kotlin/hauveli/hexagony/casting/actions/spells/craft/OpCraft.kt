@@ -10,6 +10,8 @@ import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
+import at.petrak.hexcasting.client.ClientTickCounter
+import at.petrak.hexcasting.xplat.IXplatAbstractions
 import hauveli.hexagony.features.graph_crafting.GraphCraftingInTheWorld
 import hauveli.hexagony.features.graph_crafting.GraphCraftingRecipeStuff
 import hauveli.hexagony.registry.HexagonyAdvancements
@@ -125,11 +127,11 @@ object OpCraft : SpellAction  {
                     casterMaybePlayer,
                     HexagonyAdvancements.GRAPHTING)
 
-                GraphCraftingInTheWorld.sprayAndPray(worldGraph)
+                GraphCraftingInTheWorld.sprayAndPray(worldGraph, env.pigment)
                 theatrics(itemEntities, recipe, worldGraph)
                 HexagonyAdvancements.tryGrantingAdvancement(env.castingEntity as ServerPlayer, HexagonyAdvancements.GRAPHTING)
             } else {
-                GraphCraftingInTheWorld.sprayAndPray(worldGraph)
+                GraphCraftingInTheWorld.sprayAndPray(worldGraph, env.pigment)
             }
 
         }

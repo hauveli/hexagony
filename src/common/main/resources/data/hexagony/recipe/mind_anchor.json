@@ -6,6 +6,7 @@
         "1": {
           "center":  true,
           "validIngredients": [ "minecraft:diamond" ],
+          "replacedBy": "minecraft:stone",
           "count": 1,
           "relations": ["BANANA", "3"]
         },
@@ -31,14 +32,6 @@
     "result": {
       "item": "hexagony:mind_anchor/empty",
       "count": 1
-    },
-    "remainingItems": {
-      "somePartitionName": {
-        "1": {
-          "item": "minecraft:stone",
-          "count": 1
-        }
-      }
     }
   }
 }
