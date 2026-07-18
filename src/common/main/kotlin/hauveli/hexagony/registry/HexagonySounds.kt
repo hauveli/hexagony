@@ -3,6 +3,7 @@ package hauveli.hexagony.registry
 import at.petrak.hexcasting.common.lib.HexAttributes
 import hauveli.hexagony.Hexagony
 import hauveli.hexagony.features.freecam.FreeCameraMobEffect
+import net.minecraft.client.resources.sounds.Sound
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
@@ -29,21 +30,35 @@ object HexagonySounds : HexagonyRegistrar<SoundEvent>(
         SoundEvent.createVariableRangeEvent(Hexagony.id("freecam.bounce"))
     }
 
-    val MUSIC_DISC_SELULANCE_NIGHT_CODING = makeMusicDisc("music_disc/selulance/night_coding") {
-        SoundEvent.createVariableRangeEvent(Hexagony.id("music_disc/selulance/night_coding"))
-    }
+    val MUSIC_DISC_SELULANCE_NIGHT_CODING = makeMusicDisc("music_disc/selulance/night_coding")
+
+    val MUSIC_DISC_ALBUM_SELULANCE_FRACTAL_FOREST = makeMusicDiscAlbum("selulance", "fractal_forest", listOf(
+        "c4", "descention", "eko", "north", "very_eight", "step_down", "fractal_forest_part_one", "fractal_forest_part_two",
+        "sender", "safehouse", "seven"
+    ))
 
     private fun <T : SoundEvent> make(name: String, builder: () -> T): HexagonyRegistrar<SoundEvent>.Entry<T> =
         register(Hexagony.id(name), builder)
 
-    private fun <T : SoundEvent> makeMusicDisc(name: String, builder: () -> T): MusicDiscEntry<T> {
+    private fun makeMusicDisc(name: String): MusicDiscEntry<SoundEvent> {
         val jukeboxSong = ResourceKey.create(
             Registries.JUKEBOX_SONG,
             Hexagony.id(name)
         )
-        val soundEvent = make(name, builder)
+        val soundEvent = make(name) {
+            SoundEvent.createVariableRangeEvent(Hexagony.id(name))
+        }
         return MusicDiscEntry(soundEvent, jukeboxSong)
     }
 
-
+    private fun makeMusicDiscAlbum(artist: String, album: String, tracks: List<String>): List<MusicDiscEntry<SoundEvent>> {
+        val mutableList = mutableListOf<MusicDiscEntry<SoundEvent>>()
+        for (track in tracks) {
+            val currentTrack = "music_disc/${artist}/${album}/${track}"
+            mutableList.addLast(
+                makeMusicDisc(currentTrack)
+            )
+        }
+        return mutableList.toList()
+    }
 }

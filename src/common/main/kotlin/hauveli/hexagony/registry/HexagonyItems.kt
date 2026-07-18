@@ -2,11 +2,15 @@ package hauveli.hexagony.registry
 
 import hauveli.hexagony.Hexagony
 import hauveli.hexagony.features.mind_anchor.item.ItemMindAnchor
+import hauveli.hexagony.registry.HexagonySounds.MUSIC_DISC_ALBUM_SELULANCE_FRACTAL_FOREST
+import hauveli.hexagony.registry.HexagonySounds.MusicDiscEntry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Item
 import net.minecraft.core.Registry
+import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.item.JukeboxSong
 import net.minecraft.world.item.Rarity
 
@@ -47,6 +51,20 @@ object HexagonyItems : HexagonyRegistrar<Item>(
         musicDiscItem(HexagonySounds.MUSIC_DISC_SELULANCE_NIGHT_CODING.jukeboxSong)
     }
 
+    val ALBUM_FRACTAL_FOREST = makeMusicDiscAlbum(MUSIC_DISC_ALBUM_SELULANCE_FRACTAL_FOREST)
+
     private fun <T : Item> make(name: String, builder: () -> T): HexagonyRegistrar<Item>.Entry<T> =
         register(Hexagony.id(name), builder)
+
+    private fun makeMusicDiscAlbum(album: List<MusicDiscEntry<SoundEvent>>): List<HexagonyRegistrar<Item>.Entry<Item>> {
+        val mutableList = mutableListOf<HexagonyRegistrar<Item>.Entry<Item>>()
+        for (track in album) {
+            mutableList.addLast(
+                make(track.soundEvent.id.path) {
+                    musicDiscItem(track.jukeboxSong)
+                }
+            )
+        }
+        return mutableList.toList()
+    }
 }

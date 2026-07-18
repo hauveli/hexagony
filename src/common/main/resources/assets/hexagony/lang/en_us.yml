@@ -49,6 +49,19 @@ advancement:
     mind_alive_body_revived:
       title: Life insurance
       desc: Commandeer a homunculus while your body is dead.
+jukebox_song:
+  hexagony:
+    selulance:
+      night_coding: Selulance - Night Coding
+      fractal_forest:
+        c4: Selulance - Fractal Forest - C4
+item:
+  hexagony:
+    music_disc:
+      selulance:
+        night_coding: Music Disc
+        fractal_forest:
+          c4: Music Disc
 block:
   hexagony:
     mind_anchor:
@@ -112,7 +125,6 @@ hexagony:
         '0': They appear like me, but their demeanor does not match. Familiarly, this--dare I say--creature, is distinctly unhuman. And yet, I can communicate with it; It's as if someone's cauterized all its inputs, save the signal to start its work. $(br2)And so that signal is what I shall give it. The following pages will refer to them as Bids. Most cost a tenth of a dust.
         '1': Yippee sample text example bla bla bla
     patterns:
-
       spells:
         bilocation_spells:
           '': Bilocation Spells

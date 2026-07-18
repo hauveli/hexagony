@@ -337,12 +337,19 @@ object GraphCraftingInTheWorld {
     fun summonItemEntityAtItemEntity(itemEntity: ItemEntity,
                                      recipe: Recipe<*>) {
         val level = itemEntity.level() ?: return
+        summonItemEntityAtItemEntity(itemEntity, recipe.getResultItem(level.registryAccess()))
+    }
+
+
+    fun summonItemEntityAtItemEntity(itemEntity: ItemEntity,
+                                     itemStack: ItemStack) {
+        val level = itemEntity.level() ?: return
         val toCreate = ItemEntity(
             level,
             itemEntity.position().x,
             itemEntity.position().y,
             itemEntity.position().z,
-            recipe.getResultItem(level.registryAccess())
+            itemStack
         )
         toCreate.setPickUpDelay(10) // 10 is delay of naturally dropped items
         toCreate.level().addFreshEntity(toCreate)
@@ -352,7 +359,7 @@ object GraphCraftingInTheWorld {
         if (recipe is GraphRecipe) {
             for (itemNode in worldItemNode.nodeList) {
                 if (itemNode.replacedBy != null) {
-                    summonItemEntityAtItemEntity(itemNode.entity, recipe)
+                    summonItemEntityAtItemEntity(itemNode.entity, itemNode.replacedBy!!)
                 }
             }
         }
@@ -389,6 +396,7 @@ object GraphCraftingInTheWorld {
         val recipe = match.first
         val worldGraph = match.second
         val casterMaybePlayer = env.castingEntity
+        sprayAndPray(worldGraph, env.pigment)
         if (recipe != null) {
             if (casterMaybePlayer is ServerPlayer)
                 HexagonyAdvancements.tryGrantingAdvancement(
@@ -400,7 +408,6 @@ object GraphCraftingInTheWorld {
                 playChimeOnCenterItem(worldGraph.entity)
             return true
         }
-        sprayAndPray(worldGraph, env.pigment)
         return false
     }
 

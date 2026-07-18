@@ -16,5 +16,13 @@
         "stream": true
       }
     ]
+  },
+  "music_disc/selulance/fractal_forest/c4": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/c4",
+        "stream": true
+      }
+    ]
   }
 }

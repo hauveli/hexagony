@@ -177,6 +177,7 @@ object GraphCraftingJson {
     }
 
     fun jsonNodeToItemNode(jsonNode: Node): ItemNodeVanilla {
+        Hexagony.LOGGER.info("thing;: {}", replacedByFromNode(jsonNode))
         return ItemNodeVanilla(
             validIngredients = ingredientsFromNode(jsonNode),
             pos = Vec3.ZERO,
