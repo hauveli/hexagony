@@ -62,7 +62,7 @@ object SpringyBoingBoing {
                 pos = Vec3(
                     INITIAL_RADIUS * sin(phi) * cos(theta),
                     INITIAL_RADIUS * cos(phi),
-                    INITIAL_RADIUS * sin(phi) * sin(theta)
+                    0.0 // INITIAL_RADIUS * sin(phi) * sin(theta)
                 )
             )
         }
