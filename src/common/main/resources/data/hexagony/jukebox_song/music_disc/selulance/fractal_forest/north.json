@@ -1,0 +1,8 @@
+{
+  "comparator_output": 5,
+  "description": {
+    "translate": "jukebox_song.hexagony.selulance.fractal_forest.north"
+  },
+  "length_in_seconds": 241,
+  "sound_event": "hexagony:music_disc/selulance/fractal_forest/north"
+}

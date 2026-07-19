@@ -1,0 +1,8 @@
+{
+  "comparator_output": 10,
+  "description": {
+    "translate": "jukebox_song.hexagony.selulance.fractal_forest.safehouse"
+  },
+  "length_in_seconds": 304,
+  "sound_event": "hexagony:music_disc/selulance/fractal_forest/safehouse"
+}

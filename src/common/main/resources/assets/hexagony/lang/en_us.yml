@@ -55,6 +55,16 @@ jukebox_song:
       night_coding: Selulance - Night Coding
       fractal_forest:
         c4: Selulance - Fractal Forest - C4
+        descention: Selulance - Fractal Forest - Descention
+        eko: Selulance - Fractal Forest - Eko
+        north: Selulance - Fractal Forest - North
+        very_eight: Selulance - Fractal Forest - Very Eight
+        step_down: Selulance - Fractal Forest - Step Down
+        fractal_forest_part_one: Selulance - Fractal Forest - Fractal Forest Part 1
+        fractal_forest_part_two: Selulance - Fractal Forest - Fractal Forest Part 1
+        sender: Selulance - Fractal Forest - Sender
+        safehouse: Selulance - Fractal Forest - Safehouse
+        seven: Selulance - Fractal Forest - Seven
 item:
   hexagony:
     music_disc:

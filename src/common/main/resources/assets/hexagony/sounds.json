@@ -24,5 +24,85 @@
         "stream": true
       }
     ]
+  },
+  "music_disc/selulance/fractal_forest/descention": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/descention",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc/selulance/fractal_forest/eko": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/eko",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc/selulance/fractal_forest/north": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/north",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc/selulance/fractal_forest/very_eight": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/very_eight",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc/selulance/fractal_forest/step_down": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/step_down",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc/selulance/fractal_forest/fractal_forest_part_one": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/fractal_forest_part_one",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc/selulance/fractal_forest/fractal_forest_part_two": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/fractal_forest_part_two",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc/selulance/fractal_forest/sender": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/sender",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc/selulance/fractal_forest/safehouse": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/safehouse",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc/selulance/fractal_forest/seven": {
+    "sounds": [
+      {
+        "name": "hexagony:music_disc/selulance/fractal_forest/seven",
+        "stream": true
+      }
+    ]
   }
 }

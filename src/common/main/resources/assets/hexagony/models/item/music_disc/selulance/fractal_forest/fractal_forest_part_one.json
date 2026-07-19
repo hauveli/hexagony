@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "hexagony:item/music_disc/selulance/fractal_forest/fractal_forest_part_one"
+  }
+}
