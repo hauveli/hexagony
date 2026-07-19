@@ -9,6 +9,7 @@ import at.petrak.hexcasting.server.ScrungledPatternsSave
 import hauveli.hexagony.Hexagony
 import hauveli.hexagony.networking.HexagonyNetworking.CHANNEL
 import hauveli.hexagony.networking.msg.PerWorldPatternPacketC2S
+import hauveli.hexagony.networking.msg.PerWorldPatternPacketS2C
 import hauveli.hexagony.registry.HexagonyAdvancements.hasHeldScroll
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
@@ -42,7 +43,7 @@ object ScrungledPatternSending {
                 HexActions.REGISTRY.getHolder(ResourceLocation.parse(resourceKey)).get().key()
             )
             if (perWorldPattern == null) return
-            clientRenderThisNow(resourceKey, perWorldPattern.first, perWorldPattern.second.canonicalStartDir().toString())
+            CHANNEL.serverHandle(serverPlayer).send(PerWorldPatternPacketS2C(resourceKey, perWorldPattern.first, perWorldPattern.second.canonicalStartDir().toString()))
         }
     }
 

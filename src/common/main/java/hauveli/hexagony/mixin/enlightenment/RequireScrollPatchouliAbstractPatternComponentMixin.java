@@ -3,6 +3,7 @@ package hauveli.hexagony.mixin.enlightenment;
 import at.petrak.hexcasting.api.casting.math.HexPattern;
 import at.petrak.hexcasting.interop.patchouli.AbstractPatternComponent;
 import at.petrak.hexcasting.interop.patchouli.LookupPatternComponent;
+import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.config.HexagonyCommonConfig;
 import hauveli.hexagony.config.HexagonyConfigs;
 import hauveli.hexagony.features.enlightenment.ScrungledPatternSending;
@@ -43,6 +44,7 @@ public abstract class RequireScrollPatchouliAbstractPatternComponentMixin {
             if (!key.equals(ScrungledPatternSending.currentKey)) {
                 if (key.equals(ScrungledPatternSending.previousKeyRequest)) return;
                 // request the thing to be rendered, try asking the server once
+                Hexagony.LOGGER.info("begging for: {}", key);
                 ScrungledPatternSending.fromClient(key);
             } else {
                 this.patterns = List.of(ScrungledPatternSending.currentHexPattern);
