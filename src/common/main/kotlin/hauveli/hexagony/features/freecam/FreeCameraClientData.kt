@@ -4,7 +4,6 @@ import at.petrak.hexcasting.api.HexAPI
 import at.petrak.hexcasting.api.casting.iota.Iota
 import hauveli.hexagony.networking.HexagonyNetworking.CHANNEL
 import hauveli.hexagony.networking.msg.FreeCamDataPacketC2S
-import hauveli.hexagony.networking.msg.PerWorldPatternPacketC2S
 import net.minecraft.world.entity.Entity
 
 

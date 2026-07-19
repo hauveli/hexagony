@@ -43,7 +43,10 @@ object ScrungledPatternSending {
                 HexActions.REGISTRY.getHolder(ResourceLocation.parse(resourceKey)).get().key()
             )
             if (perWorldPattern == null) return
-            CHANNEL.serverHandle(serverPlayer).send(PerWorldPatternPacketS2C(resourceKey, perWorldPattern.first, perWorldPattern.second.canonicalStartDir().toString()))
+            CHANNEL.serverHandle(serverPlayer).send(
+                PerWorldPatternPacketS2C(resourceKey,
+                    perWorldPattern.first,
+                    perWorldPattern.second.canonicalStartDir().toString()))
         }
     }
 

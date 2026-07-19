@@ -49,7 +49,11 @@ sealed interface HexagonyMessageCompanion<T> where T : HexagonyMessage, T : Reco
         }
     }
 
-    fun register(channel: OwoNetChannel) {
+    fun registerServerbound(channel: OwoNetChannel) {
         channel.registerServerbound(type) { msg, access -> apply(msg, access) }
+    }
+
+    fun registerClientbound(channel: OwoNetChannel) {
+        channel.registerClientbound(type) { msg, access -> apply(msg, access) }
     }
 }

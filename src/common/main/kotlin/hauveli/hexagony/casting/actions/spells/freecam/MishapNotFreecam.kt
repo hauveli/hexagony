@@ -18,7 +18,8 @@ class MishapNotFreecam : Mishap() {
         dyeColor(DyeColor.BLUE) // I think? I really can't quite figure out what to do with these
 
     override fun execute(env: CastingEnvironment, errorCtx: Context, stack: TreeList<Iota>): TreeList<Iota> {
-        stack.add(GarbageIota())
+        stack.appended(GarbageIota())
+        // stack.add(GarbageIota())
         /*
         val pat = errorCtx.pattern
         if (pat != null) {
