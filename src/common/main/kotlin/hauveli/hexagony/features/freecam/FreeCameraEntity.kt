@@ -5,7 +5,7 @@ import at.petrak.hexcasting.common.lib.HexAttributes
 import at.petrak.hexcasting.common.lib.HexSounds
 import com.mojang.authlib.GameProfile
 import hauveli.hexagony.Hexagony
-import hauveli.hexagony.Hexagony.MINECRAFT
+import hauveli.hexagony.client.HexagonyClient.MINECRAFT
 import hauveli.hexagony.Hexagony.id
 import hauveli.hexagony.registry.HexagonyMobEffects
 import hauveli.hexagony.registry.HexagonySounds

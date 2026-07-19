@@ -1,7 +1,7 @@
 package hauveli.hexagony.features.freecam
 
 import hauveli.hexagony.Hexagony
-import hauveli.hexagony.Hexagony.MINECRAFT
+import hauveli.hexagony.client.HexagonyClient.MINECRAFT
 import net.minecraft.client.renderer.PostChain
 import net.minecraft.resources.ResourceLocation
 import java.io.IOException

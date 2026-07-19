@@ -61,7 +61,7 @@ jukebox_song:
         very_eight: Selulance - Fractal Forest - Very Eight
         step_down: Selulance - Fractal Forest - Step Down
         fractal_forest_part_one: Selulance - Fractal Forest - Fractal Forest Part 1
-        fractal_forest_part_two: Selulance - Fractal Forest - Fractal Forest Part 1
+        fractal_forest_part_two: Selulance - Fractal Forest - Fractal Forest Part 2
         sender: Selulance - Fractal Forest - Sender
         safehouse: Selulance - Fractal Forest - Safehouse
         seven: Selulance - Fractal Forest - Seven
@@ -72,6 +72,16 @@ item:
         night_coding: Music Disc
         fractal_forest:
           c4: Music Disc
+          descention: Music Disc
+          eko: Music Disc
+          north: Music Disc
+          very_eight: Music Disc
+          step_down: Music Disc
+          fractal_forest_part_one: Music Disc
+          fractal_forest_part_two: Music Disc
+          sender: Music Disc
+          safehouse: Music Disc
+          seven: Music Disc
 block:
   hexagony:
     mind_anchor:

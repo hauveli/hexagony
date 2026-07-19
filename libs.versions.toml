@@ -23,7 +23,7 @@ neoforge = "21.1.233"
 
 # mods
 
-hexcasting        = "0.12.0-devel-pre-24"
+hexcasting        = "0.12.0-devel-pre-26"
 architectury      = "[13.0, 14.0["
 inline            = "1.21.1-1.2.2"
 caelus-neoforge   = "7.0.1+1.21.1"

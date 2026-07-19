@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static hauveli.hexagony.Hexagony.MINECRAFT;
+import static hauveli.hexagony.client.HexagonyClient.MINECRAFT;
 
 
 @Mixin(Camera.class)

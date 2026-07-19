@@ -16,10 +16,6 @@ object Hexagony {
     @JvmField
     val LOGGER: Logger = LogManager.getLogger(MODID)
 
-
-    @JvmField
-    val MINECRAFT: Minecraft? = Minecraft.getInstance()
-
     @JvmStatic
     fun id(path: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath(MODID, path)
 

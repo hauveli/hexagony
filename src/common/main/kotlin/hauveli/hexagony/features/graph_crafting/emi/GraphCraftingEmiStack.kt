@@ -5,7 +5,7 @@ import at.petrak.hexcasting.client.ClientTickCounter
 import at.petrak.hexcasting.client.render.renderEntity
 import com.mojang.blaze3d.systems.RenderSystem
 import dev.emi.emi.api.stack.EmiStack
-import hauveli.hexagony.Hexagony.MINECRAFT
+import hauveli.hexagony.client.HexagonyClient.MINECRAFT
 import hauveli.hexagony.features.graph_crafting.GraphCraftingRecipeStuff
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
