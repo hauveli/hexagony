@@ -5,6 +5,7 @@ import at.petrak.hexcasting.api.casting.mishaps.Mishap;
 import at.petrak.hexcasting.api.casting.mishaps.MishapInvalidPattern;
 import at.petrak.hexcasting.api.casting.mishaps.MishapUnenlightened;
 import at.petrak.hexcasting.api.casting.iota.Iota;
+import at.petrak.hexcasting.api.utils.TreeList;
 import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.config.HexagonyCommonConfig;
 import hauveli.hexagony.config.HexagonyConfigs;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
@@ -34,8 +36,10 @@ public class RequireScrollMishapUnenlightenedMixin {
     private void execute(
             CastingEnvironment env,
             Mishap.Context errorCtx,
-            List<Iota> iotaList, // if stack is empty and last iota is greater spell, then what? (I forget what I was yapping about but I think the concern is that this list may be empty somehow some way (not true?))
-            CallbackInfo ci) {
+            TreeList<Iota> iotaList,
+            CallbackInfoReturnable<TreeList<Iota>> cir
+            // if stack is empty and last iota is greater spell, then what? (I forget what I was yapping about but I think the concern is that this list may be empty somehow some way (not true?))
+    ) {
         HexagonyCommonConfig conf = HexagonyConfigs.INSTANCE.getCOMMON_CONFIG();
         // Hexagony.LOGGER.info(iotaList); // shows preceding iota (if any), but not the current one, which I need...
         if (!conf.getRequireScrollForEnlightenment().get()) return;
@@ -45,7 +49,7 @@ public class RequireScrollMishapUnenlightenedMixin {
             if (caster instanceof ServerPlayer player) {
                 if (hexagony$hasHeldScroll(player, errorCtx)) return;
                 // if we don't have what we need, cancel the enlightenment
-                ci.cancel();
+                cir.cancel();
                 throw new MishapInvalidPattern(errorCtx.getPattern());
             }
         } catch (Mishap mishap) {
