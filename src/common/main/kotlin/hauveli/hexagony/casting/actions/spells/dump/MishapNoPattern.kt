@@ -11,12 +11,13 @@ import net.minecraft.world.item.DyeColor
 
 import at.petrak.hexcasting.api.casting.iota.PatternIota
 import at.petrak.hexcasting.api.casting.math.HexPattern
+import at.petrak.hexcasting.api.utils.TreeList
 
 class MishapNoPattern : Mishap() {
     override fun accentColor(ctx: CastingEnvironment, errorCtx: Context): FrozenPigment =
         dyeColor(DyeColor.ORANGE)
 
-    override fun execute(env: CastingEnvironment, errorCtx: Context, stack: MutableList<Iota>) {
+    override fun execute(env: CastingEnvironment, errorCtx: Context, stack: TreeList<Iota>): TreeList<Iota> {
         stack.add(GarbageIota())
         /*
         val pat = errorCtx.pattern
@@ -24,6 +25,7 @@ class MishapNoPattern : Mishap() {
             stack.add(PatternIota(HexPattern.fromAngles(pat.anglesSignature(), pat.startDir)))
         }
         */
+        return stack
     }
 
     override fun errorMessage(ctx: CastingEnvironment, errorCtx: Context) =

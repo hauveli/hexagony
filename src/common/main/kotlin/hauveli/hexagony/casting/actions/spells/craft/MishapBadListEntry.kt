@@ -10,6 +10,7 @@ import at.petrak.hexcasting.api.casting.mishaps.MishapInvalidIota
 import at.petrak.hexcasting.api.casting.mishaps.MishapNotEnoughArgs
 import at.petrak.hexcasting.api.casting.mishaps.MishapUnescapedValue
 import at.petrak.hexcasting.api.pigment.FrozenPigment
+import at.petrak.hexcasting.api.utils.TreeList
 import at.petrak.hexcasting.api.utils.asTranslatedComponent
 import at.petrak.hexcasting.common.casting.arithmetic.operator.list.OperatorReplace
 import at.petrak.hexcasting.common.lib.hex.HexIotaTypes
@@ -35,7 +36,7 @@ class MishapBadListEntry(
     override fun accentColor(ctx: CastingEnvironment, errorCtx: Context): FrozenPigment =
         dyeColor(DyeColor.GRAY)
 
-    override fun execute(env: CastingEnvironment, errorCtx: Context, stack: MutableList<Iota>) {
+    override fun execute(env: CastingEnvironment, errorCtx: Context, stack: TreeList<Iota>): TreeList<Iota> {
         // todo: garbify the element in the list because it would be funny
         /*
         OperatorReplace.apply(
@@ -50,8 +51,9 @@ class MishapBadListEntry(
         tempList[index] = GarbageIota()
 
          */
-
+        // uhhhhhhhhhh todo: check if this does anything? MutableList was changed to TreeList, unsure if this still works...
         (badList as ListIota).list.minusElement(badList.list[perpetratorIndex])
+        return stack
     }
 
     override fun errorMessage(ctx: CastingEnvironment, errorCtx: Context): Component {
