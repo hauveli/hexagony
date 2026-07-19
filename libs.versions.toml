@@ -62,8 +62,8 @@ emi     = "1.1.24+1.21.1"
 
 [bundles]
 cardinalComponents = ["cardinalComponents-base", "cardinalComponents-entity", "cardinalComponents-item", "cardinalComponents-block"]
-hexcasting-fabric = ["hexcasting-fabric", "paucal-fabric", "patchouli-fabric", "clothConfig-fabric", "inline-fabric", "emi-fabric"] #, "accessories-fabric"]
-hexcasting-neoforge = ["hexcasting-neoforge", "paucal-neoforge", "patchouli-neoforge", "clothConfig-neoforge", "inline-neoforge", "caelus-neoforge", "emi-neoforge"] #, "accessories-neoforge"]
+hexcasting-fabric = ["hexcasting-fabric", "paucal-fabric", "patchouli-fabric", "clothConfig-fabric", "inline-fabric"] #, "accessories-fabric"]
+hexcasting-neoforge = ["hexcasting-neoforge", "paucal-neoforge", "patchouli-neoforge", "clothConfig-neoforge", "inline-neoforge", "caelus-neoforge"] #, "accessories-neoforge"]
 
 [libraries]
 kotlin-stdlib = { module="org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref="kotlin" }

@@ -139,6 +139,8 @@ cloche {
                 modImplementation(it)
             }
             modRuntimeOnly(libs.architectury.fabric)
+            modCompileOnlyApi(libs.emi.fabric)
+            modRuntimeOnly(libs.emi.fabric)
 
             modImplementation(libs.modMenu)
             modImplementation(libs.owoLib.fabric)
@@ -202,6 +204,8 @@ cloche {
                 modImplementation(it)
             }
             modRuntimeOnly(libs.architectury.neoforge)
+            modCompileOnlyApi(libs.emi.neoforge)
+            modRuntimeOnly(libs.emi.neoforge)
 
             modImplementation(libs.owoLib.neoforge)
             modImplementation(libs.fzzyConfig.neoforge)
