@@ -1,5 +1,6 @@
 package hauveli.hexagony.features.fake_player
 
+import net.minecraft.network.DisconnectionDetails
 import net.minecraft.network.PacketSendListener
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
@@ -10,8 +11,8 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.CommonListenerCookie
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 
-class DummyServerGamePacketListenerImpl(connection: DummyConnection, player: ServerPlayer
-) : ServerGamePacketListenerImpl(player.server, connection, player, CommonListenerCookie.createInitial(player.gameProfile, false)) {
+class DummyServerGamePacketListenerImpl(connection: DummyConnection, player: ServerPlayer, commonListenerCookie: CommonListenerCookie
+) : ServerGamePacketListenerImpl(player.server, connection, player, commonListenerCookie) {
 
     private var playerInfoSent = false
 
@@ -31,6 +32,10 @@ class DummyServerGamePacketListenerImpl(connection: DummyConnection, player: Ser
             playerInfoSent = true
         }
 
+    }
+
+    override fun disconnect(p0: DisconnectionDetails) {
+        super.disconnect(p0)
     }
 
     override fun disconnect(p0: Component) {

@@ -9,7 +9,10 @@ import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.PacketFlow
 
 class DummyConnection : Connection(PacketFlow.SERVERBOUND) {
-
+    // this is enough to make it work on fabric
+    override fun flushChannel() {
+        // super.flushChannel()
+    }
 
     override fun isConnected(): Boolean = true
     override fun disconnect(component: Component) {}

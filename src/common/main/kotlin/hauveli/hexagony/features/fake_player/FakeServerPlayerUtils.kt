@@ -34,7 +34,7 @@ object FakeServerPlayerUtils {
         val clone = FakeServerPlayer(level, uuid)
 
         val connection = DummyConnection()
-        val listener = DummyServerGamePacketListenerImpl(connection, clone)
+        // val listener = DummyServerGamePacketListenerImpl(connection, clone)
         // connection.setListenerForServerboundHandshake(listener)
         clone.server.playerList.placeNewPlayer(
             connection,
@@ -236,13 +236,15 @@ object FakeServerPlayerUtils {
 
     fun FakeServerPlayer.doFakeConnectionStuff() {
         val connection = DummyConnection()
-        val listener = DummyServerGamePacketListenerImpl(connection, this)
+        val cookie = CommonListenerCookie(this.gameProfile, 0, this.clientInformation(), false)
+        val listener = DummyServerGamePacketListenerImpl(connection, this, cookie)
         // connection.setListenerForServerboundHandshake(listener)
+        connection.setListenerForServerboundHandshake(listener)
 
         this.server.playerList.placeNewPlayer(
             connection,
             this,
-            CommonListenerCookie(this.gameProfile, 0, this.clientInformation(), false) // err...
+            cookie // err...
         )
         /*
         */
@@ -302,7 +304,7 @@ object FakeServerPlayerUtils {
 
     fun FakeServerPlayer.sendDisconnected() {
         val connection = DummyConnection()
-        val listener = DummyServerGamePacketListenerImpl(connection, this)
+        // val listener = DummyServerGamePacketListenerImpl(connection, this)
         // connection.setListenerForServerboundHandshake(listener)
         server.playerList.remove(
             this
