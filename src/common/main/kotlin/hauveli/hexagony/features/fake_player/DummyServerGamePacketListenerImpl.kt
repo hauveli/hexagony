@@ -1,15 +1,17 @@
 package hauveli.hexagony.features.fake_player
 
 import net.minecraft.network.PacketSendListener
+import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.network.CommonListenerCookie
 import net.minecraft.server.network.ServerGamePacketListenerImpl
 
-class DummyServerGamePacketListenerImpl(server: MinecraftServer, connection: DummyConnection, player: ServerPlayer
-) : ServerGamePacketListenerImpl(server, connection, player) {
+class DummyServerGamePacketListenerImpl(connection: DummyConnection, player: ServerPlayer
+) : ServerGamePacketListenerImpl(player.server, connection, player, CommonListenerCookie.createInitial(player.gameProfile, false)) {
 
     private var playerInfoSent = false
 
@@ -29,6 +31,10 @@ class DummyServerGamePacketListenerImpl(server: MinecraftServer, connection: Dum
             playerInfoSent = true
         }
 
+    }
+
+    override fun disconnect(p0: Component) {
+        super.disconnect(p0)
     }
 
     override fun send(packet: Packet<*>, listener: PacketSendListener?) {

@@ -19,7 +19,7 @@ object OpFreecamLookdir : ConstMediaAction {
     override val argc = 1
 
     override fun execute(args: List<Iota>, env: CastingEnvironment): List<Iota> {
-        val target = args.getEntity(env.castingEntity!!.level() as ServerLevel, 0, argc)
+        val target = args.getEntity(env.world, 0, argc)
         // Uhhhh I forget if ConstMediaAction does anything for me or not for Mishaps
         env.assertEntityInRange(target)
 

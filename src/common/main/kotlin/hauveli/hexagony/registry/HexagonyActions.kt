@@ -6,6 +6,7 @@ import at.petrak.hexcasting.api.casting.math.HexDir
 import at.petrak.hexcasting.api.casting.math.HexPattern
 import at.petrak.hexcasting.common.lib.HexRegistries
 import at.petrak.hexcasting.common.lib.hex.HexActions
+import hauveli.hexagony.casting.actions.spells.OpTest
 import hauveli.hexagony.casting.actions.spells.craft.OpCraft
 import hauveli.hexagony.casting.actions.spells.freecam.OpFreecam
 import hauveli.hexagony.casting.actions.spells.dump.OpDump
@@ -24,6 +25,8 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     val FREECAM = make("freecam", HexDir.SOUTH_WEST, "ewwawwqwwawwaeaqaaww", OpFreecam)
     val FREECAM_POS = make("freecam/pos", HexDir.WEST, "wwawwqwwawwawaa", OpFreecamPos)
     val FREECAM_LOOK = make("freecam/look", HexDir.WEST, "wwawwqwwawwawa", OpFreecamLookdir)
+
+    val CONGRATULATE = make("congratulate", HexDir.WEST, "eed", OpTest)
 
     // val CONGRATULATE = make("congratulate", HexDir.WEST, "eed", OpCongratulate)
 
