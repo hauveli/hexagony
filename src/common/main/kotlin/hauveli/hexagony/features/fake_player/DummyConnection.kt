@@ -1,5 +1,6 @@
 package hauveli.hexagony.features.fake_player
 
+import io.netty.channel.ChannelHandlerContext
 import net.minecraft.network.Connection
 import net.minecraft.network.PacketListener
 import net.minecraft.network.PacketSendListener
@@ -10,6 +11,7 @@ import net.minecraft.network.protocol.PacketFlow
 
 class DummyConnection : Connection(PacketFlow.SERVERBOUND) {
     // this is enough to make it work on fabric
+
     override fun flushChannel() {
         // super.flushChannel()
     }

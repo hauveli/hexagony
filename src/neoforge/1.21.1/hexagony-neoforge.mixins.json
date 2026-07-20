@@ -8,7 +8,7 @@
   ],
   "mixins": [
     "handholding.OnDpSyncNeoForgeEventHandlerMixin",
-    "handholding.HasChannelICommonPacketListenerMixin"
+    "handholding.HasChannelNetworkRegistryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
