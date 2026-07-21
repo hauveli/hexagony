@@ -55,7 +55,7 @@ object OpFreecam : SpellAction  {
                 // based on currently remaining media?
 
                 // I have no fucking idea how to make my registration thing return a holder but I'll figure that out later :clueless:
-                HexagonyMobEffects.FREECAM.value
+                // HexagonyMobEffects.FREECAM.value
                 val instance = MobEffectInstance(
                     HexagonyMobEffects.FREECAM.holder(),
                     duration.toInt(),

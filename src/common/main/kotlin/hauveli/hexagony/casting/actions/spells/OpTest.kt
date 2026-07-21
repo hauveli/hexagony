@@ -10,8 +10,10 @@ import at.petrak.hexcasting.api.misc.MediaConstants
 import at.petrak.hexcasting.api.utils.asTranslatedComponent
 import hauveli.hexagony.features.fake_player.FakeServerPlayer
 import hauveli.hexagony.features.fake_player.FakeServerPlayerUtils
+import hauveli.hexagony.registry.HexagonyMobEffects
 import net.minecraft.core.UUIDUtil
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import java.util.UUID
@@ -34,7 +36,19 @@ object OpTest : SpellAction {
         // IMPORTANT: do not throw mishaps in this method! mishaps should ONLY be thrown in SpellAction.execute
         override fun cast(env: CastingEnvironment) {
             env.printMessage("text.hexagony.congrats".asTranslatedComponent("STARTED"))
-            FakeServerPlayerUtils.spawnFakeClone(env.castingEntity!! as ServerPlayer, env.castingEntity!!.position(), UUID.randomUUID())
+            val clone = FakeServerPlayerUtils.spawnFakeClone(env.castingEntity!! as ServerPlayer, env.castingEntity!!.position(), UUID.randomUUID())
+            val instance = MobEffectInstance(
+                HexagonyMobEffects.WALK_FORWARD.holder(),
+                120,
+                1, // amplifier, I guess I could use strength 1 if mind anchor for jank checks? that seems silly though, but it would work...
+                false,  // ambient effect?
+                false,  // visible in inventory?
+                false // visible in top right corner?
+            )
+
+            clone.addEffect(
+                instance
+            )
             env.printMessage("text.hexagony.congrats".asTranslatedComponent("FINISHED"))
         }
     }
