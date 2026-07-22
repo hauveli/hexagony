@@ -70,6 +70,7 @@ object ControlHelperStuff {
 
     fun attack(player: ServerPlayer) {
         val hitResult = getPlayerTarget(player)
+        player.swing(player.usedItemHand) // swing no matter what
         when (hitResult.type) {
             HitResult.Type.MISS -> {return}
             HitResult.Type.ENTITY -> {
