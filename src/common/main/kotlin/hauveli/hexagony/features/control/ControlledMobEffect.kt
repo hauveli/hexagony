@@ -8,12 +8,18 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
+import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
 
 // https://docs.neoforged.net/docs/items/mobeffects/
-class ControlledMobEffect(private val actionTaken: ((LivingEntity) -> Unit), private val intervalInTicks: Int, category: MobEffectCategory, color: Int) : MobEffect(category, color) {
+class ControlledMobEffect(
+    private val actionTaken: ((LivingEntity, Int) -> Unit),
+    private val amplifierIsNotInterval: Boolean,
+    color: Int)
+    : MobEffect(MobEffectCategory.NEUTRAL, color) {
+
     override fun onMobRemoved(livingEntity: LivingEntity, p1: Int, p2: Entity.RemovalReason) {
         super.onMobRemoved(livingEntity, p1, p2)
         // whenExpired(livingEntity)
@@ -22,11 +28,12 @@ class ControlledMobEffect(private val actionTaken: ((LivingEntity) -> Unit), pri
     override fun applyEffectTick(livingEntity: LivingEntity, amplifier: Int): Boolean {
         // whenGained(livingEntity)
         // whenExpired(livingEntity)
-        actionTaken(livingEntity)
+        actionTaken(livingEntity, amplifier)
         return true
     }
 
     override fun shouldApplyEffectTickThisTick(tickCount: Int, amplifier: Int): Boolean {
+        if (amplifierIsNotInterval) return true
         return tickCount % amplifier == 0
     }
 

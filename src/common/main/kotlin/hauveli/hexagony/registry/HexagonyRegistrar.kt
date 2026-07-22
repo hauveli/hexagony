@@ -59,7 +59,7 @@ abstract class HexagonyRegistrar<T : Any>(
             else -> false
         }
 
-
+        // for stuff that for some reason takes the holder as an arg... is there a more sensible way?
         fun holder(): Holder<T> = registry.wrapAsHolder(value)
 
         override fun hashCode() = 31 * key.registry().hashCode() + id.hashCode()

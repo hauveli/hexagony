@@ -8,6 +8,9 @@ import at.petrak.hexcasting.api.casting.getEntity
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
 import at.petrak.hexcasting.api.utils.asTranslatedComponent
+import hauveli.hexagony.Hexagony
+import hauveli.hexagony.features.control.ControlledMobEffects
+import hauveli.hexagony.features.control.FakePlayerActions
 import hauveli.hexagony.features.fake_player.FakeServerPlayer
 import hauveli.hexagony.features.fake_player.FakeServerPlayerUtils
 import hauveli.hexagony.registry.HexagonyMobEffects
@@ -15,6 +18,7 @@ import net.minecraft.core.UUIDUtil
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import java.util.UUID
 
@@ -28,7 +32,7 @@ object OpTest : SpellAction {
         return SpellAction.Result(
             Spell(),
             (0.1 * MediaConstants.DUST_UNIT).toLong(),
-            listOf(ParticleSpray.Companion.cloud(env.castingEntity!!.position().add(0.0, env.castingEntity!!.eyeHeight / 2.0, 0.0), 1.0))
+            listOf(ParticleSpray.cloud(env.castingEntity!!.position().add(0.0, env.castingEntity!!.eyeHeight / 2.0, 0.0), 1.0))
         )
     }
 
@@ -37,18 +41,27 @@ object OpTest : SpellAction {
         override fun cast(env: CastingEnvironment) {
             env.printMessage("text.hexagony.congrats".asTranslatedComponent("STARTED"))
             val clone = FakeServerPlayerUtils.spawnFakeClone(env.castingEntity!! as ServerPlayer, env.castingEntity!!.position(), UUID.randomUUID())
-            val instance = MobEffectInstance(
-                HexagonyMobEffects.WALK_FORWARD.holder(),
-                120,
-                1, // amplifier, I guess I could use strength 1 if mind anchor for jank checks? that seems silly though, but it would work...
-                false,  // ambient effect?
-                false,  // visible in inventory?
-                false // visible in top right corner?
+            val amplifier = FakePlayerActions.pack(60.45f, 60.9f)
+
+            Hexagony.LOGGER.info("supposed amplifier: {}", amplifier)
+
+            val instanceFake = HexagonyMobEffects.getInstance(
+                ControlledMobEffects.LOOK.fake,
+                800,
+                amplifier
             )
 
-            clone.addEffect(
-                instance
+            Hexagony.LOGGER.info("amplifier on instance: {}", instanceFake.amplifier)
+            clone.addEffect(instanceFake)
+            /*
+            val instanceReal = HexagonyMobEffects.getInstance(
+                ControlledMobEffects.WALK_FORWARD.real,
+                120,
+                0
             )
+            env.castingEntity!!.addEffect(instanceReal)
+
+             */
             env.printMessage("text.hexagony.congrats".asTranslatedComponent("FINISHED"))
         }
     }

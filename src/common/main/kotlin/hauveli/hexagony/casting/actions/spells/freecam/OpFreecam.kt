@@ -56,13 +56,10 @@ object OpFreecam : SpellAction  {
 
                 // I have no fucking idea how to make my registration thing return a holder but I'll figure that out later :clueless:
                 // HexagonyMobEffects.FREECAM.value
-                val instance = MobEffectInstance(
-                    HexagonyMobEffects.FREECAM.holder(),
+                val instance = HexagonyMobEffects.getInstance(
+                    HexagonyMobEffects.FREECAM,
                     duration.toInt(),
-                    0, // amplifier, I guess I could use strength 1 if mind anchor for jank checks? that seems silly though, but it would work...
-                    false,  // ambient effect?
-                    false,  // visible in inventory?
-                    false // visible in top right corner?
+                    0
                 )
                 env.castingEntity!!.addEffect(instance)
             }

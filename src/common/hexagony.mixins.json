@@ -19,6 +19,7 @@
     "freecam.ShaderGameRendererMixin"
   ],
   "mixins": [
+    "control.UncapAmplifierMobEffectInstanceMixin",
     "enlightenment.PiggyBackInventoryChangeTriggerMixin",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "enlightenment.RequireScrollPatternIotaMixin",
