@@ -54,9 +54,13 @@ object FakePlayerActions {
     }
 
     fun attack(livingEntity: LivingEntity, amplifier: Int) {
-        livingEntity.swing(livingEntity.usedItemHand)
+        if (livingEntity !is ServerPlayer) return
+        // livingEntity.attack()
+        // livingEntity.swing(livingEntity.usedItemHand)
+        ControlHelperStuff.attack(livingEntity)
     }
 
+    // I couldn't figure out a good way to do some of these without access to ServerPlayer...
     fun use(livingEntity: LivingEntity, amplifier: Int) {
         if (livingEntity !is ServerPlayer) return
         //livingEntity.useItemRemainingTicks
