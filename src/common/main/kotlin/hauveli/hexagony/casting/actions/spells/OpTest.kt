@@ -9,6 +9,7 @@ import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
 import at.petrak.hexcasting.api.utils.asTranslatedComponent
 import hauveli.hexagony.Hexagony
+import hauveli.hexagony.features.control.ControlHelperStuff
 import hauveli.hexagony.features.control.ControlledMobEffects
 import hauveli.hexagony.features.control.FakePlayerActions
 import hauveli.hexagony.features.fake_player.FakeServerPlayer
@@ -41,7 +42,7 @@ object OpTest : SpellAction {
         override fun cast(env: CastingEnvironment) {
             env.printMessage("text.hexagony.congrats".asTranslatedComponent("STARTED"))
             val clone = FakeServerPlayerUtils.spawnFakeClone(env.castingEntity!! as ServerPlayer, env.castingEntity!!.position(), UUID.randomUUID())
-            val amplifier = FakePlayerActions.pack(60.45f, 60.9f)
+            val amplifier = ControlHelperStuff.pack(-60.45f, -60.9f)
 
             Hexagony.LOGGER.info("supposed amplifier: {}", amplifier)
 

@@ -34,7 +34,7 @@ class ControlledMobEffect(
 
     override fun shouldApplyEffectTickThisTick(tickCount: Int, amplifier: Int): Boolean {
         if (amplifierIsNotInterval) return true
-        return tickCount % amplifier == 0
+        return tickCount % (amplifier + 1) == 0
     }
 
     // Utility method that is called when the effect is first added to the entity.

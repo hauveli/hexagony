@@ -23,7 +23,8 @@ public class UncapAmplifierMobEffectInstanceMixin {
     private void afterInit(Holder<MobEffect> effect, int duration, int amplifier,
                            boolean ambient, boolean visible, boolean showIcon,
                            CallbackInfo ci) {
-        if (effect.value() instanceof ControlledMobEffect)
+        if (effect.value() instanceof ControlledMobEffect) {
             this.amplifier = amplifier;
+        }
     }
 }

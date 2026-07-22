@@ -1,7 +1,10 @@
 package hauveli.hexagony.features.control
 
 import hauveli.hexagony.Hexagony
+import hauveli.hexagony.features.control.ControlHelperStuff.unpackX
+import hauveli.hexagony.features.control.ControlHelperStuff.unpackY
 import hauveli.hexagony.features.control.ControlledMobEffects.makeControlEffect
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
@@ -45,23 +48,9 @@ object FakePlayerActions {
         }
     }
 
-    private const val DEG_TO_INDEX = (65536.0 / 360.0).toFloat()
-    private const val INDEX_TO_DEG = (360.0 / 65536.0).toFloat()
-
-    fun pack(yRot: Float, xRot: Float): Int {
-        val x = (xRot * DEG_TO_INDEX).toInt() and 0xFFFF
-        val y = (yRot * DEG_TO_INDEX).toInt() and 0xFFFF
-
-        return (x shl 16) or y
-    }
-
     fun look(livingEntity: LivingEntity, amplifier: Int) {
-        // how it feels to do some nonsense :ridingmybikey:
-        val xIndex = (amplifier ushr 16) and 0xFFFF
-        val yIndex = amplifier and 0xFFFF
-
-        livingEntity.xRot = xIndex * INDEX_TO_DEG
-        livingEntity.yRot = yIndex * INDEX_TO_DEG
+        livingEntity.xRot = unpackX(amplifier)
+        livingEntity.yRot = unpackY(amplifier)
     }
 
     fun attack(livingEntity: LivingEntity, amplifier: Int) {
@@ -69,6 +58,10 @@ object FakePlayerActions {
     }
 
     fun use(livingEntity: LivingEntity, amplifier: Int) {
+        if (livingEntity !is ServerPlayer) return
+        //livingEntity.useItemRemainingTicks
+        //livingEntity.useItem.useOnRelease()
+        livingEntity.useItem.use(livingEntity.level(), livingEntity, livingEntity.usedItemHand)
 
         // p.lookAngle
         /*
@@ -89,29 +82,20 @@ object FakePlayerActions {
 
     // reads entity data to get slot value
     fun hotbarSlot(livingEntity: LivingEntity, amplifier: Int) {
-        if (livingEntity !is Player) return
-        // livingEntity.entityData.get<>()
+        if (livingEntity !is ServerPlayer) return
         livingEntity.inventory.selected = amplifier
     }
 
     fun swapHands(livingEntity: LivingEntity, amplifier: Int) {
-        if (livingEntity !is Player) return
+        if (livingEntity !is ServerPlayer) return
         val tempItemStack = livingEntity.getItemInHand(InteractionHand.MAIN_HAND)
         livingEntity.setItemInHand(InteractionHand.MAIN_HAND, livingEntity.getItemInHand(InteractionHand.OFF_HAND))
         livingEntity.setItemInHand(InteractionHand.OFF_HAND, tempItemStack)
     }
 
     fun drop(livingEntity: LivingEntity, amplifier: Int) {
-        if (livingEntity !is Player) return
-        val tempItemStack = livingEntity.getItemInHand(InteractionHand.MAIN_HAND)
+        if (livingEntity !is ServerPlayer) return
         val entireStack = amplifier > 0
-        if (!tempItemStack.isEmpty) {
-            livingEntity.drop(tempItemStack, entireStack)
-        } else {
-            val otherItemStack = livingEntity.getItemInHand(InteractionHand.OFF_HAND)
-            if (!otherItemStack.isEmpty) {
-                livingEntity.drop(otherItemStack, entireStack)
-            }
-        }
+        livingEntity.drop(entireStack)
     }
 }
