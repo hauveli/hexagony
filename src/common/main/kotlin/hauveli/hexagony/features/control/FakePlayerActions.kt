@@ -73,35 +73,15 @@ object FakePlayerActions {
         livingEntity.yRot = unpackY(amplifier)
     }
 
+    // I couldn't figure out a good way to do some of these without access to ServerPlayer...
     fun attack(livingEntity: LivingEntity, amplifier: Int) {
         if (livingEntity !is ServerPlayer) return
-        // livingEntity.attack()
-        // livingEntity.swing(livingEntity.usedItemHand)
         ControlHelperStuff.attack(livingEntity)
     }
 
-    // I couldn't figure out a good way to do some of these without access to ServerPlayer...
     fun use(livingEntity: LivingEntity, amplifier: Int) {
         if (livingEntity !is ServerPlayer) return
-        //livingEntity.useItemRemainingTicks
-        //livingEntity.useItem.useOnRelease()
         livingEntity.useItem.use(livingEntity.level(), livingEntity, livingEntity.usedItemHand)
-
-        // p.lookAngle
-        /*
-        val hit = p.gameMode. .hitResult ?: return
-        if (hit.type != HitResult.Type.BLOCK) return
-        hit as BlockHitResult
-        val useContext = UseOnContext(
-            p,
-            InteractionHand.MAIN_HAND,
-            hit
-        )
-        p.useItem.useOn(
-            useContext
-        )
-         */
-        //p.swing(player!!.usedItemHand) // Periodic
     }
 
     // reads entity data to get slot value
