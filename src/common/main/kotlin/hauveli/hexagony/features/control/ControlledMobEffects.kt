@@ -28,7 +28,7 @@ object ControlledMobEffects {
 
     val WALK_FORWARD = makeControlEffect(
         "forward",
-        FakePlayerActions::walkForward,
+        FakePlayerActions::walkForward, // todo: change to RealPlayerAction::walkForward
         FakePlayerActions::walkForward,
         FakePlayerActions::stopWalkingForwardsBackwards,
         FakePlayerActions::stopWalkingForwardsBackwards
