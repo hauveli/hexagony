@@ -13,25 +13,29 @@ import net.minecraft.world.phys.HitResult
 import kotlin.math.max
 
 object ControlHelperStuff {
+    // referenced this a little: https://www.mcpk.wiki/wiki/Angles
     // how it feels to do some nonsense :ridingmybikey:
-    private const val DEG_TO_INDEX = (65536.0 / 360.0).toFloat()
-    private const val INDEX_TO_DEG = (360.0 / 65536.0).toFloat()
+    // Originally was going to use a big (65536) table for it but this is a bit easier to understand
+    // I think this may be lossy on some floating point values (which ones?)
+    // todo: determine if edge cases on some angles or if I'm ok to not change this at all
+    private const val DEG_TO_PACKED = (65536.0 / 360.0).toFloat()
+    private const val PACKED_TO_DEG = (360.0 / 65536.0).toFloat()
 
     fun pack(yRot: Float, xRot: Float): Int {
-        val x = (xRot * DEG_TO_INDEX).toInt() and 0xFFFF
-        val y = (yRot * DEG_TO_INDEX).toInt() and 0xFFFF
+        val x = (xRot * DEG_TO_PACKED).toInt() and 0xFFFF
+        val y = (yRot * DEG_TO_PACKED).toInt() and 0xFFFF
 
         return (x shl 16) or y
     }
 
     fun unpackX(packed: Int): Float {
         val xIndex = (packed ushr 16) and 0xFFFF
-        return xIndex * INDEX_TO_DEG
+        return xIndex * PACKED_TO_DEG
     }
 
     fun unpackY(packed: Int): Float {
         val yIndex = packed and 0xFFFF
-        return yIndex * INDEX_TO_DEG
+        return yIndex * PACKED_TO_DEG
     }
 
     fun getPlayerTarget(player: ServerPlayer): HitResult {
@@ -99,6 +103,8 @@ object ControlHelperStuff {
             HitResult.Type.MISS -> {return}
             HitResult.Type.ENTITY -> {
                 player.attack((hitResult as EntityHitResult).entity)
+                if (player !is FakeServerPlayer) return
+                resetMiningProgress(player)
             }
             HitResult.Type.BLOCK -> {
                 if (player !is FakeServerPlayer) return
