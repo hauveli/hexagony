@@ -1,5 +1,8 @@
 package hauveli.hexagony.features.control
 
+import hauveli.hexagony.features.fake_player.FakeServerPlayer
+import net.minecraft.core.Direction
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.projectile.ProjectileUtil
@@ -68,6 +71,27 @@ object ControlHelperStuff {
         }
     }
 
+    fun doMiningThing(player: FakeServerPlayer) {
+        val job = player.miningProgress
+        val state = player.serverLevel().getBlockState(job.pos)
+        if (state.isAir) return
+        val destroySpeed = state.getDestroyProgress(player, player.serverLevel(), job.pos)
+        job.progress += destroySpeed
+
+        val stage = (job.progress * 10).toInt().coerceAtMost(9)
+        player.serverLevel().destroyBlockProgress(player.id, job.pos, stage)
+
+        if (job.progress >= 1.0f) {
+            player.gameMode.destroyBlock(job.pos)
+            job.progress = 0f
+        }
+    }
+
+    fun resetMiningProgress(player: FakeServerPlayer) {
+        player.serverLevel().destroyBlockProgress(player.id, player.miningProgress.pos, 0)
+        player.miningProgress.progress = 0f
+    }
+
     fun attack(player: ServerPlayer) {
         val hitResult = getPlayerTarget(player)
         player.swing(player.usedItemHand) // swing no matter what
@@ -77,7 +101,13 @@ object ControlHelperStuff {
                 player.attack((hitResult as EntityHitResult).entity)
             }
             HitResult.Type.BLOCK -> {
-                player.gameMode.destroyBlock((hitResult as BlockHitResult).blockPos)
+                if (player !is FakeServerPlayer) return
+                val targetPos = (hitResult as BlockHitResult).blockPos
+                if (player.miningProgress.pos != targetPos) {
+                    resetMiningProgress(player)
+                    player.miningProgress.pos = targetPos
+                }
+                doMiningThing(player)
             }
         }
 

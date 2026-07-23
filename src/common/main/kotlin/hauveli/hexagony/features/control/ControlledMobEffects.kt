@@ -29,43 +29,57 @@ object ControlledMobEffects {
     val WALK_FORWARD = makeControlEffect(
         "forward",
         FakePlayerActions::walkForward,
-        FakePlayerActions::walkForward
+        FakePlayerActions::walkForward,
+        FakePlayerActions::stopWalkingForwardsBackwards,
+        FakePlayerActions::stopWalkingForwardsBackwards
     )
 
     val WALK_BACKWARD = makeControlEffect(
         "backward",
         FakePlayerActions::walkBackward,
-        FakePlayerActions::walkBackward
+        FakePlayerActions::walkBackward,
+        FakePlayerActions::stopWalkingForwardsBackwards,
+        FakePlayerActions::stopWalkingForwardsBackwards
     )
 
     val WALK_LEFT = makeControlEffect(
         "left",
         FakePlayerActions::walkLeft,
-        FakePlayerActions::walkLeft
+        FakePlayerActions::walkLeft,
+        FakePlayerActions::stopWalkingLeftRight,
+        FakePlayerActions::stopWalkingLeftRight
     )
 
     val WALK_RIGHT = makeControlEffect(
         "right",
         FakePlayerActions::walkRight,
-        FakePlayerActions::walkRight
+        FakePlayerActions::walkRight,
+        FakePlayerActions::stopWalkingLeftRight,
+        FakePlayerActions::stopWalkingLeftRight
     )
 
     val SPRINT = makeControlEffect(
         "sprint",
         FakePlayerActions::sprint,
-        FakePlayerActions::sprint
+        FakePlayerActions::sprint,
+        FakePlayerActions::stopSprinting,
+        FakePlayerActions::stopSprinting
     )
 
     val SNEAK = makeControlEffect(
         "sneak",
         FakePlayerActions::sneak,
-        FakePlayerActions::sneak
+        FakePlayerActions::sneak,
+        FakePlayerActions::stopSneaking,
+        FakePlayerActions::stopSneaking
     )
 
     val JUMP = makeControlEffect(
         "jump",
         FakePlayerActions::jump,
-        FakePlayerActions::jump
+        FakePlayerActions::jump,
+        FakePlayerActions::stopJumping,
+        FakePlayerActions::stopJumping
     )
 
     val SWAP_HANDS = makeControlEffect(
@@ -93,35 +107,37 @@ object ControlledMobEffects {
         "look",
         FakePlayerActions::look,
         FakePlayerActions::look,
-        true
+        amplifierIsNotInterval = true
     )
 
     val HOTBAR_SLOT = makeControlEffect(
         "hotbar_slot",
         FakePlayerActions::hotbarSlot,
         FakePlayerActions::hotbarSlot,
-        true
+        amplifierIsNotInterval = true
     )
 
     val DROP = makeControlEffect(
         "drop",
         FakePlayerActions::drop,
         FakePlayerActions::drop,
-        true
+        amplifierIsNotInterval = true
     )
 
     fun makeControlEffect(
         name: String,
         realAction: (LivingEntity, Int) -> Unit,
         fakeAction: (LivingEntity, Int) -> Unit,
+        realAbort: (LivingEntity) -> Unit = { },
+        fakeAbort: (LivingEntity) -> Unit = { },
         amplifierIsNotInterval: Boolean = false
     ): ControlledMobEffectPair {
         val real = make("control/real/$name") {
-            ControlledMobEffect(realAction, amplifierIsNotInterval, 0)
+            ControlledMobEffect(realAction, realAbort, amplifierIsNotInterval, 0)
         }
 
         val fake = make("control/fake/$name") {
-            ControlledMobEffect(fakeAction, amplifierIsNotInterval, 0)
+            ControlledMobEffect(fakeAction, fakeAbort, amplifierIsNotInterval, 0)
         }
 
         REAL_PLAYER_EFFECTS += real

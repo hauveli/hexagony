@@ -14,12 +14,20 @@ import kotlin.math.sin
 
 object FakePlayerActions {
 
+    fun stopWalkingForwardsBackwards(livingEntity: LivingEntity) {
+        livingEntity.zza = 0f
+    }
+
     fun walkForward(livingEntity: LivingEntity, amplifier: Int) {
         livingEntity.zza = 1f
     }
 
     fun walkBackward(livingEntity: LivingEntity, amplifier: Int) {
         livingEntity.zza = -1f
+    }
+
+    fun stopWalkingLeftRight(livingEntity: LivingEntity) {
+        livingEntity.xxa = 0f
     }
 
     fun walkLeft(livingEntity: LivingEntity, amplifier: Int) {
@@ -30,12 +38,24 @@ object FakePlayerActions {
         livingEntity.xxa = -1f
     }
 
+    fun stopSprinting(livingEntity: LivingEntity) {
+        livingEntity.isSprinting = false
+    }
+
     fun sprint(livingEntity: LivingEntity, amplifier: Int) {
         livingEntity.isSprinting = livingEntity.canSprint()
     }
 
+    fun stopSneaking(livingEntity: LivingEntity) {
+        livingEntity.isShiftKeyDown = false
+    }
+
     fun sneak(livingEntity: LivingEntity, amplifier: Int) {
         livingEntity.isShiftKeyDown = true
+    }
+
+    fun stopJumping(livingEntity: LivingEntity) {
+        livingEntity.setJumping(false)
     }
 
     fun jump(livingEntity: LivingEntity, amplifier: Int) {

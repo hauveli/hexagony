@@ -1,16 +1,8 @@
 package hauveli.hexagony.features.fake_player
 
-import at.petrak.hexcasting.api.HexAPI
-import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import com.mojang.authlib.GameProfile
 import hauveli.hexagony.features.fake_player.FakeServerPlayerUtils.removeForReal
 import net.minecraft.core.BlockPos
-import net.minecraft.network.protocol.PacketFlow
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket
-import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
-import net.minecraft.network.protocol.game.ServerboundClientCommandPacket
-import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ClientInformation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -21,19 +13,15 @@ import net.minecraft.world.entity.HumanoidArm
 import net.minecraft.world.entity.player.ChatVisiblity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.portal.DimensionTransition
-import net.minecraft.world.phys.Vec3
-import net.minecraft.world.scores.PlayerTeam
-import net.minecraft.world.scores.Scoreboard
-import net.minecraft.world.scores.Team
 import java.util.*
 
 
 class FakeServerPlayer(
     level: ServerLevel,
-    uuid: UUID
+    uuid: UUID,
+    val miningProgress: MiningProgress = MiningProgress()
 ) : ServerPlayer(
     level.server,
     level,
@@ -49,6 +37,11 @@ class FakeServerPlayer(
         false
     )
 ) {
+    // No display when mining otherwise hmm... how do I even show this?
+    class MiningProgress {
+        var progress = 0f
+        var pos = BlockPos(0,0,0)
+    }
 
     override fun isInvulnerable(): Boolean {
         return false

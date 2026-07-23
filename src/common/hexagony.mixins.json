@@ -20,6 +20,7 @@
   ],
   "mixins": [
     "control.UncapAmplifierMobEffectInstanceMixin",
+    "control.OnRemovedEffectLivingEntityMixin",
     "enlightenment.PiggyBackInventoryChangeTriggerMixin",
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "enlightenment.RequireScrollPatternIotaMixin",

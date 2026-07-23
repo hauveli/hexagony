@@ -3,11 +3,9 @@ package hauveli.hexagony.features.fake_player
 import at.petrak.hexcasting.api.HexAPI
 import at.petrak.hexcasting.api.casting.ParticleSpray.Companion.burst
 import hauveli.hexagony.features.healthcasting.OvercastUtils
-import net.minecraft.network.protocol.PacketFlow
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
-import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.network.CommonListenerCookie
@@ -31,7 +29,7 @@ object FakeServerPlayerUtils {
     }
 
     fun FakeServerPlayer.respawnFakeClone(level: ServerLevel, pos: Vec3, uuid: UUID): FakeServerPlayer {
-        val clone = FakeServerPlayer(level, uuid)
+        val clone = FakeServerPlayer(level, uuid,)
 
         val connection = DummyConnection()
         // val listener = DummyServerGamePacketListenerImpl(connection, clone)
@@ -268,7 +266,7 @@ object FakeServerPlayerUtils {
         val server = original.server ?: throw IllegalStateException("Server null")
         val level = original.level() as ServerLevel
 
-        val clone = FakeServerPlayer(level, uuid)
+        val clone = FakeServerPlayer(level, uuid,)
 
         clone.moveTo(pos.x, pos.y, pos.z, 0f, 0f)
         // Idk if feet or eyes
