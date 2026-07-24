@@ -1,5 +1,6 @@
 package hauveli.hexagony.features.control
 
+import at.petrak.hexcasting.ktxt.UseOnContext
 import hauveli.hexagony.Hexagony
 import hauveli.hexagony.client.HexagonyClient.MINECRAFT
 import hauveli.hexagony.features.fake_player.FakeServerPlayer
@@ -124,14 +125,32 @@ object FakePlayerControlHelperStuff {
         }
     }
 
+    // todo: AHHHHHHHHHHHHHH
     fun placeBlock(player: ServerPlayer, hit: BlockHitResult): Boolean {
         val result = player.gameMode.useItemOn(
             player,
-            player.level(),
+            player.serverLevel(),
             player.useItem,
             player.usedItemHand,
             hit
         )
+
+        // player.gameMode.useItem()
+
+        // player.level().setBlock()
+
+        /*
+        // what the fuck why is this the exact same but with flipped ABCD BADC ????
+        val result = player.useItem.useOn(
+            UseOnContext(
+                player.level(),
+                player,
+                player.usedItemHand,
+                player.useItem,
+                hit
+            )
+        )
+        */
 
         return result.consumesAction()
     }
@@ -149,8 +168,8 @@ object FakePlayerControlHelperStuff {
                 // player.interactAt(player, hitResult.location, InteractionHand.MAIN_HAND)
             }
             HitResult.Type.BLOCK -> {
-                if (player.useItem.item !is BlockItem
-                    && !placeBlock(player, hitResult as BlockHitResult)) {
+                val interacted = placeBlock(player, hitResult as BlockHitResult)
+                if (!interacted && player.useItem.item !is BlockItem) {
                     player.useItem.use(player.level(), player, player.usedItemHand)
                 }
             }
