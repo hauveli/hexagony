@@ -126,7 +126,8 @@ object FakePlayerControlHelperStuff {
     }
 
     // todo: AHHHHHHHHHHHHHH
-    fun placeBlock(player: ServerPlayer, hit: BlockHitResult): Boolean {
+    fun placeBlockOrInteract(player: ServerPlayer, hit: BlockHitResult): Boolean {
+        // this lets me interact? how do I place block.....
         val result = player.gameMode.useItemOn(
             player,
             player.serverLevel(),
@@ -134,6 +135,8 @@ object FakePlayerControlHelperStuff {
             player.usedItemHand,
             hit
         )
+
+        Hexagony.LOGGER.info("FUCKKKK {} {} {} {} {}", player, player.serverLevel(), player.useItem, player.usedItemHand, hit)
 
         // player.gameMode.useItem()
 
@@ -168,7 +171,7 @@ object FakePlayerControlHelperStuff {
                 // player.interactAt(player, hitResult.location, InteractionHand.MAIN_HAND)
             }
             HitResult.Type.BLOCK -> {
-                val interacted = placeBlock(player, hitResult as BlockHitResult)
+                val interacted = placeBlockOrInteract(player, hitResult as BlockHitResult)
                 if (!interacted && player.useItem.item !is BlockItem) {
                     player.useItem.use(player.level(), player, player.usedItemHand)
                 }
