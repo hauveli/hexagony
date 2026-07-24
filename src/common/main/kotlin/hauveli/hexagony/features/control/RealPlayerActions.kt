@@ -1,16 +1,11 @@
 package hauveli.hexagony.features.control
 
-import hauveli.hexagony.Hexagony
-import hauveli.hexagony.features.control.ControlHelperStuff.unpackX
-import hauveli.hexagony.features.control.ControlHelperStuff.unpackY
-import hauveli.hexagony.features.control.ControlledMobEffects.makeControlEffect
-import net.minecraft.server.level.ServerPlayer
-import net.minecraft.util.Mth
+import hauveli.hexagony.features.control.FakePlayerControlHelperStuff.unpackX
+import hauveli.hexagony.features.control.FakePlayerControlHelperStuff.unpackY
+import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import kotlin.math.PI
-import kotlin.math.sin
 
 object RealPlayerActions {
 
@@ -73,41 +68,42 @@ object RealPlayerActions {
         }
     }
 
-    // look works fine
+    // Works
     fun look(livingEntity: LivingEntity, amplifier: Int) {
         livingEntity.xRot = unpackX(amplifier)
         livingEntity.yRot = unpackY(amplifier)
     }
 
     // entity portion works, mining blocks does NOT. no animation is played, either.
+    //
     fun attack(livingEntity: LivingEntity, amplifier: Int) {
-        if (livingEntity !is ServerPlayer) return
-        ControlHelperStuff.attack(livingEntity)
+        if (livingEntity !is Player) return // animation plays if I set this to LocalPlayer... hmmm...
+        RealPlayerControlHelperStuff.localAttack(livingEntity)
     }
 
     // doesn't work
     fun use(livingEntity: LivingEntity, amplifier: Int) {
-        if (livingEntity !is ServerPlayer) return
+        if (livingEntity !is LocalPlayer) return
         livingEntity.useItem.use(livingEntity.level(), livingEntity, livingEntity.usedItemHand)
     }
 
-    // doesn't work
+    // Works
     fun hotbarSlot(livingEntity: LivingEntity, amplifier: Int) {
-        if (livingEntity !is ServerPlayer) return
+        if (livingEntity !is LocalPlayer) return
         livingEntity.inventory.selected = amplifier
     }
 
-    //  seems to work
+    // Works
     fun swapHands(livingEntity: LivingEntity, amplifier: Int) {
-        if (livingEntity !is ServerPlayer) return
+        if (livingEntity !is LocalPlayer) return
         val tempItemStack = livingEntity.getItemInHand(InteractionHand.MAIN_HAND)
         livingEntity.setItemInHand(InteractionHand.MAIN_HAND, livingEntity.getItemInHand(InteractionHand.OFF_HAND))
         livingEntity.setItemInHand(InteractionHand.OFF_HAND, tempItemStack)
     }
 
-    // works visually, but doesn't actually
+    // Works
     fun drop(livingEntity: LivingEntity, amplifier: Int) {
-        if (livingEntity !is ServerPlayer) return
+        if (livingEntity !is LocalPlayer) return
         val entireStack = amplifier > 0
         livingEntity.drop(entireStack)
     }

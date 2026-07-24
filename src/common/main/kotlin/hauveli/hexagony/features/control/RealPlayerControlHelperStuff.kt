@@ -1,18 +1,23 @@
 package hauveli.hexagony.features.control
 
+import hauveli.hexagony.client.HexagonyClient.MINECRAFT
 import hauveli.hexagony.features.fake_player.FakeServerPlayer
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.ProjectileUtil
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
+import org.apache.logging.log4j.core.jmx.Server
 import kotlin.math.max
 
-object ControlHelperStuff {
+object RealPlayerControlHelperStuff {
     // referenced this a little: https://www.mcpk.wiki/wiki/Angles
     // how it feels to do some nonsense :ridingmybikey:
     // Originally was going to use a big (65536) table for it but this is a bit easier to understand
@@ -38,7 +43,7 @@ object ControlHelperStuff {
         return yIndex * PACKED_TO_DEG
     }
 
-    fun getPlayerTarget(player: ServerPlayer): HitResult {
+    fun getPlayerTarget(player: Player): HitResult {
         val start = player.eyePosition
         val reach = max(
             player.attributes.getValue(Attributes.ENTITY_INTERACTION_RANGE),
@@ -75,28 +80,58 @@ object ControlHelperStuff {
         }
     }
 
-    fun doMiningThing(player: FakeServerPlayer) {
-        val job = player.miningProgress
-        val state = player.serverLevel().getBlockState(job.pos)
+    fun localBreakBlock(player: Player, miningProgress: FakeServerPlayer.MiningProgress) {
+        val gm = MINECRAFT!!.gameMode!!
+        if (miningProgress.progress != 0f) {
+            gm.continueDestroyBlock(miningProgress.pos, Direction.DOWN)
+        } else {
+            gm.startDestroyBlock(miningProgress.pos, Direction.DOWN)
+        }
+
+        /*
+        val job = miningProgress
+        val state = player.level().getBlockState(job.pos)
         if (state.isAir) return
-        val destroySpeed = state.getDestroyProgress(player, player.serverLevel(), job.pos)
+        val destroySpeed = state.getDestroyProgress(player, player.level(), job.pos)
         job.progress += destroySpeed
 
         val stage = (job.progress * 10).toInt().coerceAtMost(9)
-        player.serverLevel().destroyBlockProgress(player.id, job.pos, stage)
+        player.level().destroyBlockProgress(player.id, job.pos, stage)
 
         if (job.progress >= 1.0f) {
-            player.gameMode.destroyBlock(job.pos)
+            if (player is ServerPlayer) {
+                player.gameMode.destroyBlock(job.pos)
+            }
+            job.progress = 0f
+        }
+
+         */
+    }
+
+    fun serverBreakBlock(player: Player, miningProgress: FakeServerPlayer.MiningProgress) {
+        val job = miningProgress
+        val state = player.level().getBlockState(job.pos)
+        if (state.isAir) return
+        val destroySpeed = state.getDestroyProgress(player, player.level(), job.pos)
+        job.progress += destroySpeed
+
+        val stage = (job.progress * 10).toInt().coerceAtMost(9)
+        player.level().destroyBlockProgress(player.id, job.pos, stage)
+
+        if (job.progress >= 1.0f) {
+            if (player is ServerPlayer) {
+                player.gameMode.destroyBlock(job.pos)
+            }
             job.progress = 0f
         }
     }
 
-    fun resetMiningProgress(player: FakeServerPlayer) {
-        player.serverLevel().destroyBlockProgress(player.id, player.miningProgress.pos, 0)
-        player.miningProgress.progress = 0f
+    fun resetMiningProgress(player: Player, miningProgress: FakeServerPlayer.MiningProgress) {
+        player.level().destroyBlockProgress(player.id, miningProgress.pos, 0)
+        miningProgress.progress = 0f
     }
 
-    fun attack(player: ServerPlayer) {
+    fun attack(player: Player) {
         val hitResult = getPlayerTarget(player)
         player.swing(player.usedItemHand) // swing no matter what
         when (hitResult.type) {
@@ -104,18 +139,41 @@ object ControlHelperStuff {
             HitResult.Type.ENTITY -> {
                 player.attack((hitResult as EntityHitResult).entity)
                 if (player !is FakeServerPlayer) return
-                resetMiningProgress(player)
+                resetMiningProgress(player, player.miningProgress)
             }
             HitResult.Type.BLOCK -> {
                 if (player !is FakeServerPlayer) return
                 val targetPos = (hitResult as BlockHitResult).blockPos
                 if (player.miningProgress.pos != targetPos) {
-                    resetMiningProgress(player)
+                    resetMiningProgress(player, player.miningProgress)
                     player.miningProgress.pos = targetPos
                 }
-                doMiningThing(player)
+                serverBreakBlock(player, player.miningProgress)
             }
         }
+    }
 
+    val localMiningProgress = FakeServerPlayer.MiningProgress()
+
+    fun localAttack(player: Player) {
+        if (!player.level().isClientSide) return
+        val hitResult = getPlayerTarget(player)
+        player.swing(player.usedItemHand) // swing no matter what
+        when (hitResult.type) {
+            HitResult.Type.MISS -> {return}
+            HitResult.Type.ENTITY -> {
+                player.attack((hitResult as EntityHitResult).entity)
+                resetMiningProgress(player, localMiningProgress)
+            }
+            HitResult.Type.BLOCK -> {
+                val targetPos = (hitResult as BlockHitResult).blockPos
+                if (localMiningProgress.pos != targetPos) {
+                    MINECRAFT!!.gameMode!!.stopDestroyBlock()
+                    resetMiningProgress(player, localMiningProgress)
+                    localMiningProgress.pos = targetPos
+                }
+                localBreakBlock(player, localMiningProgress)
+            }
+        }
     }
 }
