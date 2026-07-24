@@ -125,35 +125,14 @@ object FakePlayerControlHelperStuff {
         }
     }
 
-    // todo: AHHHHHHHHHHHHHH
     fun placeBlockOrInteract(player: ServerPlayer, hit: BlockHitResult): Boolean {
-        // this lets me interact? how do I place block.....
         val result = player.gameMode.useItemOn(
             player,
             player.serverLevel(),
-            player.useItem,
+            player.getItemInHand(player.usedItemHand),
             player.usedItemHand,
             hit
         )
-
-        Hexagony.LOGGER.info("FUCKKKK {} {} {} {} {}", player, player.serverLevel(), player.useItem, player.usedItemHand, hit)
-
-        // player.gameMode.useItem()
-
-        // player.level().setBlock()
-
-        /*
-        // what the fuck why is this the exact same but with flipped ABCD BADC ????
-        val result = player.useItem.useOn(
-            UseOnContext(
-                player.level(),
-                player,
-                player.usedItemHand,
-                player.useItem,
-                hit
-            )
-        )
-        */
 
         return result.consumesAction()
     }
