@@ -197,7 +197,9 @@ object RealPlayerControlHelperStuff {
         when (hitResult.type) {
             HitResult.Type.MISS -> {
                 // this works if I open chat? hhmmmmm.....
+                // MINECRAFT!!.gameMode!!.useItem(player, player.usedItemHand)
                 MINECRAFT!!.gameMode!!.useItem(player, player.usedItemHand)
+                MINECRAFT.options.keyUse.isDown = true
                 // player.getItemInHand(player.usedItemHand).use(player.level(), player, player.usedItemHand)
                 // player.useItem.use(player.level(), player, player.usedItemHand)
             }
@@ -208,7 +210,9 @@ object RealPlayerControlHelperStuff {
             HitResult.Type.BLOCK -> {
                 val interacted = placeBlockOrInteract(player, hitResult as BlockHitResult)
                 if (!interacted && player.useItem.item !is BlockItem) {
-                    player.useItem.use(player.level(), player, player.usedItemHand)
+                    MINECRAFT!!.gameMode!!.useItem(player, player.usedItemHand)
+                    MINECRAFT.options.keyUse.isDown = true
+                    MINECRAFT.options.keyUse.consumeClick()
                 }
             }
         }
