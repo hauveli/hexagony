@@ -134,31 +134,9 @@ object RealPlayerControlHelperStuff {
         miningProgress.progress = 0f
     }
 
-    fun attack(player: Player) {
-        val hitResult = getPlayerTarget(player)
-        player.swing(player.usedItemHand) // swing no matter what
-        when (hitResult.type) {
-            HitResult.Type.MISS -> {return}
-            HitResult.Type.ENTITY -> {
-                player.attack((hitResult as EntityHitResult).entity)
-                if (player !is FakeServerPlayer) return
-                resetMiningProgress(player, player.miningProgress)
-            }
-            HitResult.Type.BLOCK -> {
-                if (player !is FakeServerPlayer) return
-                val targetPos = (hitResult as BlockHitResult).blockPos
-                if (player.miningProgress.pos != targetPos) {
-                    resetMiningProgress(player, player.miningProgress)
-                    player.miningProgress.pos = targetPos
-                }
-                serverBreakBlock(player, player.miningProgress)
-            }
-        }
-    }
-
     val localMiningProgress = FakeServerPlayer.MiningProgress()
 
-    fun localAttack(player: Player) {
+    fun attack(player: Player) {
         if (!player.level().isClientSide) return
         val hitResult = getPlayerTarget(player)
         player.swing(player.usedItemHand) // swing no matter what
@@ -178,6 +156,7 @@ object RealPlayerControlHelperStuff {
                 localBreakBlock(player, localMiningProgress)
             }
         }
+        MINECRAFT!!.options.keyAttack.isDown = true
     }
 
     fun placeBlockOrInteract(player: LocalPlayer, hit: BlockHitResult): Boolean {
@@ -199,7 +178,6 @@ object RealPlayerControlHelperStuff {
                 // this works if I open chat? hhmmmmm.....
                 // MINECRAFT!!.gameMode!!.useItem(player, player.usedItemHand)
                 MINECRAFT!!.gameMode!!.useItem(player, player.usedItemHand)
-                MINECRAFT.options.keyUse.isDown = true
                 // player.getItemInHand(player.usedItemHand).use(player.level(), player, player.usedItemHand)
                 // player.useItem.use(player.level(), player, player.usedItemHand)
             }
@@ -211,10 +189,9 @@ object RealPlayerControlHelperStuff {
                 val interacted = placeBlockOrInteract(player, hitResult as BlockHitResult)
                 if (!interacted && player.useItem.item !is BlockItem) {
                     MINECRAFT!!.gameMode!!.useItem(player, player.usedItemHand)
-                    MINECRAFT.options.keyUse.isDown = true
-                    MINECRAFT.options.keyUse.consumeClick()
                 }
             }
         }
+        MINECRAFT!!.options.keyUse.isDown = true
     }
 }
