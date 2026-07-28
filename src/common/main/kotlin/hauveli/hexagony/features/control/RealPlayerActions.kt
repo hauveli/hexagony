@@ -1,37 +1,121 @@
 package hauveli.hexagony.features.control
 
+import at.petrak.hexcasting.api.HexAPI
+import hauveli.hexagony.client.HexagonyClient.MINECRAFT
 import hauveli.hexagony.features.control.FakePlayerControlHelperStuff.unpackX
 import hauveli.hexagony.features.control.FakePlayerControlHelperStuff.unpackY
+import hauveli.hexagony.features.freecam.FreeCameraEntity
+import hauveli.hexagony.features.freecam.FreeCameraServerData
+import net.minecraft.client.KeyMapping
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.phys.Vec3
+import kotlin.math.cos
+import kotlin.math.min
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 object RealPlayerActions {
 
-    // walks dont work
+
+    // These are from the parkour wiki
+    object movementCalculation {
+        val SPRINTING = 1.3
+        val WALKING = 1.0
+        val SNEAKING = 0.3
+        val STOPPING = 0.0
+        val ANGLE_DEFAULT = 0.98
+        val ANGLE_STRAFE = 1.0
+        val ANGLE_STRAFE_SNEAK = 0.98 * sqrt(2.0)
+        val SLIPPERINESS_DEFAULT = 0.6
+        val SLIPPERINESS_SLIME = 0.8
+        val SLIPPERINESS_ICE = 0.98
+        val SLIPPERINESS_AIRBORNE = 0.0
+        val SPEED_INCREASE_PER_LEVEL = 0.2
+        val SLOWNESS_DECREASE_PER_LEVEL = 0.15
+
+        var velocity_old = 0.0
+    }
+
+    val SPEED_MULT: Double = 0.36
+
+    fun getSpeedMultiplier(entity: LivingEntity): Double {
+
+        // todo: what the fuck was I referring to here?
+        // TODO: 1.21.1+? make else if in game versions where the bug is fixed
+        // i just guesstimated the unlabelled values here based on how it felt to play
+        val sneakMult = if (entity.isShiftKeyDown) movementCalculation.SNEAKING else 1.0
+        val sprintMult = if (entity.isSprinting) movementCalculation.SPRINTING else 1.0
+        val viscosityMult = if (entity.isInWater || entity.isInLava) 0.3 else 1.0
+        val groundAccel = if (entity.onGround()) {
+            SPEED_MULT * (entity.level().getBlockState(entity.blockPosition().below()).block.friction * 0.91)
+        } else if (entity.isSprinting) {
+            0.075
+        } else {
+            0.045 // decelerate a lot in the air if not sprintjumping
+        }
+        val finalMult = min(sneakMult * sprintMult * groundAccel * viscosityMult, 3.0)
+        return finalMult
+    }
+
+    // walks dont work how I want, no sprinting really...
     fun stopWalkingForwardsBackwards(livingEntity: LivingEntity) {
-        livingEntity.zza = 0f
+        // livingEntity.zza = 0f
     }
 
     fun walkForward(livingEntity: LivingEntity, amplifier: Int) {
-        livingEntity.zza = 1f
+        // livingEntity.zza = 1f
+        // with how I'm doing it:
+        // check if freecam and if so, don't worry about inputs
+        // if not in free-cam, don't run this if forward is being held
+        // if (freecamera || !holdingForward)
+        // if (!freecamera && holdingForward) return
+        if (MINECRAFT!!.options.keyUp.isDown && !FreeCameraEntity.active) return
+        // do I need to check if swimming/flying/whatever for this to make sense? hmm...
+        if (livingEntity !is LocalPlayer) return
+        val headAngle = Vec3.directionFromRotation(0f, livingEntity.yHeadRot)
+        val speedMult = getSpeedMultiplier(livingEntity)
+        livingEntity.addDeltaMovement(headAngle.scale(speedMult))
+        // player.input.forwardImpulse = 1f
+        // player.input.up = true
+        // player.zza = -1f
+        // livingEntity.zza = -1f
+        //livingEntity.input.up = true
+        //livingEntity.input.forwardImpulse = 1f
     }
 
     fun walkBackward(livingEntity: LivingEntity, amplifier: Int) {
-        livingEntity.zza = -1f
+        if (MINECRAFT!!.options.keyDown.isDown && !FreeCameraEntity.active) return
+        // do I need to check if swimming/flying/whatever for this to make sense? hmm...
+        if (livingEntity !is LocalPlayer) return
+        val headAngle = Vec3.directionFromRotation(0f, livingEntity.yHeadRot)
+        val speedMult = getSpeedMultiplier(livingEntity)
+        livingEntity.addDeltaMovement(headAngle.scale(-speedMult))
     }
 
     fun stopWalkingLeftRight(livingEntity: LivingEntity) {
-        livingEntity.xxa = 0f
+        // livingEntity.xxa = 0f
     }
 
     fun walkLeft(livingEntity: LivingEntity, amplifier: Int) {
-        livingEntity.xxa = 1f
+        if (MINECRAFT!!.options.keyLeft.isDown && !FreeCameraEntity.active) return
+        // do I need to check if swimming/flying/whatever for this to make sense? hmm...
+        if (livingEntity !is LocalPlayer) return
+        val headAngle = Vec3.directionFromRotation(0f, livingEntity.yHeadRot + 90f)
+        val speedMult = getSpeedMultiplier(livingEntity)
+        livingEntity.addDeltaMovement(headAngle.scale(-speedMult))
     }
 
     fun walkRight(livingEntity: LivingEntity, amplifier: Int) {
-        livingEntity.xxa = -1f
+        if (MINECRAFT!!.options.keyRight.isDown && !FreeCameraEntity.active) return
+        // do I need to check if swimming/flying/whatever for this to make sense? hmm...
+        if (livingEntity !is LocalPlayer) return
+        val headAngle = Vec3.directionFromRotation(0f, livingEntity.yHeadRot + 90f)
+        val speedMult = getSpeedMultiplier(livingEntity)
+        livingEntity.addDeltaMovement(headAngle.scale(speedMult))
     }
 
     // I mean, it works, but it also feels a little jank. low priority.
@@ -40,7 +124,9 @@ object RealPlayerActions {
     }
 
     fun sprint(livingEntity: LivingEntity, amplifier: Int) {
-        livingEntity.isSprinting = livingEntity.canSprint()
+        // using canSprint causes it to tweak which is annoying, hmm...§
+        // livingEntity.canSprint())
+        livingEntity.isSprinting = true
     }
 
     // sneak doesn't work properly, sneaks once then stops instantly? jank
@@ -81,10 +167,10 @@ object RealPlayerActions {
         RealPlayerControlHelperStuff.localAttack(livingEntity)
     }
 
-    // doesn't work
+    // eating no worky, place block and interact work
     fun use(livingEntity: LivingEntity, amplifier: Int) {
         if (livingEntity !is LocalPlayer) return
-        livingEntity.useItem.use(livingEntity.level(), livingEntity, livingEntity.usedItemHand)
+        RealPlayerControlHelperStuff.use(livingEntity)
     }
 
     // Works

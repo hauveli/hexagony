@@ -1,15 +1,18 @@
 package hauveli.hexagony.features.control
 
 import hauveli.hexagony.client.HexagonyClient.MINECRAFT
+import hauveli.hexagony.features.control.FakePlayerControlHelperStuff.placeBlockOrInteract
 import hauveli.hexagony.features.fake_player.FakeServerPlayer
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.ProjectileUtil
+import net.minecraft.world.item.BlockItem
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
@@ -173,6 +176,37 @@ object RealPlayerControlHelperStuff {
                     localMiningProgress.pos = targetPos
                 }
                 localBreakBlock(player, localMiningProgress)
+            }
+        }
+    }
+
+    fun placeBlockOrInteract(player: LocalPlayer, hit: BlockHitResult): Boolean {
+        val result = MINECRAFT!!.gameMode!!.useItemOn(
+            player,
+            player.usedItemHand,
+            hit
+        )
+
+        return result.consumesAction()
+    }
+
+    fun use(player: LocalPlayer) {
+        // todo: how the fuck do I check this in a sane way?
+
+        val hitResult = FakePlayerControlHelperStuff.getPlayerTarget(player)
+        when (hitResult.type) {
+            HitResult.Type.MISS -> {
+                player.useItem.use(player.level(), player, player.usedItemHand)
+            }
+            HitResult.Type.ENTITY -> {
+                player.interactOn((hitResult as EntityHitResult).entity, InteractionHand.MAIN_HAND)
+                // player.interactAt(player, hitResult.location, InteractionHand.MAIN_HAND)
+            }
+            HitResult.Type.BLOCK -> {
+                val interacted = placeBlockOrInteract(player, hitResult as BlockHitResult)
+                if (!interacted && player.useItem.item !is BlockItem) {
+                    player.useItem.use(player.level(), player, player.usedItemHand)
+                }
             }
         }
     }
