@@ -83,12 +83,12 @@ object RealPlayerControlHelperStuff {
         }
     }
 
-    fun localBreakBlock(player: Player, miningProgress: FakeServerPlayer.MiningProgress) {
+    fun localBreakBlock(player: Player, hitResult: BlockHitResult, miningProgress: FakeServerPlayer.MiningProgress) {
         val gm = MINECRAFT!!.gameMode!!
         if (miningProgress.progress != 0f) {
-            gm.continueDestroyBlock(miningProgress.pos, Direction.DOWN)
+            gm.continueDestroyBlock(miningProgress.pos, hitResult.direction)
         } else {
-            gm.startDestroyBlock(miningProgress.pos, Direction.DOWN)
+            gm.startDestroyBlock(miningProgress.pos, hitResult.direction)
         }
 
         /*
@@ -141,9 +141,12 @@ object RealPlayerControlHelperStuff {
         val hitResult = getPlayerTarget(player)
         player.swing(player.usedItemHand) // swing no matter what
         when (hitResult.type) {
-            HitResult.Type.MISS -> {return}
+            HitResult.Type.MISS -> {
+                // does this even help the behavior? hmmm....
+                MINECRAFT!!.options.keyAttack.isDown = false
+            }
             HitResult.Type.ENTITY -> {
-                player.attack((hitResult as EntityHitResult).entity)
+                MINECRAFT!!.gameMode!!.attack(player, (hitResult as EntityHitResult).entity)
                 resetMiningProgress(player, localMiningProgress)
             }
             HitResult.Type.BLOCK -> {
@@ -153,7 +156,7 @@ object RealPlayerControlHelperStuff {
                     resetMiningProgress(player, localMiningProgress)
                     localMiningProgress.pos = targetPos
                 }
-                localBreakBlock(player, localMiningProgress)
+                localBreakBlock(player, hitResult, localMiningProgress)
             }
         }
         MINECRAFT!!.options.keyAttack.isDown = true

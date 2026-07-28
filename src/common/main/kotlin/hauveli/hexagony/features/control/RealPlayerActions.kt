@@ -164,7 +164,7 @@ object RealPlayerActions {
     //
     fun attack(livingEntity: LivingEntity, amplifier: Int) {
         if (livingEntity !is Player) return // animation plays if I set this to LocalPlayer... hmmm...
-        RealPlayerControlHelperStuff.localAttack(livingEntity)
+        RealPlayerControlHelperStuff.attack(livingEntity)
     }
 
     // eating no worky, place block and interact work
