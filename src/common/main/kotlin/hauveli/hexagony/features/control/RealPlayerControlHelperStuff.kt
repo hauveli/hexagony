@@ -196,7 +196,10 @@ object RealPlayerControlHelperStuff {
         val hitResult = FakePlayerControlHelperStuff.getPlayerTarget(player)
         when (hitResult.type) {
             HitResult.Type.MISS -> {
-                player.useItem.use(player.level(), player, player.usedItemHand)
+                // this works if I open chat? hhmmmmm.....
+                MINECRAFT!!.gameMode!!.useItem(player, player.usedItemHand)
+                // player.getItemInHand(player.usedItemHand).use(player.level(), player, player.usedItemHand)
+                // player.useItem.use(player.level(), player, player.usedItemHand)
             }
             HitResult.Type.ENTITY -> {
                 player.interactOn((hitResult as EntityHitResult).entity, InteractionHand.MAIN_HAND)
