@@ -91,7 +91,6 @@ object RealPlayerControlHelperStuff {
         // gm.isDestroying is true when I open chat.
         // this means gm.continueDestroyBlock is called at that time.
         // I should track this perhaps using miningProgress instead?
-        Hexagony.LOGGER.info(gm.isDestroying)
         if (miningProgress.progress > 0f) {
             gm.continueDestroyBlock(miningProgress.pos, hitResult.direction)
         } else {
@@ -125,7 +124,6 @@ object RealPlayerControlHelperStuff {
             }
             HitResult.Type.BLOCK -> {
                 val targetPos = (hitResult as BlockHitResult).blockPos
-                Hexagony.LOGGER.info(targetPos)
                 if (localMiningProgress.pos != targetPos) {
                     resetMiningProgress(player, localMiningProgress)
                     localMiningProgress.pos = targetPos
@@ -157,8 +155,15 @@ object RealPlayerControlHelperStuff {
             HitResult.Type.MISS -> {
                 // this works if I open chat? hhmmmmm.....
                 // MINECRAFT!!.gameMode!!.useItem(player, player.usedItemHand)
-                MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                // MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
                 // player.getItemInHand(player.usedItemHand).use(player.level(), player, player.usedItemHand)
+                // how can I unfuck this when in freecam....
+                MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                //MINECRAFT.gameMode!!.useItem(MINECRAFT.player!!, MINECRAFT.player!!.usedItemHand)
+                //Hexagony.LOGGER.info(player.usedItemHand)
+                //Hexagony.LOGGER.info(player.getItemInHand(player.usedItemHand))
+                //val a = player.getItemInHand(player.usedItemHand).use(player.level(), player, player.usedItemHand)
+                //Hexagony.LOGGER.info(a.result)
                 // player.useItem.use(player.level(), player, player.usedItemHand)
             }
             HitResult.Type.ENTITY -> {
@@ -169,6 +174,12 @@ object RealPlayerControlHelperStuff {
                 val interacted = placeBlockOrInteract(player, hitResult as BlockHitResult)
                 if (!interacted && player.useItem.item !is BlockItem) {
                     MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                    //MINECRAFT.gameMode!!.useItem(MINECRAFT.player!!, MINECRAFT.player!!.usedItemHand)
+                    //Hexagony.LOGGER.info(player.usedItemHand)
+                    //Hexagony.LOGGER.info(player.getItemInHand(player.usedItemHand))
+                    //val a = player.getItemInHand(player.usedItemHand).use(player.level(), player, player.usedItemHand)
+                    // Hexagony.LOGGER.info(a.result)
+                    // player.useItem.use(player.level(), player, player.usedItemHand)
                 }
             }
         }
