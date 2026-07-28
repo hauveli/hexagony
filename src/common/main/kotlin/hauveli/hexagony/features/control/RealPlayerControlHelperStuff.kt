@@ -1,5 +1,6 @@
 package hauveli.hexagony.features.control
 
+import hauveli.hexagony.Hexagony
 import hauveli.hexagony.client.HexagonyClient.MINECRAFT
 import hauveli.hexagony.features.control.FakePlayerControlHelperStuff.placeBlockOrInteract
 import hauveli.hexagony.features.fake_player.FakeServerPlayer
@@ -86,16 +87,23 @@ object RealPlayerControlHelperStuff {
 
     fun localBreakBlock(player: Player, hitResult: BlockHitResult, miningProgress: FakeServerPlayer.MiningProgress) {
         val gm = MINECRAFT!!.gameMode!!
-        if (gm.isDestroying) {
+
+        // gm.isDestroying is true when I open chat.
+        // this means gm.continueDestroyBlock is called at that time.
+        // I should track this perhaps using miningProgress instead?
+        Hexagony.LOGGER.info(gm.isDestroying)
+        if (miningProgress.progress > 0f) {
             gm.continueDestroyBlock(miningProgress.pos, hitResult.direction)
         } else {
             gm.startDestroyBlock(miningProgress.pos, hitResult.direction)
+            miningProgress.progress = 1f
         }
     }
 
     fun resetMiningProgress(player: Player, miningProgress: FakeServerPlayer.MiningProgress) {
         player.level().destroyBlockProgress(player.id, miningProgress.pos, 0)
         MINECRAFT!!.gameMode!!.stopDestroyBlock()
+        miningProgress.progress = 0f
     }
 
     val localMiningProgress = FakeServerPlayer.MiningProgress()
@@ -109,7 +117,7 @@ object RealPlayerControlHelperStuff {
         when (hitResult.type) {
             HitResult.Type.MISS -> {
                 // does this even help the behavior? hmmm....
-                MINECRAFT.options.keyAttack.isDown = false
+                // MINECRAFT.options.keyAttack.isDown = false
             }
             HitResult.Type.ENTITY -> {
                 MINECRAFT.gameMode!!.attack(player, (hitResult as EntityHitResult).entity)
@@ -117,11 +125,13 @@ object RealPlayerControlHelperStuff {
             }
             HitResult.Type.BLOCK -> {
                 val targetPos = (hitResult as BlockHitResult).blockPos
+                Hexagony.LOGGER.info(targetPos)
                 if (localMiningProgress.pos != targetPos) {
                     resetMiningProgress(player, localMiningProgress)
                     localMiningProgress.pos = targetPos
                 }
                 localBreakBlock(player, hitResult, localMiningProgress)
+                // MINECRAFT.gameMode!!.destroyBlock(hitResult.blockPos) // does it instantly so nuh uh
             }
         }
         key.consumeClick()
