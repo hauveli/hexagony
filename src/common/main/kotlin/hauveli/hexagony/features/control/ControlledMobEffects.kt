@@ -91,13 +91,15 @@ object ControlledMobEffects {
     val ATTACK = makeControlEffect(
         "attack",
         RealPlayerActions::attack,
-        FakePlayerActions::attack
+        FakePlayerActions::attack,
+        RealPlayerActions::stopAttack
     )
 
     val USE = makeControlEffect(
         "use",
         RealPlayerActions::use,
-        FakePlayerActions::use
+        FakePlayerActions::use,
+        RealPlayerActions::stopUse
     )
 
     // where do I store the x and y rot?

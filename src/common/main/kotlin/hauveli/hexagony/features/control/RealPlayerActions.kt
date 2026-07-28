@@ -160,11 +160,20 @@ object RealPlayerActions {
         livingEntity.yRot = unpackY(amplifier)
     }
 
+
+    fun stopAttack(livingEntity: LivingEntity) {
+        MINECRAFT!!.options.keyAttack.isDown = false
+    }
+
     // entity portion works, mining blocks does NOT. no animation is played, either.
     //
     fun attack(livingEntity: LivingEntity, amplifier: Int) {
         if (livingEntity !is Player) return // animation plays if I set this to LocalPlayer... hmmm...
         RealPlayerControlHelperStuff.attack(livingEntity)
+    }
+
+    fun stopUse(livingEntity: LivingEntity) {
+        MINECRAFT!!.options.keyUse.isDown = false
     }
 
     // eating no worky, place block and interact work

@@ -36,10 +36,10 @@ public abstract class NoInputMinecraftMixin {
                         MINECRAFT.options.keyRight
                 );
             }
-            if (disallowedKeys == null) {
-                disallowedKeys = List.of(
-                        MINECRAFT.options.keyUse,
-                        MINECRAFT.options.keyAttack
+            if (exceptionKeys == null) {
+                exceptionKeys = List.of(
+                        // MINECRAFT.options.keyUse,
+                        // MINECRAFT.options.keyAttack
                 );
             }
             /*
@@ -53,7 +53,9 @@ public abstract class NoInputMinecraftMixin {
              */
             Arrays.stream(MINECRAFT.options.keyMappings).forEach(
                     keyMapping -> {
-                        if (!allowedKeys.contains(keyMapping)) {
+                        if (exceptionKeys.contains(keyMapping)) {
+                            // if ()
+                        } else if (!allowedKeys.contains(keyMapping)) {
                             keyMapping.consumeClick();
                             keyMapping.setDown(false);
                         }
@@ -71,7 +73,7 @@ public abstract class NoInputMinecraftMixin {
     }
 
     @Unique
-    private static List<KeyMapping> disallowedKeys = null;
+    private static List<KeyMapping> exceptionKeys = null;
 
     @Unique
     private static List<KeyMapping> allowedKeys = null;
