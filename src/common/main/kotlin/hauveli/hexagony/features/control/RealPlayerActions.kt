@@ -1,16 +1,20 @@
 package hauveli.hexagony.features.control
 
 import at.petrak.hexcasting.api.HexAPI
+import hauveli.hexagony.Hexagony
 import hauveli.hexagony.client.HexagonyClient.MINECRAFT
 import hauveli.hexagony.features.control.FakePlayerControlHelperStuff.unpackX
 import hauveli.hexagony.features.control.FakePlayerControlHelperStuff.unpackY
 import hauveli.hexagony.features.freecam.FreeCameraEntity
 import hauveli.hexagony.features.freecam.FreeCameraServerData
+import hauveli.hexagony.mixin.control.IsCrouchingLocalPLayerAccessorMixin
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
 import kotlin.math.cos
@@ -118,7 +122,7 @@ object RealPlayerActions {
         livingEntity.addDeltaMovement(headAngle.scale(speedMult))
     }
 
-    // I mean, it works, but it also feels a little jank. low priority.
+    // Works
     fun stopSprinting(livingEntity: LivingEntity) {
         livingEntity.isSprinting = false
     }
@@ -126,16 +130,54 @@ object RealPlayerActions {
     fun sprint(livingEntity: LivingEntity, amplifier: Int) {
         // using canSprint causes it to tweak which is annoying, hmm...§
         // livingEntity.canSprint())
-        livingEntity.isSprinting = true
+        val localPlayer = MINECRAFT!!.player
+        if (localPlayer != null
+            && localPlayer.canSprint()
+            && (localPlayer.getFoodData().foodLevel > 6
+                    || localPlayer.abilities.instabuild) // todo: figure out if there's a less jank way to check...
+            && localPlayer.input != null
+            && localPlayer.input.hasForwardImpulse()) {
+            /*
+            && livingEntity.deltaMovement.lengthSqr() > 0.00001
+            && livingEntity.forward.dot(livingEntity.deltaMovement) > 0) {
+             */
+            livingEntity.isSprinting = true
+            // MINECRAFT!!.player!!.isSprinting = true
+        } else {
+            stopSprinting(livingEntity)
+        }
     }
 
+    // todo: AHHHHH I CANT EVEN BEGIN TO FIGURE IT OUT
     // sneak doesn't work properly, sneaks once then stops instantly? jank
     fun stopSneaking(livingEntity: LivingEntity) {
         livingEntity.isShiftKeyDown = false
+        if (livingEntity !is LocalPlayer) return
+        // livingEntity.input.shiftKeyDown = true
+        // livingEntity as IsCrouchingLocalPLayerAccessorMixin
+        // livingEntity.isCrouching = false
     }
+
+    val sneakPoses = listOf(
+        Pose.CROUCHING
+        //Pose.SWIMMING
+    )
 
     fun sneak(livingEntity: LivingEntity, amplifier: Int) {
         livingEntity.isShiftKeyDown = true
+        livingEntity.pose = Pose.CROUCHING
+        if (livingEntity !is LocalPlayer) return
+        // livingEntity.input.shiftKeyDown = true
+        /*
+        livingEntity as IsCrouchingLocalPLayerAccessorMixin
+        livingEntity.isCrouching = true
+        livingEntity.crouching = true
+        livingEntity.setWasShiftKeyDown(true)
+        livingEntity.wasShiftKeyDown = true
+
+         */
+        // livingEntity.input.shiftKeyDown = true
+        // Hexagony.LOGGER.info("teeest")
     }
 
     // jump works ok, but not in water
@@ -143,12 +185,14 @@ object RealPlayerActions {
         livingEntity.setJumping(false)
     }
 
+    // todo: not happy with solution for behavior in water.
     fun jump(livingEntity: LivingEntity, amplifier: Int) {
         if (livingEntity.onGround()) {
             livingEntity.jumpFromGround()
             // setjumping doesn't seem to work for underwater stuff, need to fix
         } else if (livingEntity.isInWater || livingEntity.isInLava) {
             livingEntity.setJumping(true)
+            livingEntity.addDeltaMovement(Vec3(0.0,0.05,0.0))
         } else {
             livingEntity.setJumping(false)
         }
@@ -165,8 +209,7 @@ object RealPlayerActions {
         MINECRAFT!!.options.keyAttack.isDown = false
     }
 
-    // entity portion works, mining blocks does NOT. no animation is played, either.
-    //
+    // Works
     fun attack(livingEntity: LivingEntity, amplifier: Int) {
         if (livingEntity !is Player) return // animation plays if I set this to LocalPlayer... hmmm...
         RealPlayerControlHelperStuff.attack(livingEntity)

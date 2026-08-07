@@ -109,10 +109,11 @@ object RealPlayerControlHelperStuff {
 
     fun attack(player: Player) {
         if (!player.level().isClientSide) return
+        val mc = MINECRAFT!!
         val hitResult = getPlayerTarget(player)
         player.swing(player.usedItemHand) // swing no matter what
-        val key = MINECRAFT!!.options.keyAttack
-        key.isDown = true
+        // val key = MINECRAFT!!.options.keyAttack
+        // key.isDown = true
         when (hitResult.type) {
             HitResult.Type.MISS -> {
                 // does this even help the behavior? hmmm....
@@ -147,11 +148,12 @@ object RealPlayerControlHelperStuff {
 
     fun use(player: Player) {
         if (!player.level().isClientSide) return
+        val mc = MINECRAFT!!
         // todo: how the fuck do I check this in a sane way?
 
         val hitResult = FakePlayerControlHelperStuff.getPlayerTarget(player)
-        val key = MINECRAFT!!.options.keyUse
-        key.isDown = true
+        // val key = MINECRAFT!!.options.keyUse
+        // key.isDown = true
         when (hitResult.type) {
             HitResult.Type.MISS -> {
                 // this works if I open chat? hhmmmmm.....
@@ -159,6 +161,7 @@ object RealPlayerControlHelperStuff {
                 // MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
                 // player.getItemInHand(player.usedItemHand).use(player.level(), player, player.usedItemHand)
                 // how can I unfuck this when in freecam....
+                val localPlayer = MINECRAFT.player!!
                 MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
 
                 //MINECRAFT.gameMode!!.useItem(MINECRAFT.player!!, MINECRAFT.player!!.usedItemHand)
@@ -175,6 +178,7 @@ object RealPlayerControlHelperStuff {
             HitResult.Type.BLOCK -> {
                 val interacted = placeBlockOrInteract(player, hitResult as BlockHitResult)
                 if (!interacted && player.useItem.item !is BlockItem) {
+                    val localPlayer = MINECRAFT.player!!
                     MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
                     //MINECRAFT.gameMode!!.useItem(MINECRAFT.player!!, MINECRAFT.player!!.usedItemHand)
                     //Hexagony.LOGGER.info(player.usedItemHand)

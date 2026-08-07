@@ -39,7 +39,7 @@ public abstract class NoInputMinecraftMixin {
             }
             if (exceptionKeys == null) {
                 exceptionKeys = List.of(
-                        MINECRAFT.options.keyUse
+                        // MINECRAFT.options.keyUse
                         // MINECRAFT.options.keyAttack
                 );
             }
