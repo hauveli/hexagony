@@ -237,7 +237,7 @@ class BlockEntityFullMindAnchor(
             return false
         }
 
-        if (stack.`is`(HexItems.CREATIVE_UNLOCKER)) {
+        if (stack.`is`(HexItems.CREATIVE_UNLOCKER.get())) {
             return true
         }
 

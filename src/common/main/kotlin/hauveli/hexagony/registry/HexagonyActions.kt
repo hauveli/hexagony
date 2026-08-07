@@ -26,11 +26,7 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     val FREECAM_POS = make("freecam/pos", HexDir.WEST, "wwawwqwwawwawaa", OpFreecamPos)
     val FREECAM_LOOK = make("freecam/look", HexDir.WEST, "wwawwqwwawwawa", OpFreecamLookdir)
 
-    val CONGRATULATE = make("congratulate", HexDir.WEST, "eed", OpTest)
-
-    // val CONGRATULATE = make("congratulate", HexDir.WEST, "eed", OpCongratulate)
-
-    // val GREAT_CONGRATULATE = make("congratulate/great", HexDir.EAST, "qwwqqqwwqwded", OpCongratulate)
+    // val TEST_SPELL = make("congratulate", HexDir.WEST, "eed", OpTest)
 
     private fun make(name: String, startDir: HexDir, signature: String, action: Action) =
         make(name, startDir, signature) { action }

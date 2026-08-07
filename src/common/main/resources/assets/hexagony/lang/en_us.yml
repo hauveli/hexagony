@@ -67,6 +67,7 @@ jukebox_song:
         seven: Selulance - Fractal Forest - Seven
 item:
   hexagony:
+    living_hat: Living Hat
     music_disc:
       selulance:
         night_coding: Music Disc
@@ -97,6 +98,8 @@ effect:
   hexagony:
     freecam: Dissociation
 hexagony:
+  creative_tab:
+    title: Hexagony
   subtitles:
     freecam:
       bounce: Ambit Boundary boioioings

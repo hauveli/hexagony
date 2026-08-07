@@ -15,7 +15,7 @@ import hauveli.hexagony.registry.HexagonyMobEffects
 import net.minecraft.server.level.ServerPlayer
 import java.util.UUID
 
-object OpTest : SpellAction {
+object OpSpawnClone : SpellAction {
     override val argc = 0
 
     override fun execute(args: List<Iota>, env: CastingEnvironment): SpellAction.Result {
@@ -33,10 +33,28 @@ object OpTest : SpellAction {
         // IMPORTANT: do not throw mishaps in this method! mishaps should ONLY be thrown in SpellAction.execute
         override fun cast(env: CastingEnvironment) {
             env.printMessage("text.hexagony.congrats".asTranslatedComponent("STARTED"))
-            Hexagony.LOGGER.info("supposed amplifier: stuff {}", 1)
+            val clone = FakeServerPlayerUtils.spawnFakeClone(env.castingEntity!! as ServerPlayer, env.castingEntity!!.position(), UUID.randomUUID())
+            val amplifier = FakePlayerControlHelperStuff.pack(-60.45f, -60.9f)
 
+            Hexagony.LOGGER.info("supposed amplifier: {}", amplifier)
 
+            val instanceFake = HexagonyMobEffects.getInstance(
+                ControlledMobEffects.LOOK.fake,
+                800,
+                amplifier
+            )
 
+            Hexagony.LOGGER.info("amplifier on instance: {}", instanceFake.amplifier)
+            clone.addEffect(instanceFake)
+            /*
+            val instanceReal = HexagonyMobEffects.getInstance(
+                ControlledMobEffects.WALK_FORWARD.real,
+                120,
+                0
+            )
+            env.castingEntity!!.addEffect(instanceReal)
+
+             */
             env.printMessage("text.hexagony.congrats".asTranslatedComponent("FINISHED"))
         }
     }
