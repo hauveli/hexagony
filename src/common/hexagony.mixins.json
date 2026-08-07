@@ -16,7 +16,9 @@
     "freecam.OnRemovedEffectLivingEntityMixin",
     "freecam.SelectedSlotInventoryMixin",
     "freecam.SetPositionCameraMixin",
-    "freecam.ShaderGameRendererMixin"
+    "freecam.ShaderGameRendererMixin",
+    "mind_anchor.LocalPlayerTickDeathMixin",
+    "mind_anchor.NoDeathScreenMixin"
   ],
   "mixins": [
     "control.UncapAmplifierMobEffectInstanceMixin",
@@ -25,6 +27,10 @@
     "enlightenment.RequireScrollMishapUnenlightenedMixin",
     "enlightenment.RequireScrollPatternIotaMixin",
     "fake_player.KnockbackServerPlayerMixin",
+    "mind_anchor.AddFreshEntityServerLevelMixin",
+    "mind_anchor.GraftedPlayerEntityDieMixin",
+    "mind_anchor.MindAnchorInventorySlotMixin",
+    "mind_anchor.PlayerEntityOpBrainsweepMixin",
     "overcast.ApplyPenaltyAtHeadTrulyHurtMixin",
     "overcast.RemovePenaltyAtHeadStopSleepInBedMixin"
   ],

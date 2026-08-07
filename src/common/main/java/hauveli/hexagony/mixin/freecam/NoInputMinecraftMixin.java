@@ -1,5 +1,6 @@
 package hauveli.hexagony.mixin.freecam;
 
+import hauveli.hexagony.features.control.ControlledMobEffects;
 import hauveli.hexagony.features.freecam.FreeCameraEntity;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -38,7 +39,7 @@ public abstract class NoInputMinecraftMixin {
             }
             if (exceptionKeys == null) {
                 exceptionKeys = List.of(
-                        // MINECRAFT.options.keyUse,
+                        MINECRAFT.options.keyUse
                         // MINECRAFT.options.keyAttack
                 );
             }
@@ -53,8 +54,16 @@ public abstract class NoInputMinecraftMixin {
              */
             Arrays.stream(MINECRAFT.options.keyMappings).forEach(
                     keyMapping -> {
+                        // This is the wrong way to deal with the use method, but I just want something that I can at least test to begin with...
+
+                        // TODO: change this. does not work well and allows user to use when they shouldn't be able to in some situations (ex. inbetween intervals)
+                        // todo: it also incorrectly allows player to place things at freecam look block, ugh...
                         if (exceptionKeys.contains(keyMapping)) {
-                            // if ()
+                            assert MINECRAFT.player != null;
+                            if (!MINECRAFT.player.hasEffect(ControlledMobEffects.INSTANCE.getUSE().getReal().holder())) {
+                                keyMapping.consumeClick();
+                                keyMapping.setDown(false);
+                            }
                         } else if (!allowedKeys.contains(keyMapping)) {
                             keyMapping.consumeClick();
                             keyMapping.setDown(false);

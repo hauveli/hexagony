@@ -1,13 +1,17 @@
 package hauveli.hexagony
 
 //import hauveli.hexagony.networking.HexagonyNetworking
+import at.petrak.hexcasting.xplat.IXplatAbstractions
 import hauveli.hexagony.config.HexagonyConfigs
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.registry.*
 import net.minecraft.client.Minecraft
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.util.function.BiConsumer
 
 
 object Hexagony {
@@ -23,9 +27,9 @@ object Hexagony {
         initRegistries(
             HexagonyCriterions,
             HexagonyActions,
+            HexagonyItems,
             HexagonyBlocks,
             HexagonyBlockEntities,
-            HexagonyItems,
             HexagonyMobEffects,
             HexagonyRecipeTypes,
             HexagonyRecipeSerializers,

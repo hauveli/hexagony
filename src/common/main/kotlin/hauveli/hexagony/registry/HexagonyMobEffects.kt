@@ -8,6 +8,7 @@ import hauveli.hexagony.features.control.ControlledMobEffects.makeControlEffect
 import hauveli.hexagony.features.control.FakePlayerActions
 import hauveli.hexagony.features.control.FakePlayerActions.look
 import hauveli.hexagony.features.freecam.FreeCameraMobEffect
+import hauveli.hexagony.features.mind_anchor.MindGraftedMobEffect
 import hauveli.hexagony.features.mind_anchor.item.ItemMindAnchor
 import net.minecraft.core.Holder
 import net.minecraft.core.registries.BuiltInRegistries
@@ -37,6 +38,13 @@ object HexagonyMobEffects : HexagonyRegistrar<MobEffect>(
             .addAttributeModifier(HexAttributes.FEEBLE_MIND,
                 Hexagony.id("effect.freecam"), 2.0, AttributeModifier.Operation.ADD_VALUE)
             // .withSoundOnAdded()
+    }
+
+    // todo: consider the feeble mind stuff
+    // can do .onMobHurt or .onMobRemoved from the effect in order to deal with mind anchor stuff?
+    @JvmField
+    val MINDGRAFTED = make("mindgrafted") {
+        MindGraftedMobEffect(MobEffectCategory.BENEFICIAL, 0) // .onMobHurt()
     }
 
     // todo: make this less bad, I want to give it just the MobEffect...?

@@ -59,7 +59,7 @@ class BlockFullMindAnchor(properties: Properties) :
     }
 
     /*
-    override fun playerWillDestroy(pLevel: Level, pPos: BlockPos, state: BlockState, player: Player) {
+    override fun playerWillDestroy(pLevel: Level, pPos: BlockPos, state: BlockState, player: Player): BlockState {
         if (pLevel !is ServerLevel
             && pLevel.getBlockEntity(pPos) is BlockEntityFullMindAnchor) return
         summonItem(pLevel as ServerLevel, pPos)

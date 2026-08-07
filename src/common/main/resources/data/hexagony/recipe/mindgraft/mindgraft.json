@@ -1,0 +1,8 @@
+{
+  "type": "hexagony:mindgraft",
+  "exchange": {
+    "type": "hexagony:mindgraft_brainsweep",
+    "entityIn": "fishcasting:cursed",
+    "entityOut": "minecraft:allay"
+  }
+}

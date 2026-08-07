@@ -132,12 +132,12 @@ object RealPlayerControlHelperStuff {
                 // MINECRAFT.gameMode!!.destroyBlock(hitResult.blockPos) // does it instantly so nuh uh
             }
         }
-        key.consumeClick()
+        // key.consumeClick()
     }
 
-    fun placeBlockOrInteract(player: LocalPlayer, hit: BlockHitResult): Boolean {
+    fun placeBlockOrInteract(player: Player, hit: BlockHitResult): Boolean {
         val result = MINECRAFT!!.gameMode!!.useItemOn(
-            player,
+            player as LocalPlayer,
             player.usedItemHand,
             hit
         )
@@ -145,7 +145,8 @@ object RealPlayerControlHelperStuff {
         return result.consumesAction()
     }
 
-    fun use(player: LocalPlayer) {
+    fun use(player: Player) {
+        if (!player.level().isClientSide) return
         // todo: how the fuck do I check this in a sane way?
 
         val hitResult = FakePlayerControlHelperStuff.getPlayerTarget(player)
@@ -159,6 +160,7 @@ object RealPlayerControlHelperStuff {
                 // player.getItemInHand(player.usedItemHand).use(player.level(), player, player.usedItemHand)
                 // how can I unfuck this when in freecam....
                 MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+
                 //MINECRAFT.gameMode!!.useItem(MINECRAFT.player!!, MINECRAFT.player!!.usedItemHand)
                 //Hexagony.LOGGER.info(player.usedItemHand)
                 //Hexagony.LOGGER.info(player.getItemInHand(player.usedItemHand))
@@ -183,6 +185,10 @@ object RealPlayerControlHelperStuff {
                 }
             }
         }
-        key.consumeClick()
+        // huh? MINECRAFT.hitresult already exists? hmmm.... todo: investigate this
+        // MINECRAFT.hitResult
+        // I don't think I can use this when in freecam, so whatever
+
+        Hexagony.LOGGER.info(player.isUsingItem)
     }
 }

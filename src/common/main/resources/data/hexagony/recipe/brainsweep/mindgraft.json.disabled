@@ -1,0 +1,15 @@
+{
+  "type": "hexcasting:brainsweep",
+  "blockIn": {
+    "type": "hexcasting:block",
+    "block": "minecraft:grass_block"
+  },
+  "cost": 100000,
+  "entityIn": {
+    "type": "hexagony:mindgraft_brainsweep",
+    "entityType": "minecraft:player"
+  },
+  "result": {
+    "Name": "minecraft:budding_amethyst"
+  }
+}

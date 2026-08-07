@@ -123,7 +123,7 @@ class FreeCameraEntity : AbstractClientPlayer (
         // from hexmod
         fun stopAmbiance() {
             val soundManager = MINECRAFT!!.soundManager
-            soundManager.stop(HexSounds.CASTING_AMBIANCE.location, null)
+            soundManager.stop(HexSounds.CASTING_AMBIANCE.value().location, null)
         }
 
         fun startAmbiance() {
