@@ -2,6 +2,7 @@ package hauveli.hexagony.registry
 
 import hauveli.hexagony.Hexagony
 import hauveli.hexagony.features.hat.LivingHatItem
+import hauveli.hexagony.features.hat.StupidChudDummyItem
 import hauveli.hexagony.features.mind_anchor.item.ItemMindAnchor
 import hauveli.hexagony.registry.HexagonyCreativeTabs.HEXAGONY_MAIN_TAB
 import hauveli.hexagony.registry.HexagonySounds.MUSIC_DISC_ALBUM_SELULANCE_FRACTAL_FOREST
@@ -60,11 +61,18 @@ object HexagonyItems : HexagonyRegistrar<Item>(
         LivingHatItem(fireResistantUnstackable.rarity(Rarity.EPIC))
     }
 
+
     val MUSIC_DISC_SELULANCE_NIGHT_CODING = make("music_disc/selulance/night_coding") {
         musicDiscItem(HexagonySounds.MUSIC_DISC_SELULANCE_NIGHT_CODING.jukeboxSong)
     }
 
     val ALBUM_FRACTAL_FOREST = makeMusicDiscAlbum(MUSIC_DISC_ALBUM_SELULANCE_FRACTAL_FOREST)
+
+    // the layers because I'm a stupid chud dummy who couldn't figure out how to rotate the modelparts of an item in 1.21.1 properly
+    val LIVING_HAT_A = make("living_hat/living_hat_a") { StupidChudDummyItem() }
+    val LIVING_HAT_B = make("living_hat/living_hat_b") { StupidChudDummyItem() }
+    val LIVING_HAT_C = make("living_hat/living_hat_c") { StupidChudDummyItem() }
+    val LIVING_HAT_D = make("living_hat/living_hat_d") { StupidChudDummyItem() }
 
     private abstract class TabEntry {
         abstract fun register(r: CreativeModeTab.Output?)

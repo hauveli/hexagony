@@ -1,0 +1,33 @@
+{
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 64],
+	"textures": {
+		"0": "hexagony:item/living_hat"
+	},
+	"elements": [
+		{
+			"name": "cone2",
+			"from": [6, 10, 6],
+			"to": [10, 15, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 12.5, 8]},
+			"faces": {
+				"north": {"uv": [7, 10.25, 8, 11.5], "texture": "#0"},
+				"east": {"uv": [6, 10.25, 7, 11.5], "texture": "#0"},
+				"south": {"uv": [9, 10.25, 10, 11.5], "texture": "#0"},
+				"west": {"uv": [8, 10.25, 9, 11.5], "texture": "#0"},
+				"up": {"uv": [8, 10.25, 7, 9.25], "texture": "#0"},
+				"down": {"uv": [9, 9.25, 8, 10.25], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "middle",
+			"origin": [8, 13, 8],
+			"scope": 0,
+			"color": 0,
+			"children": [0]
+		}
+	]
+}

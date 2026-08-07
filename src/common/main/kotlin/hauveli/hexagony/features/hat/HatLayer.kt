@@ -2,6 +2,7 @@ package hauveli.hexagony.features.hat
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
+import hauveli.hexagony.Hexagony
 import hauveli.hexagony.registry.HexagonyItems
 import net.minecraft.client.CameraType
 import net.minecraft.client.Minecraft
@@ -10,7 +11,6 @@ import net.minecraft.client.model.HeadedModel
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.RenderLayerParent
 import net.minecraft.client.renderer.entity.layers.RenderLayer
-import net.minecraft.core.particles.ColorParticleOption
 import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.core.particles.SimpleParticleType
@@ -23,10 +23,18 @@ import net.minecraft.world.item.ItemStack
 import java.util.*
 import java.util.function.Consumer
 
+
+// todo: this doesn't run for some reason, figure out why...
 // from
 // https://github.com/fonnymunkey/SimpleHats/blob/MultiLoader-1.21.1/common/src/main/java/fonnymunkey/simplehats/client/hat/HatLayer.java
-class HatLayer<T : LivingEntity?, M>(renderer: RenderLayerParent<T?, M?>) :
-    RenderLayer<T?, M?>(renderer) where M : EntityModel<T?>?, M : HeadedModel? {
+class HatLayer<T : LivingEntity, M>(renderer: RenderLayerParent<T, M>) :
+    RenderLayer<T, M>(renderer) where M : EntityModel<T>, M : HeadedModel {
+
+    override fun getParentModel(): M {
+        // val modelpart = LivingHatModel.createBodyLayer().bakeRoot() // I don't think I can do anything in this direction.....
+        return super.getParentModel()
+    }
+
     override fun render(
         poseStack: PoseStack,
         buffer: MultiBufferSource,
@@ -39,12 +47,14 @@ class HatLayer<T : LivingEntity?, M>(renderer: RenderLayerParent<T?, M?>) :
         netHeadYaw: Float,
         headPitch: Float
     ) {
+        Hexagony.LOGGER.info("hello!!")
         val forceFirstPersonNoRender = true
         //Hacky fix for first person render mods also rendering player layers over the camera
         if (livingEntity === Minecraft.getInstance().cameraEntity
             && Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON
             && forceFirstPersonNoRender) return
 
+        Hexagony.LOGGER.info("What...!!")
         Optional.ofNullable<T?>(livingEntity).ifPresent(Consumer { component: T? ->
             if (livingEntity !is Player) {
                 val matchingItemStack = livingEntity?.armorSlots
@@ -81,6 +91,7 @@ class HatLayer<T : LivingEntity?, M>(renderer: RenderLayerParent<T?, M?>) :
         netHeadYaw: Float,
         headPitch: Float
     ) {
+        Hexagony.LOGGER.info("inthething now!!")
         if (!livingEntity!!.isInvisible) {
             poseStack.pushPose()
 
@@ -97,10 +108,23 @@ class HatLayer<T : LivingEntity?, M>(renderer: RenderLayerParent<T?, M?>) :
                 poseStack.translate(0.0f, 1.0f, 0.0f)
             }
 
-            this.parentModel!!.head.translateAndRotate(poseStack)
+            // if I CAN do it however, most likely getParentModel()
+            val modelPart = parentModel
+            modelPart.head.translateAndRotate(poseStack)
             translateToHead(poseStack, flag)
+            // todo: future self please figure this out somehow
+            // if I can't manipulate each modelpart individually, I have all the parts split up like this
             Minecraft.getInstance().entityRenderDispatcher.itemInHandRenderer
-                .renderItem(livingEntity, itemStack, ItemDisplayContext.HEAD, false, poseStack, buffer, packedLight)
+                .renderItem(livingEntity, HexagonyItems.LIVING_HAT_A.value.defaultInstance, ItemDisplayContext.HEAD, false, poseStack, buffer, packedLight)
+            Minecraft.getInstance().entityRenderDispatcher.itemInHandRenderer
+                .renderItem(livingEntity, HexagonyItems.LIVING_HAT_B.value.defaultInstance, ItemDisplayContext.HEAD, false, poseStack, buffer, packedLight)
+            Minecraft.getInstance().entityRenderDispatcher.itemInHandRenderer
+                .renderItem(livingEntity, HexagonyItems.LIVING_HAT_C.value.defaultInstance, ItemDisplayContext.HEAD, false, poseStack, buffer, packedLight)
+            Minecraft.getInstance().entityRenderDispatcher.itemInHandRenderer
+                .renderItem(livingEntity, HexagonyItems.LIVING_HAT_D.value.defaultInstance, ItemDisplayContext.HEAD, false, poseStack, buffer, packedLight)
+
+            // I can also try doing each part individually?
+            // modelPart.head.getChild("i forgot the names of my cubes but I have to get the above to even run before I can consider this................")
 
             poseStack.popPose()
         }
