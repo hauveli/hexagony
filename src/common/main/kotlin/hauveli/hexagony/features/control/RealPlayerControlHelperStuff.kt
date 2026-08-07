@@ -157,12 +157,55 @@ object RealPlayerControlHelperStuff {
         when (hitResult.type) {
             HitResult.Type.MISS -> {
                 // this works if I open chat? hhmmmmm.....
+                val localPlayer = MINECRAFT.player!!
                 // MINECRAFT!!.gameMode!!.useItem(player, player.usedItemHand)
                 // MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
                 // player.getItemInHand(player.usedItemHand).use(player.level(), player, player.usedItemHand)
                 // how can I unfuck this when in freecam....
-                val localPlayer = MINECRAFT.player!!
-                MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                MINECRAFT.gameMode!!.useItem(localPlayer, localPlayer.usedItemHand)
+                if (true) return
+                val itemInHand = localPlayer.getItemInHand(localPlayer.usedItemHand)
+                val useDurationInTicks = itemInHand.getUseDuration(localPlayer)
+                val remainingTicks = localPlayer.useItemRemainingTicks
+                val usedForThisManyTicks = useDurationInTicks - remainingTicks
+
+                Hexagony.LOGGER.info("What..: {}", useDurationInTicks)
+                Hexagony.LOGGER.info("What..2 : {}", itemInHand)
+
+                Hexagony.LOGGER.info("ticks remaining: {}", remainingTicks)
+                Hexagony.LOGGER.info("used for: {}", usedForThisManyTicks)
+
+                itemInHand.use(localPlayer.level(), localPlayer, localPlayer.usedItemHand)
+                // itemInHand.onUseTick(localPlayer.level(), localPlayer, remainingTicks)
+                if (useDurationInTicks == usedForThisManyTicks) {
+                    itemInHand.consume(1, localPlayer)
+                } else if (useDurationInTicks == remainingTicks) {
+                    localPlayer.startUsingItem(localPlayer.usedItemHand)
+                }
+
+                if (true) return
+
+                if (itemInHand.getUseDuration(localPlayer) == 0) return
+                // localPlayer.canEat(true) // what?
+                MINECRAFT.gameMode!!.useItem(localPlayer, localPlayer.usedItemHand)
+
+                if (!localPlayer.isUsingItem) {
+                    Hexagony.LOGGER.info("STARTING USE ITEM")
+                    localPlayer.startUsingItem(localPlayer.usedItemHand)
+                    localPlayer.useItem.use(
+                        localPlayer.level(),
+                        localPlayer,
+                        localPlayer.usedItemHand
+                    )
+                    MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                    if (localPlayer.canEat(true)) {
+                    }
+                } else {
+                    Hexagony.LOGGER.info("REPEATING")
+                    MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                    // localPlayer.useItem.consume(0, localPlayer)
+                }
+                Hexagony.LOGGER.info(player.isUsingItem)
 
                 //MINECRAFT.gameMode!!.useItem(MINECRAFT.player!!, MINECRAFT.player!!.usedItemHand)
                 //Hexagony.LOGGER.info(player.usedItemHand)
@@ -179,7 +222,13 @@ object RealPlayerControlHelperStuff {
                 val interacted = placeBlockOrInteract(player, hitResult as BlockHitResult)
                 if (!interacted && player.useItem.item !is BlockItem) {
                     val localPlayer = MINECRAFT.player!!
-                    MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                    // MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                    // ok so this fixes the useItemOn behavior I think?
+                    // still need to figure out the actual chat open -> actual use thing...
+                    if (!MINECRAFT.gameMode!!.useItemOn(localPlayer, localPlayer.usedItemHand, hitResult)
+                            .consumesAction()) {
+                        MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                    }
                     //MINECRAFT.gameMode!!.useItem(MINECRAFT.player!!, MINECRAFT.player!!.usedItemHand)
                     //Hexagony.LOGGER.info(player.usedItemHand)
                     //Hexagony.LOGGER.info(player.getItemInHand(player.usedItemHand))
@@ -193,6 +242,5 @@ object RealPlayerControlHelperStuff {
         // MINECRAFT.hitResult
         // I don't think I can use this when in freecam, so whatever
 
-        Hexagony.LOGGER.info(player.isUsingItem)
     }
 }
