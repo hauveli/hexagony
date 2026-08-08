@@ -1,8 +1,11 @@
 package hauveli.hexagony.mixin.freecam;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import hauveli.hexagony.features.control.ControlledMobEffects;
 import hauveli.hexagony.features.freecam.FreeCameraClientData;
 import hauveli.hexagony.features.freecam.FreeCameraEntity;
+import hauveli.hexagony.registry.HexagonyMobEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.phys.Vec3;
@@ -21,10 +24,14 @@ public abstract class AntiSneakLocalPlayerMixin {
 
     @Inject(method = "isShiftKeyDown", at = @At("HEAD"), cancellable = true)
     private void hexagony$disableSneak(CallbackInfoReturnable<Boolean> cir) {
-        if (FreeCameraEntity.Companion.getActive()) {
+        LocalPlayer localPlayer = (LocalPlayer) (Object) this;
+        if (FreeCameraEntity.Companion.getActive()
+                && !localPlayer.hasEffect(ControlledMobEffects.INSTANCE.getSNEAK().getReal().holder())) {
             cir.cancel();
         }
     }
+
+
 
     /*
     @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;isFlyingLocked()Z"))
@@ -38,6 +45,7 @@ public abstract class AntiSneakLocalPlayerMixin {
     private boolean letServerKnowImHere(boolean previous) {
         if (FreeCameraEntity.Companion.getActive()) {
             FreeCameraClientData.INSTANCE.sync(); // piggybacking hehehehehe.... I hope I won't forget this in the future...!
+            // for future self: I'm just syncing the lookdir and pos from here, I think my reasoning was that it's for the freecam anyway so many as well
             return true;
         }
         return previous;

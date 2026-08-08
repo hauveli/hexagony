@@ -15,12 +15,17 @@ import net.minecraft.client.player.Input
 import net.minecraft.client.player.KeyboardInput
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.commands.arguments.EntityAnchorArgument
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.EntityDimensions
 import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.Pose
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.GameType
+import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.Scoreboard
@@ -47,6 +52,33 @@ class FreeCameraEntity : AbstractClientPlayer (
         pose = Pose.SWIMMING
         abilities.flying = true
         input = KeyboardInput(MINECRAFT!!.options)
+        blocksBuilding = false
+
+        abilities.mayBuild = false
+        abilities.instabuild = false
+    }
+
+
+    override fun getLookAngle(): Vec3 {
+        return originalPlayer!!.lookAngle // super.getLookAngle()
+    }
+
+    override fun tick() {
+        // super.tick()
+    }
+
+    override fun mayBuild(): Boolean {
+        return false
+    }
+    override fun mayInteract(p0: Level, p1: BlockPos): Boolean {
+        return false
+    }
+    override fun mayUseItemAt(p0: BlockPos, p1: Direction, p2: ItemStack): Boolean {
+        return false
+    }
+
+    override fun blockActionRestricted(p0: Level, p1: BlockPos, p2: GameType): Boolean {
+        return true // super.blockActionRestricted(p0, p1, p2)
     }
 
     override fun getDefaultDimensions(p0: Pose): EntityDimensions {
@@ -70,6 +102,14 @@ class FreeCameraEntity : AbstractClientPlayer (
 
     override fun getScoreboard(): Scoreboard {
         return Scoreboard() // uhhh....
+    }
+
+    override fun blockInteractionRange(): Double {
+        return 0.0
+    }
+
+    override fun entityInteractionRange(): Double {
+        return 0.0
     }
 
     override fun isSpectator(): Boolean {

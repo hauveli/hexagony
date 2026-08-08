@@ -4,6 +4,7 @@ import hauveli.hexagony.Hexagony
 import hauveli.hexagony.client.HexagonyClient.MINECRAFT
 import hauveli.hexagony.features.control.FakePlayerControlHelperStuff.placeBlockOrInteract
 import hauveli.hexagony.features.fake_player.FakeServerPlayer
+import hauveli.hexagony.registry.HexagonyMobEffects
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -149,6 +150,8 @@ object RealPlayerControlHelperStuff {
     fun use(player: Player) {
         if (!player.level().isClientSide) return
         val mc = MINECRAFT!!
+        val gm = mc.gameMode!!
+        val localPlayer = mc.player!!
         // todo: how the fuck do I check this in a sane way?
 
         val hitResult = FakePlayerControlHelperStuff.getPlayerTarget(player)
@@ -157,12 +160,12 @@ object RealPlayerControlHelperStuff {
         when (hitResult.type) {
             HitResult.Type.MISS -> {
                 // this works if I open chat? hhmmmmm.....
-                val localPlayer = MINECRAFT.player!!
                 // MINECRAFT!!.gameMode!!.useItem(player, player.usedItemHand)
                 // MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
                 // player.getItemInHand(player.usedItemHand).use(player.level(), player, player.usedItemHand)
                 // how can I unfuck this when in freecam....
-                MINECRAFT.gameMode!!.useItem(localPlayer, localPlayer.usedItemHand)
+                gm.useItem(localPlayer, localPlayer.usedItemHand)
+                MINECRAFT.options.keyUse.isDown = true
                 if (true) return
                 val itemInHand = localPlayer.getItemInHand(localPlayer.usedItemHand)
                 val useDurationInTicks = itemInHand.getUseDuration(localPlayer)
@@ -187,7 +190,7 @@ object RealPlayerControlHelperStuff {
 
                 if (itemInHand.getUseDuration(localPlayer) == 0) return
                 // localPlayer.canEat(true) // what?
-                MINECRAFT.gameMode!!.useItem(localPlayer, localPlayer.usedItemHand)
+                gm.useItem(localPlayer, localPlayer.usedItemHand)
 
                 if (!localPlayer.isUsingItem) {
                     Hexagony.LOGGER.info("STARTING USE ITEM")
@@ -197,12 +200,12 @@ object RealPlayerControlHelperStuff {
                         localPlayer,
                         localPlayer.usedItemHand
                     )
-                    MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                    gm.useItem(player, player.usedItemHand)
                     if (localPlayer.canEat(true)) {
                     }
                 } else {
                     Hexagony.LOGGER.info("REPEATING")
-                    MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                    gm.useItem(player, player.usedItemHand)
                     // localPlayer.useItem.consume(0, localPlayer)
                 }
                 Hexagony.LOGGER.info(player.isUsingItem)
@@ -215,19 +218,23 @@ object RealPlayerControlHelperStuff {
                 // player.useItem.use(player.level(), player, player.usedItemHand)
             }
             HitResult.Type.ENTITY -> {
-                player.interactOn((hitResult as EntityHitResult).entity, InteractionHand.MAIN_HAND)
+                if (!player.interactOn((hitResult as EntityHitResult).entity, InteractionHand.MAIN_HAND)
+                    .consumesAction())
+                    gm.useItem(player, player.usedItemHand)
                 // player.interactAt(player, hitResult.location, InteractionHand.MAIN_HAND)
             }
             HitResult.Type.BLOCK -> {
                 val interacted = placeBlockOrInteract(player, hitResult as BlockHitResult)
                 if (!interacted && player.useItem.item !is BlockItem) {
-                    val localPlayer = MINECRAFT.player!!
                     // MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
                     // ok so this fixes the useItemOn behavior I think?
                     // still need to figure out the actual chat open -> actual use thing...
-                    if (!MINECRAFT.gameMode!!.useItemOn(localPlayer, localPlayer.usedItemHand, hitResult)
+                    if (!gm.useItemOn(localPlayer, localPlayer.usedItemHand, hitResult)
                             .consumesAction()) {
-                        MINECRAFT.gameMode!!.useItem(player, player.usedItemHand)
+                        gm.useItem(player, player.usedItemHand)
+                        if (!player.hasEffect(HexagonyMobEffects.FREECAM.holder())) {
+                        }
+                        MINECRAFT.options.keyUse.isDown = true
                     }
                     //MINECRAFT.gameMode!!.useItem(MINECRAFT.player!!, MINECRAFT.player!!.usedItemHand)
                     //Hexagony.LOGGER.info(player.usedItemHand)
