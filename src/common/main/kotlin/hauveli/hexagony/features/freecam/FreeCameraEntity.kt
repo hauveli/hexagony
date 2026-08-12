@@ -391,6 +391,8 @@ class FreeCameraEntity : AbstractClientPlayer (
             // player.move(MoverType.SELF, Vec3.ZERO)
 
             // close the hexcasting grid, too...
+            if (MINECRAFT.options.cameraType != CameraType.THIRD_PERSON_BACK)
+                MINECRAFT.options.cameraType = CameraType.THIRD_PERSON_BACK
 
             backupInput = player.input
             // freeCamera.input = KeyboardInput(client.options) // player.input
