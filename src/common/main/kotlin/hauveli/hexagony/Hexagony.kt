@@ -3,6 +3,7 @@ package hauveli.hexagony
 //import hauveli.hexagony.networking.HexagonyNetworking
 import at.petrak.hexcasting.xplat.IXplatAbstractions
 import hauveli.hexagony.config.HexagonyConfigs
+import hauveli.hexagony.features.enlightenment.HasHeldPatternTrigger
 import hauveli.hexagony.networking.HexagonyNetworking
 import hauveli.hexagony.registry.*
 import net.minecraft.client.Minecraft
@@ -38,6 +39,7 @@ object Hexagony {
         )
         HexagonyNetworking.init()
         HexagonyConfigs.init()
+        // HexagonyCriterions.init()
     }
 
     fun initServer() {

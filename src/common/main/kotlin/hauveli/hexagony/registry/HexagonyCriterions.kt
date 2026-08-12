@@ -6,8 +6,10 @@ import me.fzzyhmstrs.fzzy_config.util.FcText.description
 import net.minecraft.advancements.CriteriaTriggers
 import net.minecraft.advancements.CriterionTrigger
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger
+import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
@@ -25,13 +27,15 @@ object HexagonyCriterions : HexagonyRegistrar<CriterionTrigger<*>>(
     }
 
     val HAS_HELD_PATTERN = make("has_held_pattern", {HasHeldPatternTrigger()})
-    fun onInventoryChange(serverPlayer: ServerPlayer, itemStack: ItemStack) {
-        HAS_HELD_PATTERN.value.trigger(serverPlayer, itemStack)
+    fun onInventoryChange(player: ServerPlayer, itemStack: ItemStack) {
+        val fuckedUpString = "What the fukc?" + itemStack.item.toString() + "; player: " + player.toString() + " umm...?"
+        player.sendSystemMessage(Component.nullToEmpty(fuckedUpString))
+        HAS_HELD_PATTERN.value.trigger(player, itemStack)
     }
 
     private fun <T : CriterionTrigger<*>> make(name: String, builder: () -> T): HexagonyRegistrar<CriterionTrigger<*>>.Entry<T> =
         register(Hexagony.id(name), builder)
 
-    // fabric docs say I need to run this on init to make things work even if its blank, to load the class, which makes sense
+    // fabric docs say I need to run this on init to make things work even if its blank, to load the class, which makes sense?
     fun init() {}
 }
