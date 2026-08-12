@@ -14,6 +14,8 @@ import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.core.particles.SimpleParticleType
 import net.minecraft.util.Mth
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.ZombieVillager
 import net.minecraft.world.entity.npc.Villager
@@ -53,7 +55,7 @@ class HatLayer<T : LivingEntity, M>(renderer: RenderLayerParent<T, M>) :
             && Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON
             && forceFirstPersonNoRender) return
 
-        if (livingEntity is Player) {
+        if (livingEntity is Entity && livingEntity.hasItemInSlot(EquipmentSlot.HEAD)) {
             val matchingItemStack = livingEntity.armorSlots
                 .find { it.item == HexagonyItems.LIVING_HAT.value }
             if (matchingItemStack != null && !matchingItemStack.isEmpty) {
@@ -97,16 +99,15 @@ class HatLayer<T : LivingEntity, M>(renderer: RenderLayerParent<T, M>) :
             poseStack.pushPose()
 
             // are these all local to the livingEntity's scale? if so that makes it way easier...
-            val hatOffsetY = 0f
+            // val hatOffsetY = 0f
 
-            //Slightly scale up to fix some skin layer difference issues
-            poseStack.scale(2.01f, 2.01f, 2.01f)
-            poseStack.translate(0.0f, 0.0f - hatOffsetY, 0.0f)
+            poseStack.scale(2.0f, 2.0f, 2.0f)
+            // poseStack.translate(0.0f, 0.0f - hatOffsetY, 0.0f)
 
             val flag = livingEntity is Villager || livingEntity is ZombieVillager
             if (livingEntity.isBaby && livingEntity !is Villager) {
                 poseStack.translate(0.0f, 0.03125f, 0.0f)
-                poseStack.scale(1f,1f,1f)
+                // poseStack.scale(1f,1f,1f)
                 poseStack.translate(0.0f, 1.0f, 0.0f)
             }
 
