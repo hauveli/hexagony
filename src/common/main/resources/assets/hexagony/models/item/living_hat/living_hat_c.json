@@ -8,9 +8,9 @@
 	"elements": [
 		{
 			"name": "cone2",
-			"from": [6, 10, 6],
-			"to": [10, 15, 10],
-			"rotation": {"angle": 0, "axis": "y", "origin": [8, 12.5, 8]},
+			"from": [6, 14, 6],
+			"to": [10, 19, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 16.5, 8]},
 			"faces": {
 				"north": {"uv": [7, 10.25, 8, 11.5], "texture": "#0"},
 				"east": {"uv": [6, 10.25, 7, 11.5], "texture": "#0"},

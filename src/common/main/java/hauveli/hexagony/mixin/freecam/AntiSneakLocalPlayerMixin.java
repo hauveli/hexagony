@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -42,7 +43,7 @@ public abstract class AntiSneakLocalPlayerMixin {
      */
 
     @ModifyExpressionValue(method = "sendPosition", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isControlledCamera()Z"))
-    private boolean letServerKnowImHere(boolean previous) {
+    private boolean hexagony$letServerKnowImHere(boolean previous) {
         if (FreeCameraEntity.Companion.getActive()) {
             FreeCameraClientData.INSTANCE.sync(); // piggybacking hehehehehe.... I hope I won't forget this in the future...!
             // for future self: I'm just syncing the lookdir and pos from here, I think my reasoning was that it's for the freecam anyway so many as well
@@ -51,9 +52,12 @@ public abstract class AntiSneakLocalPlayerMixin {
         return previous;
     }
 
-    private Boolean timedToggle = false;
+    @Unique
+    private Boolean hexagony$timedToggle = false;
 
-    private Vec3 pos = Vec3.ZERO;
-    private Vec3 lookdir = Vec3.ZERO;
+    @Unique
+    private Vec3 hexagony$pos = Vec3.ZERO;
+    @Unique
+    private Vec3 hexagony$lookdir = Vec3.ZERO;
 
 }

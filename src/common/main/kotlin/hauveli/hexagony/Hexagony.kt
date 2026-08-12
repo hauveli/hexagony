@@ -27,8 +27,9 @@ object Hexagony {
         initRegistries(
             HexagonyCriterions,
             HexagonyActions,
-            HexagonyItems,
+            HexagonyCreativeTabs,
             HexagonyBlocks,
+            HexagonyItems,
             HexagonyBlockEntities,
             HexagonyMobEffects,
             HexagonyRecipeTypes,

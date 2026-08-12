@@ -2,7 +2,6 @@ package hauveli.hexagony.features.hat
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
-import hauveli.hexagony.Hexagony
 import hauveli.hexagony.registry.HexagonyItems
 import net.minecraft.client.CameraType
 import net.minecraft.client.Minecraft
@@ -14,14 +13,15 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer
 import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.core.particles.SimpleParticleType
+import net.minecraft.util.Mth
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.ZombieVillager
 import net.minecraft.world.entity.npc.Villager
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
-import java.util.*
-import java.util.function.Consumer
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 // todo: this doesn't run for some reason, figure out why...
@@ -47,36 +47,38 @@ class HatLayer<T : LivingEntity, M>(renderer: RenderLayerParent<T, M>) :
         netHeadYaw: Float,
         headPitch: Float
     ) {
-        Hexagony.LOGGER.info("hello!!")
-        val forceFirstPersonNoRender = true
+        val forceFirstPersonNoRender = false
         //Hacky fix for first person render mods also rendering player layers over the camera
         if (livingEntity === Minecraft.getInstance().cameraEntity
             && Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON
             && forceFirstPersonNoRender) return
 
-        Hexagony.LOGGER.info("What...!!")
-        Optional.ofNullable<T?>(livingEntity).ifPresent(Consumer { component: T? ->
-            if (livingEntity !is Player) {
-                val matchingItemStack = livingEntity?.armorSlots
-                    ?.find { it.item == HexagonyItems.LIVING_HAT }
-                if (matchingItemStack != null && !matchingItemStack.isEmpty) {
-                    render(
-                        matchingItemStack,
-                        poseStack,
-                        buffer,
-                        packedLight,
-                        livingEntity,
-                        limbSwing,
-                        limbSwingAmount,
-                        partialTicks,
-                        age,
-                        netHeadYaw,
-                        headPitch
-                    )
-                }
+        if (livingEntity is Player) {
+            val matchingItemStack = livingEntity.armorSlots
+                .find { it.item == HexagonyItems.LIVING_HAT.value }
+            if (matchingItemStack != null && !matchingItemStack.isEmpty) {
+                render(
+                    matchingItemStack,
+                    poseStack,
+                    buffer,
+                    packedLight,
+                    livingEntity,
+                    limbSwing,
+                    limbSwingAmount,
+                    partialTicks,
+                    age,
+                    netHeadYaw,
+                    headPitch
+                )
             }
+        }
+        /*
+        Optional.ofNullable<T?>(livingEntity).ifPresent(Consumer { component: T? ->
         })
+         */
     }
+
+    private val HAT_BRIM_DIAMETER = 22
 
     private fun render(
         itemStack: ItemStack,
@@ -91,14 +93,14 @@ class HatLayer<T : LivingEntity, M>(renderer: RenderLayerParent<T, M>) :
         netHeadYaw: Float,
         headPitch: Float
     ) {
-        Hexagony.LOGGER.info("inthething now!!")
         if (!livingEntity!!.isInvisible) {
             poseStack.pushPose()
 
-            val hatOffsetY = 0.2f
+            // are these all local to the livingEntity's scale? if so that makes it way easier...
+            val hatOffsetY = 0f
 
             //Slightly scale up to fix some skin layer difference issues
-            poseStack.scale(1.01f, 1.01f, 1.01f)
+            poseStack.scale(2.01f, 2.01f, 2.01f)
             poseStack.translate(0.0f, 0.0f - hatOffsetY, 0.0f)
 
             val flag = livingEntity is Villager || livingEntity is ZombieVillager
@@ -108,10 +110,11 @@ class HatLayer<T : LivingEntity, M>(renderer: RenderLayerParent<T, M>) :
                 poseStack.translate(0.0f, 1.0f, 0.0f)
             }
 
-            // if I CAN do it however, most likely getParentModel()
+            // if I CAN do it however, most likely getParentModel()? i have no idea... somebody reading this, PLEASE let me know how to do this in a less stupid way...
             val modelPart = parentModel
             modelPart.head.translateAndRotate(poseStack)
             translateToHead(poseStack, flag)
+
             // todo: future self please figure this out somehow
             // if I can't manipulate each modelpart individually, I have all the parts split up like this
             Minecraft.getInstance().entityRenderDispatcher.itemInHandRenderer
@@ -129,23 +132,57 @@ class HatLayer<T : LivingEntity, M>(renderer: RenderLayerParent<T, M>) :
             poseStack.popPose()
         }
         if (livingEntity is Player) {
+            // todo: check if living hat is revealed and hungry, return here if not
+            if (false) {
+                return
+            }
             val particlesEnabled = true
-            val frequency = 300
+            val frequency = 99f / 100f
             val particleType = ParticleTypes.DRIPPING_WATER
             if (particlesEnabled && !Minecraft.getInstance().isPaused && livingEntity.getRandom()
                     .nextFloat() < (if (livingEntity.isInvisible) frequency / 2 else frequency)
             ) {
+                // the region I think I want to glup is the rim of the rectangular cuboid that is the bottom-most cuboid, shifted down by 1 pixel.
+                // so that makes the region uhh.... (head_origin) + something > x > (head_origin) - somethingelse
+                // it's 22x22x1 pixels hmm... I can pick a random value between 0 and 22 for each axis? that makes it simpler for me, at least...
+
+                var x = (11 - livingEntity.random.nextIntBetweenInclusive(0,HAT_BRIM_DIAMETER)) / 8.0
+                var z = (11 - livingEntity.random.nextIntBetweenInclusive(0,HAT_BRIM_DIAMETER)) / 8.0
+                if (livingEntity.random.nextBoolean()) {
+                    if (livingEntity.random.nextBoolean()) {
+                        x = 11 / 8.0
+                    } else {
+                        x = -11 / 8.0
+                    }
+                } else {
+                    if (livingEntity.random.nextBoolean()) {
+                        z = 11 / 8.0
+                    } else {
+                        z = -11 / 8.0
+                    }
+                }
+
+                val up = livingEntity.getUpVector(partialTicks).normalize()
+                val look = livingEntity.getViewVector(partialTicks).normalize()
+
+                val right = look.cross(up).normalize()
+                val headForward = up.cross(right).normalize()
+
+                val radial =
+                    right.scale(x)
+                        .add(headForward.scale(z))
+
                 val d0 = livingEntity.getRandom().nextGaussian() * 0.02
                 val d1 = livingEntity.getRandom().nextGaussian() * 0.02
                 val d2 = livingEntity.getRandom().nextGaussian() * 0.02
-                val y = livingEntity.randomY
+                val y = 1.6 // livingEntity.randomY
                 val particleType: ParticleType<*>? = particleType
                 if (particleType is SimpleParticleType) {
                     livingEntity.level().addParticle(
                         particleType,
-                        livingEntity.x + livingEntity.getRandom().nextFloat() - 0.5,
-                        y,
-                        livingEntity.z + livingEntity.getRandom().nextFloat() - 0.5,
+                        livingEntity.x + radial.x + (livingEntity.getRandom().nextFloat() - 0.5) * 0.05,
+                        livingEntity.y + y + radial.y,
+                        livingEntity.z + radial.z + (livingEntity.getRandom().nextFloat() - 0.5) * 0.05,
                         d0,
                         d1,
                         d2

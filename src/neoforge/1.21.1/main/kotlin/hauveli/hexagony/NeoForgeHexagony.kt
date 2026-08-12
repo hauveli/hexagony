@@ -35,24 +35,6 @@ class NeoForgeHexagony(modBus: IEventBus, container: ModContainer) {
         Hexagony.init()
         // my cringe stuff
         NeoForge.EVENT_BUS.addListener(this::onServerStarted)
-
-
-        fun <T> bind(
-            registry: ResourceKey<out Registry<T>>,
-            source: Consumer<BiConsumer<T, ResourceLocation>>
-        ) {
-            modBus.addListener({ event: RegisterEvent ->
-                if (registry == event.registryKey) {
-                    source.accept(BiConsumer { t: T, rl: ResourceLocation ->
-                        event.register<T>(
-                            registry,
-                            rl
-                        ) { t }
-                    })
-                }
-            })
-        }
-        bind(Registries.CREATIVE_MODE_TAB, HexagonyCreativeTabs::registerCreativeTabs)
     }
 
 
@@ -63,7 +45,7 @@ class NeoForgeHexagony(modBus: IEventBus, container: ModContainer) {
 
     // how do I do this in common? if anybody knows please tell me
     fun registerCreativeModeTabItems(event: BuildCreativeModeTabContentsEvent) {
-        Hexagony.LOGGER.info("wtf it runs but doesn't work???? TEST FUCK {}", event.tab.displayName)
+        // Hexagony.LOGGER.info("wtf it runs but doesn't work???? TEST FUCK {}", event.tab.displayName)
         HexagonyItems.registerItemCreativeTab(event, event.tab);
     }
 

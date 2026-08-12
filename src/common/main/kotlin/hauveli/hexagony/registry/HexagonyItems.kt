@@ -24,17 +24,88 @@ object HexagonyItems : HexagonyRegistrar<Item>(
     BuiltInRegistries.ITEM.key() as ResourceKey<Registry<Item>>,
     { BuiltInRegistries.ITEM }
 ) {
+
     private val ITEM_TABS: MutableMap<CreativeModeTab, MutableList<() -> TabEntry>> =
         LinkedHashMap<CreativeModeTab, MutableList<() -> TabEntry>>()
 
+    private val ITEMS: MutableList<Entry<*>> = mutableListOf()
 
-    val props = Item.Properties()
-    val fireResistant = props.fireResistant()
-    val unstackable = props.stacksTo(1)
-    val fireResistantUnstackable = unstackable.fireResistant()
+    @JvmStatic
+    fun registerItemCreativeTab(r: CreativeModeTab.Output, tab: CreativeModeTab) {
+        if (ITEM_TABS.isEmpty()) {
+            for (item in ITEMS) {
+                ITEM_TABS.computeIfAbsent(HEXAGONY_MAIN_TAB.value) { t: CreativeModeTab -> ArrayList() }
+                    .add({ TabEntry.ItemEntry(item.value) })
+            }
+        }
+        for (item in ITEM_TABS.getOrDefault(tab, mutableListOf<() -> TabEntry?>())) {
+            item()!!.register(r)
+        }
+    }
+
+    private fun <T : Item> make(name: String, builder: () -> T): HexagonyRegistrar<Item>.Entry<T> {
+        val registered = register(Hexagony.id(name), builder)
+        ITEMS.add(registered)
+        return registered
+    }
+
+    private fun props(): Item.Properties {return Item.Properties()}
+    private fun stacksTo(props: Item.Properties = props(), stackSizeLimit: Int = 64): Item.Properties {
+        return props.stacksTo(stackSizeLimit)}
+    private fun uncommon(props: Item.Properties = props()): Item.Properties {
+        return props.rarity(Rarity.UNCOMMON) }
+    private fun rare(props: Item.Properties = props()): Item.Properties {
+        return props.rarity(Rarity.RARE) }
+    private fun epic(props: Item.Properties = props()): Item.Properties {
+        return props.rarity(Rarity.EPIC) }
+
+    private fun unstackable(props: Item.Properties = props()): Item.Properties {
+        return stacksTo(props, 1)}
+
+    private fun fireResistant(props: Item.Properties = props()): Item.Properties {
+        return props.fireResistant()}
+
+    private fun fireResistantUnstackable(props: Item.Properties = props()): Item.Properties {
+        return fireResistant(unstackable(props))}
+
+    private fun fireResistantUncommon(props: Item.Properties = props()): Item.Properties {
+        return fireResistant(uncommon(props))}
+    private fun fireResistantRare(props: Item.Properties = props()): Item.Properties {
+        return fireResistant(rare(props))}
+    private fun fireResistantEpic(props: Item.Properties = props()): Item.Properties {
+        return fireResistant(epic(props))}
+
+    private fun unstackableUncommon(props: Item.Properties = props()): Item.Properties {
+        return unstackable(uncommon(props))}
+    private fun unstackableRare(props: Item.Properties = props()): Item.Properties {
+        return unstackable(rare(props))}
+
+
+    private fun unstackableFireResistantUncommon(props: Item.Properties = props()): Item.Properties {
+        return unstackable(fireResistantUncommon(props))}
+    private fun unstackableFireResistantRare(props: Item.Properties = props()): Item.Properties {
+        return unstackable(fireResistantRare(props))}
+    private fun unstackableFireResistantEpic(props: Item.Properties = props()): Item.Properties {
+        return unstackable(fireResistantEpic(props))}
+
+    fun newItem(): Item {
+        return Item(props())
+    }
 
     private fun musicDiscItem(resourceKey: ResourceKey<JukeboxSong>): Item {
-        return Item(unstackable.jukeboxPlayable(resourceKey))
+        return Item(unstackableRare().jukeboxPlayable(resourceKey))
+    }
+
+    private fun makeMusicDiscAlbum(album: List<MusicDiscEntry<SoundEvent>>): List<HexagonyRegistrar<Item>.Entry<Item>> {
+        val mutableList = mutableListOf<HexagonyRegistrar<Item>.Entry<Item>>()
+        for (track in album) {
+            mutableList.addLast(
+                make(track.soundEvent.id.path) {
+                    musicDiscItem(track.jukeboxSong)
+                }
+            )
+        }
+        return mutableList.toList()
     }
 
     // BlockItems
@@ -42,8 +113,7 @@ object HexagonyItems : HexagonyRegistrar<Item>(
     val MIND_ANCHOR_EMPTY = make("mind_anchor/empty") {
         BlockItem(
             HexagonyBlocks.MIND_ANCHOR_EMPTY.value,   // safe: lazy evaluated during init
-            fireResistant // stacking to 64 is default, I think?
-                .rarity(Rarity.RARE)
+            fireResistantRare()
         )
     }
 
@@ -52,13 +122,12 @@ object HexagonyItems : HexagonyRegistrar<Item>(
     val MIND_ANCHOR_FULL = make("mind_anchor/full") {
         ItemMindAnchor(
             HexagonyBlocks.MIND_ANCHOR_FULL.value,   // safe: lazy evaluated during init
-            fireResistantUnstackable
-                .rarity(Rarity.EPIC)
+            unstackableFireResistantEpic()
         )
     }
 
     val LIVING_HAT = make("living_hat") {
-        LivingHatItem(fireResistantUnstackable.rarity(Rarity.EPIC))
+        LivingHatItem(unstackableFireResistantEpic())
     }
 
 
@@ -88,31 +157,5 @@ object HexagonyItems : HexagonyRegistrar<Item>(
                 r?.accept(stack.get())
             }
         }
-    }
-
-    @JvmStatic
-    fun registerItemCreativeTab(r: CreativeModeTab.Output, tab: CreativeModeTab) {
-        for (item in ITEM_TABS.getOrDefault(tab, mutableListOf<() -> TabEntry?>())) {
-            item()!!.register(r)
-        }
-    }
-
-    private fun <T : Item> make(name: String, builder: () -> T): HexagonyRegistrar<Item>.Entry<T> {
-        val registered = register(Hexagony.id(name), builder)
-        ITEM_TABS.computeIfAbsent(HEXAGONY_MAIN_TAB) {t: CreativeModeTab -> ArrayList() }
-            .add({TabEntry.ItemEntry(registered.value)})
-        return registered
-    }
-
-    private fun makeMusicDiscAlbum(album: List<MusicDiscEntry<SoundEvent>>): List<HexagonyRegistrar<Item>.Entry<Item>> {
-        val mutableList = mutableListOf<HexagonyRegistrar<Item>.Entry<Item>>()
-        for (track in album) {
-            mutableList.addLast(
-                make(track.soundEvent.id.path) {
-                    musicDiscItem(track.jukeboxSong)
-                }
-            )
-        }
-        return mutableList.toList()
     }
 }

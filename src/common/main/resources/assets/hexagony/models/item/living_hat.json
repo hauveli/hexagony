@@ -1,32 +1,6 @@
 {
-	"format_version": "1.9.0",
-	"credit": "Made with Blockbench",
-	"texture_size": [64, 64],
+	"parent": "item/generated",
 	"textures": {
-		"0": "hexagony:item/living_hat"
-	},
-	"elements": [
-		{
-			"name": "base",
-			"from": [-3, 0, -3],
-			"to": [19, 1, 19],
-			"rotation": {"angle": 0, "axis": "y", "origin": [8, 0, 8]},
-			"faces": {
-				"north": {"uv": [3.25, 4, 8.75, 4.25], "texture": "#0"},
-				"east": {"uv": [-2.25, 4, 3.25, 4.25], "texture": "#0"},
-				"south": {"uv": [14.25, 4, 19.75, 4.25], "texture": "#0"},
-				"west": {"uv": [8.75, 4, 14.25, 4.25], "texture": "#0"},
-				"up": {"uv": [8.75, 4, 3.25, -1.5], "texture": "#0"},
-				"down": {"uv": [14.25, -1.5, 8.75, 4], "texture": "#0"}
-			}
-		}
-	],
-	"groups": [
-		{
-			"name": "root",
-			"origin": [8, 13, 8],
-			"scope": 0,
-			"color": 0
-		}
-	]
+		"layer0": "hexagony:item/living_hat/asleep"
+	}
 }
