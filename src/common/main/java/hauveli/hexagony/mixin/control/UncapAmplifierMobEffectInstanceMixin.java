@@ -19,10 +19,8 @@ public class UncapAmplifierMobEffectInstanceMixin {
     @Shadow
     private int amplifier;
 
-    @Inject(method = "<init>*", at = @At("TAIL"))
-    private void afterInit(Holder<MobEffect> effect, int duration, int amplifier,
-                           boolean ambient, boolean visible, boolean showIcon,
-                           CallbackInfo ci) {
+    @Inject(method = "<init>(Lnet/minecraft/core/Holder;IIZZZLnet/minecraft/world/effect/MobEffectInstance;)V", at = @At("TAIL"))
+    private void afterInit(Holder effect, int par2, int par3, boolean par4, boolean par5, boolean par6, MobEffectInstance par7, CallbackInfo ci) {
         if (effect.value() instanceof ControlledMobEffect) {
             this.amplifier = amplifier;
         }

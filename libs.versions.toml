@@ -32,9 +32,9 @@ paucal        = "0.7.1-pre-27+1.21.1-common"
 paucal-fabric = "0.7.1-pre-27+1.21.1-fabric"
 paucal-neoforge  = "0.7.1-pre-27+1.21.1-neoforge"
 
-patchouli        = "1.21.1-90"
-patchouli-fabric = "1.21.1-90-FABRIC" # thanks vazkii
-patchouli-neoforge  = "1.21.1-90-NEOFORGE"
+patchouli        = "1.21.1-93"
+patchouli-fabric = "1.21.1-93-FABRIC" # thanks vazkii
+patchouli-neoforge  = "1.21.1-93-NEOFORGE"
 
 cardinalComponents = "6.1.3"
 clothConfig        = "15.0.130"

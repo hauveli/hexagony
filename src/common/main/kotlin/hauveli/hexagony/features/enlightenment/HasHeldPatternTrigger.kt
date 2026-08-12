@@ -21,10 +21,15 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import hauveli.hexagony.Hexagony
 import net.minecraft.advancements.critereon.ContextAwarePredicate
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger
+import net.minecraft.client.Minecraft
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import vazkii.patchouli.common.base.PatchouliSounds
 import java.util.*
@@ -48,16 +53,17 @@ class HasHeldPatternTrigger
         fun requirementsMet(itemStack: ItemStack, serverPlayer: ServerPlayer): Boolean {
             val scrollItemMaybe = itemStack.item
             // This will cause essentially no impact in all instances *except* when a player is holding a SCROLL_LARGE
-            if (scrollItemMaybe != SCROLL_LARGE) return false
+            if (scrollItemMaybe != HexItems.SCROLL_LARGE.get()) return false
             if (scrollItemMaybe !is IotaHolderItem) return false
             val iota: Iota? = scrollItemMaybe.readIota(itemStack)
             if (iota !is PatternIota) return false
             // oh my gog this rots
             val resourceKey: ResourceKey<ActionRegistryEntry> =
                 HexActions.REGISTRY.getHolder(pattern).get().key()
+            val serverLevel: ServerLevel = serverPlayer.serverLevel()
             val pat = PatternRegistryManifest.getCanonicalStrokesPerWorld(
                 resourceKey,
-                serverPlayer.serverLevel()
+                serverLevel
             )
             val matched = iota.pattern == pat
             if (matched) {

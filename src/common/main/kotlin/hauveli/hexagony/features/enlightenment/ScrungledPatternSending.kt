@@ -2,15 +2,14 @@ package hauveli.hexagony.features.enlightenment
 
 import at.petrak.hexcasting.api.casting.math.HexDir
 import at.petrak.hexcasting.api.casting.math.HexPattern
-import at.petrak.hexcasting.client.render.PatternRenderer
 import at.petrak.hexcasting.common.lib.hex.HexActions
 import at.petrak.hexcasting.interop.patchouli.LookupPatternComponent
 import at.petrak.hexcasting.server.ScrungledPatternsSave
-import hauveli.hexagony.Hexagony
 import hauveli.hexagony.networking.HexagonyNetworking.CHANNEL
 import hauveli.hexagony.networking.msg.PerWorldPatternPacketC2S
 import hauveli.hexagony.networking.msg.PerWorldPatternPacketS2C
 import hauveli.hexagony.registry.HexagonyAdvancements.hasHeldScroll
+import net.minecraft.client.Minecraft
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 
@@ -20,7 +19,7 @@ object ScrungledPatternSending {
     var storedPatterns: MutableMap<LookupPatternComponent, String> = mutableMapOf<LookupPatternComponent, String>()
 
     @JvmField
-    var previousKeyRequest: String = ""
+    var previousKeyRequest: String = "glorp"
 
     @JvmField
     var currentKey: String = ""
@@ -57,5 +56,15 @@ object ScrungledPatternSending {
         currentHexPattern = HexPattern.fromAngles(currentAngles, currentStartDir)
 
         //storedPatterns[currentKey]?.render()
+    }
+
+    @JvmStatic
+    fun singlePlayerHelper(resourceKey: String) {
+        val scrungle = ScrungledPatternsSave
+            .open(Minecraft.getInstance().singleplayerServer!!.overworld())
+            .lookupReverse(HexActions.REGISTRY.getHolder(ResourceLocation.parse(resourceKey)).get().key())
+        if (scrungle == null) return
+        previousKeyRequest = resourceKey
+        clientRenderThisNow(resourceKey, scrungle.first, scrungle.second.canonicalStartDir().toString())
     }
 }

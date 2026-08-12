@@ -1,14 +1,21 @@
 package hauveli.hexagony.mixin.enlightenment;
 
+import at.petrak.hexcasting.api.casting.ActionRegistryEntry;
 import at.petrak.hexcasting.api.casting.math.HexPattern;
+import at.petrak.hexcasting.common.lib.hex.HexActions;
 import at.petrak.hexcasting.interop.patchouli.AbstractPatternComponent;
 import at.petrak.hexcasting.interop.patchouli.LookupPatternComponent;
+import at.petrak.hexcasting.server.ScrungledPatternsSave;
+import com.mojang.datafixers.util.Pair;
 import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.config.HexagonyCommonConfig;
 import hauveli.hexagony.config.HexagonyConfigs;
 import hauveli.hexagony.features.enlightenment.ScrungledPatternSending;
 import hauveli.hexagony.registry.HexagonyAdvancements;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -43,8 +50,14 @@ public abstract class RequireScrollPatchouliAbstractPatternComponentMixin {
             if (!HexagonyAdvancements.hasHeldScroll(key)) return;
             if (!key.equals(ScrungledPatternSending.currentKey)) {
                 if (key.equals(ScrungledPatternSending.previousKeyRequest)) return;
+                /*
+                if (Minecraft.getInstance().isSingleplayer()) {
+                    ScrungledPatternSending.singlePlayerHelper(key);
+                    this.patterns = List.of(ScrungledPatternSending.currentHexPattern);
+                    return;
+                }
+                 */
                 // request the thing to be rendered, try asking the server once
-                Hexagony.LOGGER.info("begging for: {}", key);
                 ScrungledPatternSending.fromClient(key);
             } else {
                 this.patterns = List.of(ScrungledPatternSending.currentHexPattern);
