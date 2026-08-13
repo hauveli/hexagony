@@ -28,8 +28,6 @@ object HexagonyCriterions : HexagonyRegistrar<CriterionTrigger<*>>(
 
     val HAS_HELD_PATTERN = make("has_held_pattern", {HasHeldPatternTrigger()})
     fun onInventoryChange(player: ServerPlayer, itemStack: ItemStack) {
-        val fuckedUpString = "What the fukc?" + itemStack.item.toString() + "; player: " + player.toString() + " umm...?"
-        player.sendSystemMessage(Component.nullToEmpty(fuckedUpString))
         HAS_HELD_PATTERN.value.trigger(player, itemStack)
     }
 
