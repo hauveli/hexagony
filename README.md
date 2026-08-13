@@ -4,7 +4,8 @@
 
 Hexagony addon for Hex Casting
 
-For gating great spells and having them show up in the hexbook with their patterns when unlocked, please add an advancement:
+For gating great spells and having them show up in the hexbook with their patterns when unlocked, please add an advancement in the correct path in a datapack:
+`hexagony\advancement\gated\yournamespace\yourgreatspell.json`
 ```
 {
   "criteria": {
@@ -25,5 +26,6 @@ For gating great spells and having them show up in the hexbook with their patter
 ```
 (I'll get around to adding a better way to do this later...)
 
+(Once I do, it'll likely just be a tag, and I'll generate the advancements at runtime or something...)
 
 All .ogg files under the [selulance](src/common/main/resources/assets/hexagony/sounds/music_disc/selulance/) directory are compressed versions of music made by and belonging to Selulance, who may be found on bandcamp here: https://selulance.bandcamp.com/music or soundcloud here: https://soundcloud.com/selulance, under the [Creative Commons - Attribution 3.0](src/common/main/resources/assets/hexagony/sounds/music_disc/selulance/LICENSE) license.
