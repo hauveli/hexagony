@@ -3,17 +3,25 @@ package hauveli.hexagony
 import hauveli.hexagony.client.NeoForgeHexagonyClient
 import hauveli.hexagony.datagen.NeoForgeHexagonyDatagen
 import hauveli.hexagony.features.graph_crafting.GraphCraftingRecipeStuff
+import hauveli.hexagony.features.hat.LivingHatItem
 import hauveli.hexagony.interop.HexagonyEMIPlugin
 import hauveli.hexagony.registry.HexagonyCreativeTabs
 import hauveli.hexagony.registry.HexagonyItems
+import net.minecraft.client.model.HumanoidModel
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.ItemStack
 import net.neoforged.bus.api.IEventBus
+import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.ModContainer
 import net.neoforged.fml.ModList
 import net.neoforged.fml.common.Mod
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
 import net.neoforged.neoforge.common.NeoForge
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent
 import net.neoforged.neoforge.event.server.ServerStartedEvent
@@ -48,7 +56,6 @@ class NeoForgeHexagony(modBus: IEventBus, container: ModContainer) {
         // Hexagony.LOGGER.info("wtf it runs but doesn't work???? TEST FUCK {}", event.tab.displayName)
         HexagonyItems.registerItemCreativeTab(event, event.tab);
     }
-
 
     companion object {
         internal val container: ModContainer

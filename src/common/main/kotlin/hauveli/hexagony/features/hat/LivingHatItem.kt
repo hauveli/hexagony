@@ -1,32 +1,40 @@
 package hauveli.hexagony.features.hat
 
-import at.petrak.hexcasting.api.item.MediaHolderItem
+import at.petrak.hexcasting.annotations.SoftImplement
+import at.petrak.hexcasting.api.HexAPI
+import at.petrak.hexcasting.api.item.VariantItem
 import at.petrak.hexcasting.api.misc.MediaConstants
+import at.petrak.hexcasting.client.model.HexModelLayers
+import at.petrak.hexcasting.common.items.ItemLens
 import at.petrak.hexcasting.common.items.magic.ItemMediaHolder
+import at.petrak.hexcasting.common.lib.HexAttributes
+import hauveli.hexagony.Hexagony
 import hauveli.hexagony.Hexagony.id
+import hauveli.hexagony.features.hat.client.HexagonyLivingHatModel
+import hauveli.hexagony.features.hat.client.HexagonyModelLayers
+import hauveli.hexagony.registry.HexagonyArmorMaterials
+import net.minecraft.client.Minecraft
 import net.minecraft.core.Holder
-import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.EquipmentSlotGroup
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.item.ArmorItem
-import net.minecraft.world.item.ArmorMaterials
-import net.minecraft.world.item.EnchantedBookItem
-import net.minecraft.world.item.Equipable
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.enchantment.Enchantment
-import net.minecraft.world.item.enchantment.EnchantmentInstance
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.item.*
+import net.minecraft.world.item.component.ItemAttributeModifiers
 import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.world.level.Level
 
 
 class LivingHatItem(properties: Item.Properties?) :
-   ItemMediaHolder(properties), Equipable {
+   ItemMediaHolder(properties), Equipable, VariantItem {
 
     val LIVING_HAT_RESLOC: ResourceKey<Item> =
         ResourceKey.create(
@@ -73,5 +81,72 @@ class LivingHatItem(properties: Item.Properties?) :
 
     override fun getEquipSound(): Holder<SoundEvent?> {
         return SoundEvents.ARMOR_EQUIP_LEATHER
+    }
+
+
+
+    // from: https://github.com/FallingColors/HexMod/blob/make-the-armor-work/Common/src/main/java/at/petrak/hexcasting/common/items/armor/ItemRobes.java
+    /**
+     * To get the armor model in;
+     * On forge: client item extension in ForgeHexClientInitializer (line 161)
+     * On fabric: custom HexRobesRenderer set up from FabricHexClientInitializer (line 60)
+     */
+    private var models: Array<HexagonyLivingHatModel?>? = arrayOf()
+
+    /*
+    val type: Type? = null
+    fun ItemRobes(type: Type, properties: Properties) {
+        super(HexagonyArmorMaterials.LIVING, type, properties)
+        this.type = type
+    }
+     */
+
+    val armorModels: Array<HexagonyLivingHatModel?>?
+        get() {
+            if (models == null)
+                models = provideArmorModelsForSlot(equipmentSlot)
+            return models
+        }
+
+    /*
+    @SoftImplement("IItemExtension")
+    override fun getArmorTexture(
+        stack: ItemStack,
+        entity: Entity,
+        slot: EquipmentSlot,
+        layer: ArmorMaterial.Layer,
+        innerModel: Boolean
+    ): ResourceLocation {
+        return id("textures/armor/robes" + getVariant(stack) + ".png")
+    }
+     */
+
+    override fun getName(pStack: ItemStack): Component {
+        val descID = this.getDescriptionId(pStack)
+        val robesItem: LivingHatItem = pStack.item as LivingHatItem
+        return Component.translatable(descID + "." + getVariant(pStack))
+    }
+
+    override fun numVariants(): Int {
+        return 3
+    }
+
+    companion object {
+        var HOOD_MODIFIERS: ItemAttributeModifiers = ItemAttributeModifiers.builder()
+            .add(HexAttributes.SCRY_SIGHT, ItemLens.SCRY_SIGHT, EquipmentSlotGroup.HEAD)
+            .add(HexAttributes.GRID_ZOOM, ItemLens.GRID_ZOOM, EquipmentSlotGroup.HEAD)
+            .add(
+                Attributes.ARMOR, AttributeModifier(
+                    HexAPI.modLoc("robes_hood_armor"), 3.0, AttributeModifier.Operation.ADD_VALUE
+                ), EquipmentSlotGroup.HEAD
+            )
+            .build()
+
+        fun provideArmorModelsForSlot(slot: EquipmentSlot): Array<HexagonyLivingHatModel?> {
+            val models = Minecraft.getInstance().entityModels
+            return arrayOf(
+                HexagonyLivingHatModel(models.bakeLayer(HexagonyModelLayers.LIVING_HAT_0), slot),
+            )
+        }
     }
 }

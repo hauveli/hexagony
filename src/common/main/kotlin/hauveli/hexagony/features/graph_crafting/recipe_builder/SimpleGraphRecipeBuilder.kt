@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import javax.annotation.Nullable
 
+// from https://docs.neoforged.net/docs/1.21.1/resources/server/recipes/
 // This class is abstract because there is a lot of per-recipe-serializer logic.
 // It serves the purpose of showing the common part of all (vanilla) recipe builders.
 abstract class SimpleGraphRecipeBuilder // It is common for constructors to accept the result item stack.

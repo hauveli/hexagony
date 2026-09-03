@@ -61,6 +61,7 @@ import net.minecraft.world.level.block.state.BlockState
 
  */
 
+// from: https://docs.neoforged.net/docs/1.21.1/resources/server/recipes/
 /*
 // Since we have exactly one of each input, we pass them to the constructor.
 // Builders for recipe serializers that have ingredient lists of some sort would usually
