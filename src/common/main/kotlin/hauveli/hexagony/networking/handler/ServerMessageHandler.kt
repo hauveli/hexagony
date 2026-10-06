@@ -13,6 +13,9 @@ fun HexagonyMessageC2S.applyOnServer(access: ServerAccess) = access.player().ser
         is PerWorldPatternPacketC2S -> {
             ScrungledPatternSending.doesThisPlayerHavePermission(resourceKey, access.player())
         }
+        is SawWallScrollPatternPacketC2S -> {
+            ScrungledPatternSending.didThisPlayerSeeSomeRealWallScroll(access.player(), resourceKey, uuid)
+        }
         is FreeCamDataPacketC2S -> {
             FreeCameraServerData.setData(access.player(), absolutePositionOfEyes, lookDirButViaHexAPI)
         }

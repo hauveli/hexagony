@@ -95,12 +95,16 @@ object HexagonyAdvancements {
     }
 
     @JvmStatic
-    fun hasHeldScroll(resourceKey: String): Boolean {
+    fun hasPatternKnowledge(resourceKey: String): Boolean {
         return hasAdvancement(spellLocToAdvancementLoc(resourceKey))
     }
 
     @JvmStatic
-    fun hasHeldScroll(serverPlayer: ServerPlayer, resourceKey: String): Boolean {
+    fun hasPatternKnowledge(serverPlayer: ServerPlayer, resourceKey: String): Boolean {
         return hasAdvancement(serverPlayer, spellLocToAdvancementLoc(resourceKey))
+    }
+
+    fun grantPatternKnowledge(serverPlayer: ServerPlayer, resourceKey: String) {
+        tryGrantingAdvancement(serverPlayer, spellLocToAdvancementLoc(resourceKey))
     }
 }

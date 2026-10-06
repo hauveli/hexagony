@@ -6,24 +6,18 @@ import at.petrak.hexcasting.api.casting.mishaps.MishapInvalidPattern;
 import at.petrak.hexcasting.api.casting.mishaps.MishapUnenlightened;
 import at.petrak.hexcasting.api.casting.iota.Iota;
 import at.petrak.hexcasting.api.utils.TreeList;
-import hauveli.hexagony.Hexagony;
 import hauveli.hexagony.config.HexagonyCommonConfig;
 import hauveli.hexagony.config.HexagonyConfigs;
 
 import hauveli.hexagony.registry.HexagonyAdvancements;
-import net.minecraft.network.chat.*;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.List;
 
 @Mixin(value = MishapUnenlightened.class)
 public class RequireScrollMishapUnenlightenedMixin {
@@ -64,7 +58,7 @@ public class RequireScrollMishapUnenlightenedMixin {
     private static boolean hexagony$hasHeldScroll(ServerPlayer player, Mishap.Context errorCtx) {
         if (errorCtx.getName() == null) return true; // I don't fucking know what's going on, defer to Hex Casting, not my problem
         if (errorCtx.getName().getContents() instanceof TranslatableContents translatableIota) {
-            return HexagonyAdvancements.hasHeldScroll(player,
+            return HexagonyAdvancements.hasPatternKnowledge(player,
                     translatableIota.getKey().replace("hexcasting.action.", ""));
         }
         return false;

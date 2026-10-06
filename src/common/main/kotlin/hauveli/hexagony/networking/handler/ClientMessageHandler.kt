@@ -11,7 +11,6 @@ fun HexagonyMessageS2C.applyOnClient(access: ClientAccess) = Minecraft.getInstan
         is PerWorldPatternPacketS2C -> {
             ScrungledPatternSending.clientRenderThisNow(resourceKey, angles, startDir)
         }
-        is FreeCamDataPacketS2C -> {}
-        is MsgExampleS2C -> {}
+        else -> {}
     }
 }

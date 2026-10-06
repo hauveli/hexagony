@@ -6,6 +6,7 @@
   "client": [
     "control.IsCrouchingLocalPLayerAccessorMixin",
     "enlightenment.ClientAdvancementsProgressAccessor",
+    "enlightenment.PiggyBackRenderWallScrollMixin",
     "enlightenment.RequireScrollPatchouliLookupPatternComponentMixin",
     "enlightenment.RequireScrollPatchouliAbstractPatternComponentMixin",
     "fake_player.HideHomunculusFromPlayerTabOverlayMixin",

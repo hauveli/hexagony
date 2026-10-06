@@ -27,6 +27,7 @@ object FabricHexagony : ModInitializer {
     }
 
 
+    // todo: figure out how to not have to do this............
     fun onServerStart() {
         ServerLifecycleEvents.SERVER_STARTED.register(
             ServerLifecycleEvents.ServerStarted {

@@ -26,12 +26,13 @@ object HexagonyActions : HexagonyRegistrar<ActionRegistryEntry>(
     val FREECAM_POS = make("freecam/pos", HexDir.WEST, "wwawwqwwawwawaa", OpFreecamPos)
     val FREECAM_LOOK = make("freecam/look", HexDir.WEST, "wwawwqwwawwawa", OpFreecamLookdir)
 
-    // val TEST_SPELL = make("congratulate", HexDir.WEST, "eed", OpTest)
+    // no showing up in hexdoc bad comment
+    // val TEST_SPELL = make("congratulate", / HexDir.WEST, "eed", OpTest)
 
     private fun make(name: String, startDir: HexDir, signature: String, action: Action) =
         make(name, startDir, signature) { action }
 
     private fun make(name: String, startDir: HexDir, signature: String, getAction: () -> Action) = register(name) {
-        ActionRegistryEntry(HexPattern.fromAngles(signature, startDir), getAction())
+        ActionRegistryEntry(HexPattern.fromAngleString(signature, startDir), getAction())
     }
 }

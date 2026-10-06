@@ -32,6 +32,7 @@ import net.minecraft.world.scores.Scoreboard
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.cos
+import kotlin.math.ln
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -214,6 +215,13 @@ class FreeCameraEntity : AbstractClientPlayer (
 
             //val ambitSentAttr = player.getAttribute(HexAttributes.SENTINEL_RADIUS) ?: return
             val ambit = ambitAttr.value * ambitAttr.value
+            // I dont' know when or why this might be the case, but todo: seriously I gotta rewrite this to be smarter about picking which am bit to go to...
+            // I should sort by ambit radius, then add some type of pull based on that radius, then determine the closest, most pullingest ambit and move the camera that way...
+            if (ambit <= 0.1) {
+                freeCamera.deltaMovement = Vec3.ZERO
+                freeCamera.setPos(player.position())
+                return
+            }
             //val sentAmbit = ambitSentAttr.value * ambitSentAttr.value
             if (targetLengthSqr < ambit) return // within that ambit
             boioioingedStartingTickCount = player.tickCount
@@ -225,7 +233,12 @@ class FreeCameraEntity : AbstractClientPlayer (
                 min(abs(targetLengthSqr / ambit - 0.5f).toFloat(), 1f), 1.0f - 0.2f + player.random.nextFloat() * 0.4f
             )
             //if (diffSqr < sentAmbit) return
-            val mult = (1 - ambit / ( targetLengthSqr + dt ))
+            // hmmm, the smaller the ambit the lower power the bounce should be, approaching 0 slightly faster than linearly?
+            // otherwise it is unstoppable...
+            // uhhh 1 / ln(1+4/5) = 0.58
+            // and 1 / ln(1+16/17) = 0.66 ....
+            val bounceDampener = 1 / ln(1.0 + (ambit / (ambit + 1)))
+            val mult = (1 - ambit / ( targetLengthSqr + dt )) * bounceDampener
             // todo: this (0.002) determines how hard the player bounces off of ambit (be really gentle...)
             freeCamera.deltaMovement = target.scale(mult + min(freeCamera.deltaMovement.lengthSqr(), 0.002))  // bounce back as hard as I ran into it
 
