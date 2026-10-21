@@ -27,9 +27,7 @@
     },
     "show_toast": true,
     "title": {
-      "translate": "advancement.hexagony.crafted.title",
-      "color": "light_purple",
-      "bold": true
+      "translate": "advancement.hexagony.crafted.title"
     }
   }
 }

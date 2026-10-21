@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-// note to self possibly: I think (from testing) this is called only once per inventory update? which is quite good! even if it runs n checks where n is the number of gated spells...
+// note to self possibly: called once per inventory change per criteria, which isq uite good
 @Mixin(value = InventoryChangeTrigger.class)
 public class PiggyBackInventoryChangeTriggerMixin {
 

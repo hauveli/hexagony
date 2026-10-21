@@ -19,7 +19,7 @@ object HexagonyCreativeTabs : HexagonyRegistrar<CreativeModeTab>(
     // Fishex would have been a good addon name, too
     val HEXAGONY_MAIN_TAB = register(MODID,
         CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
-            .icon({ HexagonyItems.MIND_ANCHOR_FULL.value.defaultInstance })
+            .icon({ HexagonyItems.LIVING_HAT.value.defaultInstance })
     )
     // hee heee heeee
     val CreativeModeTab.key: ResourceKey<CreativeModeTab>?

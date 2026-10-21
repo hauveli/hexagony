@@ -49,6 +49,12 @@ object HexagonyItems : HexagonyRegistrar<Item>(
         return registered
     }
 
+    private fun <T : Item> makeNoCreativeTab(name: String, builder: () -> T): HexagonyRegistrar<Item>.Entry<T> {
+        val registered = register(Hexagony.id(name), builder)
+        // ITEMS.add(registered)
+        return registered
+    }
+
     private fun props(): Item.Properties {return Item.Properties()}
     private fun stacksTo(props: Item.Properties = props(), stackSizeLimit: Int = 64): Item.Properties {
         return props.stacksTo(stackSizeLimit)}
@@ -110,7 +116,7 @@ object HexagonyItems : HexagonyRegistrar<Item>(
 
     // BlockItems
     @JvmField
-    val MIND_ANCHOR_EMPTY = make("mind_anchor/empty") {
+    val MIND_ANCHOR_EMPTY = makeNoCreativeTab("mind_anchor/empty") {
         BlockItem(
             HexagonyBlocks.MIND_ANCHOR_EMPTY.value,   // safe: lazy evaluated during init
             fireResistantRare()
@@ -119,14 +125,14 @@ object HexagonyItems : HexagonyRegistrar<Item>(
 
     // BlockItems
     @JvmField
-    val MIND_ANCHOR_FULL = make("mind_anchor/full") {
+    val MIND_ANCHOR_FULL = makeNoCreativeTab("mind_anchor/full") {
         ItemMindAnchor(
             HexagonyBlocks.MIND_ANCHOR_FULL.value,   // safe: lazy evaluated during init
             unstackableFireResistantEpic()
         )
     }
 
-    val LIVING_HAT = make("living_hat") {
+    val LIVING_HAT = makeNoCreativeTab("living_hat") {
         LivingHatItem(unstackableFireResistantEpic())
     }
 
