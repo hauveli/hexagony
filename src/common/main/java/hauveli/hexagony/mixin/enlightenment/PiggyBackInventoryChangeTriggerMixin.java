@@ -16,8 +16,7 @@ public class PiggyBackInventoryChangeTriggerMixin {
 
     @Inject(
             method = "trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/item/ItemStack;)V",
-            at = @At("HEAD"),
-            cancellable = true
+            at = @At("HEAD")
     )
     private void execute(ServerPlayer serverPlayer, Inventory par2, ItemStack itemStack, CallbackInfo ci) {
         HexagonyCriterions.INSTANCE.onInventoryChange(serverPlayer, itemStack);

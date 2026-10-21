@@ -16,6 +16,9 @@ emi:
       craft: Graph Crafting
 advancement:
   hexagony:
+    root:
+      title: Hexagony
+      desc: Obtain one new great spell
     graft_attempted:
       title: Trepidation
       desc: Attempt to flay your own mind...
@@ -96,7 +99,7 @@ death:
     hidden.player: ''
 effect:
   hexagony:
-    freecam: Dissociation
+    freecam: Dissociation (To be changed)
 hexagony:
   creative_tab:
     title: Hexagony
@@ -117,8 +120,8 @@ hexagony:
   book:
     great_spells:
       freecam:
-        title: Dissociate
-        .: Disconnects my mind from my body. Costs about one $(l:items/amethyst)$(item)Amethyst Shard/$ to cast, plus $(l:items/amethyst)$(item)Amethyst Dust/$ equal to the square of the duration in twentieths of a second.
+        title: Dissociate (To be changed)
+        .: Disconnects my mind from my body. Costs about one $(l:items/amethyst)$(item)Amethyst Shard/$ to cast, plus one $(l:items/amethyst)$(item)Amethyst Dust/$ per second.
         page:
           '1': A spell to remove my conscious self from my body, leaving it vulnerable. I should secure my body in a safe place, motionless, lest my body slips and falls while it is out of my control.
         pos: Transforms the player on the stack into the position that player's mind is at.
@@ -192,7 +195,7 @@ hexcasting:
       needs_patterns: needs an image of a pattern but got none.
       not_freecam: needs a player with an fleeting mind.
   action:
-    hexagony:freecam: Dissociate
+    hexagony:freecam: Dissociate (To be changed)
     hexagony:freecam/pos: Compass' Dis. Purif.
     hexagony:freecam/look: Alidade's Dis. Purif.
     hexagony:dump: Dump Spiral

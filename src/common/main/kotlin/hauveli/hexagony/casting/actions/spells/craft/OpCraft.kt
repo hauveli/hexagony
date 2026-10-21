@@ -10,6 +10,7 @@ import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
+import hauveli.hexagony.casting.actions.spells.craft.OpCraft.argc
 import hauveli.hexagony.features.graph_crafting.GraphCraftingInTheWorld.attemptToCraftTheGraph
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
@@ -25,10 +26,17 @@ import net.minecraft.world.phys.Vec3
 object OpCraft : SpellAction  {
     override val argc = 2
 
-    override fun executeWithUserdata(
+    override fun hasCastingSound(ctx: CastingEnvironment): Boolean {
+        return true
+    }
+
+    override fun awardsCastingStat(ctx: CastingEnvironment): Boolean {
+        return true
+    }
+
+    override fun execute(
         args: List<Iota>,
-        env: CastingEnvironment,
-        userData: CompoundTag
+        env: CastingEnvironment
     ): SpellAction.Result {
         val entityList = args.getList(0, argc)
         val orientation = args.getVec3(1, argc)
@@ -60,21 +68,6 @@ object OpCraft : SpellAction  {
             listOf(burst(target.position().add(0.0, target.eyeHeight / 2.0, 0.0), 1.0, 10)),
             1
         )
-    }
-
-    override fun hasCastingSound(ctx: CastingEnvironment): Boolean {
-        return true
-    }
-
-    override fun awardsCastingStat(ctx: CastingEnvironment): Boolean {
-        return true
-    }
-
-    override fun execute(
-        args: List<Iota>,
-        env: CastingEnvironment
-    ): SpellAction.Result {
-        throw IllegalStateException()
     }
 
     private class Spell(private val entityList: List<Iota>, private val orientation: Vec3) : RenderedSpell {

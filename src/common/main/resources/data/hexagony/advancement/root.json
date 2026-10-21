@@ -1,0 +1,46 @@
+{
+  "criteria": {
+    "knows_craft": {
+      "conditions": {
+        "pattern": "hexagony:craft"
+      },
+      "trigger": "hexagony:has_held_pattern"
+    },
+    "knows_dump": {
+      "conditions": {
+        "pattern": "hexagony:dump"
+      },
+      "trigger": "hexagony:has_held_pattern"
+    },
+    "knows_freecam": {
+      "conditions": {
+        "pattern": "hexagony:freecam"
+      },
+      "trigger": "hexagony:has_held_pattern"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "background": "minecraft:textures/block/sculk_vein.png",
+    "description": {
+      "translate": "advancement.hexagony.root.desc"
+    },
+    "frame": "task",
+    "hidden": true,
+    "icon": {
+      "id": "hexagony:living_hat"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancement.hexagony.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "knows_craft",
+      "knows_dump",
+      "knows_freecam"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

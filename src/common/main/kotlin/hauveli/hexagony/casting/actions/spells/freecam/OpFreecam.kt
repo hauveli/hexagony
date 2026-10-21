@@ -19,30 +19,21 @@ import net.minecraft.world.effect.MobEffectInstance
 
 object OpFreecam : SpellAction  {
     override val argc = 1
-
-    override fun executeWithUserdata(
+    override fun execute(
         args: List<Iota>,
-        env: CastingEnvironment,
-        userData: CompoundTag
+        env: CastingEnvironment
     ): SpellAction.Result {
         val duration = args.getPositiveDouble(0, argc)
         if (env !is StaffCastEnv)
             throw MishapBadCaster() // it would be possible to trap a player indefinitely if this does not mishap.... I think?
         val caster = env.castingEntity as ServerPlayer
-        val cost = MediaConstants.SHARD_UNIT + MediaConstants.DUST_UNIT * duration * duration
+        val cost = MediaConstants.SHARD_UNIT + (MediaConstants.DUST_UNIT / 20) * duration
         return SpellAction.Result(
             Spell(duration),
             cost.toLong(),
             listOf(burst(caster.position().add(0.0, caster.eyeHeight / 2.0, 0.0), 1.0, 10)),
             1
         )
-    }
-
-    override fun execute(
-        args: List<Iota>,
-        env: CastingEnvironment
-    ): SpellAction.Result {
-        throw IllegalStateException()
     }
 
     private class Spell(private val duration: Double) : RenderedSpell {
