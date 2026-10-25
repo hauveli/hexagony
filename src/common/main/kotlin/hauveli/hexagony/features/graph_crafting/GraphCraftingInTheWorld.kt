@@ -4,6 +4,7 @@ import at.petrak.hexcasting.api.casting.eval.CastingEnvironment
 import at.petrak.hexcasting.api.pigment.FrozenPigment
 import at.petrak.hexcasting.client.ClientTickCounter
 import at.petrak.hexcasting.common.particles.ConjureParticleOptions
+import hauveli.hexagony.Hexagony
 import hauveli.hexagony.registry.HexagonyAdvancements
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -395,14 +396,8 @@ object GraphCraftingInTheWorld {
         val match = GraphCraftingRecipeStuff.matchRecipe(itemEntities, orientation)
         val recipe = match.first
         val worldGraph = match.second
-        val casterMaybePlayer = env.castingEntity
         sprayAndPray(worldGraph, env.pigment)
         if (recipe != null) {
-            if (casterMaybePlayer is ServerPlayer)
-                HexagonyAdvancements.tryGrantingAdvancement(
-                casterMaybePlayer,
-                HexagonyAdvancements.GRAPHTING)
-
             craftTheGraphForReal(worldGraph, recipe)
             if (playSoundOnSuccess)
                 playChimeOnCenterItem(worldGraph.entity)

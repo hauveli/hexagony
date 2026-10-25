@@ -1,4 +1,4 @@
-package hauveli.hexagony.interop
+package hauveli.hexagony.interop.emi
 
 import at.petrak.hexcasting.api.casting.ActionRegistryEntry
 import at.petrak.hexcasting.api.casting.math.HexPattern
@@ -29,7 +29,7 @@ class PatternRendererEMI(pattern: ResourceLocation?, w: Int, h: Int) : EmiRender
     private var patSets: PatternSettings
 
     init {
-        val regi = IXplatAbstractions.INSTANCE.getActionRegistry()
+        val regi = IXplatAbstractions.INSTANCE.actionRegistry
         val entry = regi.get(pattern)
         this.strokeOrder = isOfTag<ActionRegistryEntry?>(regi, pattern!!, HexTags.Actions.PER_WORLD_PATTERN)
         this.pat = entry!!.prototype()

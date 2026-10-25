@@ -7,7 +7,7 @@ import dev.emi.emi.api.stack.EmiIngredient
 import dev.emi.emi.api.stack.EmiStack
 import dev.emi.emi.api.widget.WidgetHolder
 import hauveli.hexagony.features.graph_crafting.GraphCraftingRecipeStuff
-import hauveli.hexagony.interop.HexagonyEMIPlugin
+import hauveli.hexagony.interop.emi.HexagonyEMIPlugin
 import net.minecraft.resources.ResourceLocation
 
 class GraphCraftingEmiPlugin(

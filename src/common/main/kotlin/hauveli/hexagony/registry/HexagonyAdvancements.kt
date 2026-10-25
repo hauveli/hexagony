@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerPlayer
 object HexagonyAdvancements {
     val TREPIDATION = Hexagony.id("graft_attempted")
     val TREPANNED = Hexagony.id("graft_succeeded")
-    val GRAPHTING = Hexagony.id("craft")
+    val GRAPHTING = Hexagony.id("crafted")
 
     @JvmStatic
     fun tryGrantingAdvancement(serverPlayer: ServerPlayer, advancementResLoc: ResourceLocation) {

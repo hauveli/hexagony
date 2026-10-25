@@ -161,7 +161,7 @@ cloche {
                 adapter = "kotlin"
             }
             entrypoint("emi") {
-                value = "hauveli.hexagony.interop.HexagonyEMIPlugin"
+                value = "hauveli.hexagony.interop.emi.HexagonyEMIPlugin"
                 adapter = "kotlin"
             }
             dependencies {

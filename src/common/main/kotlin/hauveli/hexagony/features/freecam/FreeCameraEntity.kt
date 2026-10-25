@@ -39,6 +39,11 @@ import kotlin.math.pow
 import kotlin.math.sin
 
 
+// todo: rely on NeoForge and Fabric Fakeplayers instead?
+/*
+https://nekoyue.github.io/ForgeJavaDocs-NG/javadoc/1.21.x-neoforge/net/neoforged/neoforge/common/util/FakePlayer.html
+https://maven.fabricmc.net/docs/fabric-api-0.80.0+1.20/net/fabricmc/fabric/api/entity/FakePlayer.html
+ */
 // I had an implementation working but it was awful so I will be using MinecraftFreecam/Freecam as a reference.
 // Thank you very kindly to all the people who have worked on MinecraftFreecam, your project has been a tremendous help, would not
 // have given AbstractClientPlayer a try if I didn't see it used here. LocalPLayer was so much worse to try to use.

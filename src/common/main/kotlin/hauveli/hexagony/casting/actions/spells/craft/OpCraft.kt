@@ -10,8 +10,10 @@ import at.petrak.hexcasting.api.casting.getVec3
 import at.petrak.hexcasting.api.casting.iota.EntityIota
 import at.petrak.hexcasting.api.casting.iota.Iota
 import at.petrak.hexcasting.api.misc.MediaConstants
+import hauveli.hexagony.Hexagony
 import hauveli.hexagony.casting.actions.spells.craft.OpCraft.argc
 import hauveli.hexagony.features.graph_crafting.GraphCraftingInTheWorld.attemptToCraftTheGraph
+import hauveli.hexagony.registry.HexagonyAdvancements
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -78,6 +80,14 @@ object OpCraft : SpellAction  {
             }
             val playSoundOnSuccess = true
             val craftSuccess = attemptToCraftTheGraph(itemEntities, orientation, env, playSoundOnSuccess)
+            if (craftSuccess
+                && env.castingEntity is ServerPlayer) {
+                    Hexagony.LOGGER.info("granted the advancement???")
+                    HexagonyAdvancements.tryGrantingAdvancement(
+                        env.castingEntity as ServerPlayer,
+                        HexagonyAdvancements.GRAPHTING
+                    )
+            }
         }
 
         override fun cast(env: CastingEnvironment, image: CastingImage): CastingImage? {

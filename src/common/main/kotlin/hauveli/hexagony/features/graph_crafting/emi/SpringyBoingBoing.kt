@@ -2,7 +2,7 @@ package hauveli.hexagony.features.graph_crafting.emi
 
 import dev.emi.emi.api.widget.WidgetHolder
 import hauveli.hexagony.features.graph_crafting.GraphCraftingRecipeStuff
-import hauveli.hexagony.interop.ModifiedSlotWidget
+import hauveli.hexagony.interop.emi.ModifiedSlotWidget
 import net.minecraft.world.phys.Vec3
 import kotlin.math.acos
 import kotlin.math.cos

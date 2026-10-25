@@ -1,4 +1,4 @@
-package hauveli.hexagony.interop
+package hauveli.hexagony.interop.emi
 
 import at.petrak.hexcasting.api.HexAPI
 import at.petrak.hexcasting.api.mod.HexTags
@@ -15,7 +15,6 @@ import hauveli.hexagony.features.graph_crafting.emi.GraphCraftingEmiStack
 import hauveli.hexagony.registry.HexagonyActions
 import hauveli.hexagony.registry.HexagonyRecipeTypes
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.item.Item
 
 @EmiEntrypoint
 class HexagonyEMIPlugin : EmiPlugin {

@@ -1,4 +1,4 @@
-package hauveli.hexagony.interop
+package hauveli.hexagony.interop.emi
 
 import at.petrak.hexcasting.client.ClientTickCounter
 import com.mojang.blaze3d.systems.RenderSystem
@@ -9,6 +9,8 @@ import hauveli.hexagony.features.graph_crafting.emi.GraphCraftingEmiStack
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.world.phys.Vec3
+import kotlin.math.cos
+import kotlin.math.sin
 
 // This also copy pasted from hexmod, because I don't want to depend on the Fabric stuff on common
 // https://github.com/FallingColors/HexMod/blob/1.21/Fabric/src/main/java/at/petrak/hexcasting/fabric/interop/emi/TheCoolerSlotWidget.java
@@ -32,8 +34,8 @@ class ModifiedSlotWidget(stack: EmiIngredient?,
 
         val axis = Vec3(1.0, 1.0, 1.0).normalize()
 
-        val cos = kotlin.math.cos(angle)
-        val sin = kotlin.math.sin(angle)
+        val cos = cos(angle)
+        val sin = sin(angle)
 
         val dot = vec.dot(axis)
 

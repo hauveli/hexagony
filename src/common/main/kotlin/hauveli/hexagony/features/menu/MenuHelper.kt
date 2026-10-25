@@ -22,6 +22,12 @@ package hauveli.hexagony.features.menu
         the server only needs to ask once the player joins, "what are the settings you have access to?"
         and then it can simulate what would happen, based on that information.
 
+        I don't even need to know what the settings are, only what options are on screen
+        ex a boolean button toggle can just be a boolean
+        a slider would just be a clamped number
+        a string would just be a string
+        I don't need to care about what goes where only that it is executed on the client...
+
  */
 object MenuHelper {
 
