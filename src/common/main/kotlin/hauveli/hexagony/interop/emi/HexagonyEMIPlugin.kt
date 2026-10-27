@@ -16,8 +16,7 @@ import hauveli.hexagony.registry.HexagonyActions
 import hauveli.hexagony.registry.HexagonyRecipeTypes
 import net.minecraft.resources.ResourceLocation
 
-@EmiEntrypoint
-class HexagonyEMIPlugin : EmiPlugin {
+open class HexagonyEMIPlugin : EmiPlugin {
     override fun register(registry: EmiRegistry) {
         registry.addCategory(CRAFT)
         registry.addWorkstation(CRAFT, EmiIngredient.of(HexTags.Items.STAVES))
