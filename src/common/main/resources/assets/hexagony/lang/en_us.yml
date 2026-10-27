@@ -99,7 +99,7 @@ death:
     hidden.player: ''
 effect:
   hexagony:
-    freecam: Dissociation (To be changed)
+    freecam: Detachment
 hexagony:
   creative_tab:
     title: Hexagony
@@ -120,7 +120,7 @@ hexagony:
   book:
     great_spells:
       freecam:
-        title: Dissociate (To be changed)
+        title: Detach
         .: Disconnects my mind from my body. Costs about one $(l:items/amethyst)$(item)Amethyst Shard/$ to cast, plus one $(l:items/amethyst)$(item)Amethyst Dust/$ per second.
         page:
           '1': A spell to remove my conscious self from my body, leaving it vulnerable. I should secure my body in a safe place, motionless, lest my body slips and falls while it is out of my control.
@@ -195,7 +195,7 @@ hexcasting:
       needs_patterns: needs an image of a pattern but got none.
       not_freecam: needs a player with an fleeting mind.
   action:
-    hexagony:freecam: Dissociate (To be changed)
+    hexagony:freecam: Detach
     hexagony:freecam/pos: Compass' Dis. Purif.
     hexagony:freecam/look: Alidade's Dis. Purif.
     hexagony:dump: Dump Spiral
